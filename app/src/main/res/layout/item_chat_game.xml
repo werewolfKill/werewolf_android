@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="5dp"
+    android:orientation="vertical">
+    <!--显示当前时间-->
+    <TextView
+        android:id="@+id/item_chat_time_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginBottom="5dp"
+        android:layout_marginTop="5dp"
+        android:gravity="center"
+        android:text="2017-03-07 20:10:02"
+        android:textColor="@color/text_gray"
+        android:textSize="12sp"
+        android:visibility="gone" />
+    <!--玩家进入、退出房间-->
+    <TextView
+        android:id="@+id/item_chat_entry_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginBottom="5dp"
+        android:layout_marginTop="5dp"
+        android:alpha="0.5"
+        android:background="@drawable/shape_room_entry"
+        android:gravity="center"
+        android:padding="5dp"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+        android:text="玩家 进入房间"
+        android:textColor="@android:color/white"
+        android:textSize="14sp"
+        android:visibility="gone" />
+
+    <TextView
+        android:id="@+id/item_chat_other_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:drawableLeft="@mipmap/icon_room_system"
+        android:text="法官"
+        android:textColor="@color/text_blue"
+        android:visibility="gone" />
+
+    <TextView
+        android:id="@+id/item_chat_other_msg_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/icon_chat_bubble_system"
+        android:gravity="center_vertical"
+        android:padding="5dp"
+        android:paddingLeft="5dp"
+        android:paddingRight="5dp"
+        android:text="天黑请闭眼，第1夜开始，大家出来活动吧"
+        android:textColor="@android:color/white"
+        android:visibility="gone" />
+
+    <TextView
+        android:id="@+id/item_chat_mine_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="right"
+        android:gravity="right"
+        android:text="我"
+        android:textColor="@color/text_blue"
+        android:visibility="gone" />
+
+    <TextView
+        android:id="@+id/item_chat_mine_msg_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="right"
+        android:background="@drawable/icon_chat_bubble_me"
+        android:gravity="center_vertical"
+        android:padding="5dp"
+        android:paddingLeft="5dp"
+        android:paddingRight="5dp"
+        android:text="天黑请闭眼，第1夜开始，大家出来活动吧"
+        android:textColor="@android:color/white"
+        android:visibility="gone" />
+
+</LinearLayout>

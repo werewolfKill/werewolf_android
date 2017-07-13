@@ -66,7 +66,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
       String channel = "wzc25151";
      //  App.mAudioSettings.mChannelName = channel;
        Intent i = new Intent(activity, GameActivity.class);
-       i.putExtra(ConstantApp.ACTION_KEY_CHANNEL_NAME, channel);
+       i.putExtra("ecHANEL", channel);
        startActivity(i);
         startActivity(new Intent(activity, GameActivity.class));
     }

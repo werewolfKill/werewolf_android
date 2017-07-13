@@ -1,0 +1,225 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@mipmap/room_bc"
+    android:orientation="vertical"
+    tools:context=".ui.MainActivity">
+
+    <!--标题栏-->
+    <android.support.design.widget.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@null">
+
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/colorPrimary"
+            android:minHeight="?attr/actionBarSize"
+            android:theme="@style/Toolbar"
+            app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
+            app:titleTextAppearance="@style/ToolbarTitle">
+
+            <TextView
+                android:id="@+id/game_title_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:drawableLeft="@mipmap/icon_navigation"
+                android:drawableRight="@mipmap/icon_nevigation_lock"
+                android:gravity="center"
+                android:text="简单25151房"
+                android:textColor="@android:color/white" />
+
+        </android.support.v7.widget.Toolbar>
+    </android.support.design.widget.AppBarLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <!--顶部我的身份背景-->
+        <View
+            android:id="@+id/room_myrolebg_v"
+            android:layout_width="match_parent"
+            android:layout_height="30dp"
+            android:background="@color/bg_room_role"
+            android:visibility="invisible" />
+
+        <LinearLayout
+            android:id="@+id/room_bar_left"
+            android:layout_width="65dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/room_bj"
+            android:gravity="center_horizontal"
+            android:minHeight="450dp"
+            android:orientation="vertical"
+            android:padding="2dp" />
+
+        <LinearLayout
+            android:id="@+id/room_bar_right"
+            android:layout_width="65dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/room_bj"
+            android:gravity="center_horizontal"
+            android:minHeight="450dp"
+            android:orientation="vertical"
+            android:padding="2dp" />
+        <!--顶部显示我的身份-->
+        <RelativeLayout
+            android:id="@+id/room_myrole_v"
+            android:layout_width="match_parent"
+            android:layout_height="30dp"
+            android:layout_toLeftOf="@id/room_bar_right"
+            android:layout_toRightOf="@id/room_bar_left"
+            android:gravity="center_vertical"
+            android:visibility="invisible">
+
+            <TextView
+                android:id="@+id/room_myrole_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_marginLeft="5dp"
+                android:text="我的身份："
+                android:textColor="@android:color/white" />
+
+            <TextView
+                android:id="@+id/room_myrole_details_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_marginRight="5dp"
+                android:text="详细>"
+                android:textColor="@android:color/white" />
+        </RelativeLayout>
+
+        <!--聊天输入框，语音输入-->
+        <LinearLayout
+            android:id="@+id/room_key_voice_v"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_alignParentBottom="true"
+            android:background="@color/bg_key_broad"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <ImageButton
+                android:id="@+id/room_key_switch_ib"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="15dp"
+                android:background="@drawable/room_im_keyborad_selected" />
+
+            <LinearLayout
+                android:id="@+id/room_voice_v"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_gravity="center_vertical"
+                android:layout_marginBottom="5dp"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:layout_marginTop="5dp"
+                android:background="@drawable/shape_room_voice_selected"
+                android:clickable="true"
+                android:gravity="center">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@null"
+                    android:drawableLeft="@mipmap/room_im_voice"
+                    android:gravity="center"
+                    android:text=" 按住说话"
+                    android:textColor="@android:color/white"
+                    android:textSize="16sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/room_key_v"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:gravity="center"
+                android:orientation="horizontal"
+                android:visibility="gone">
+
+                <EditText
+                    android:id="@+id/room_et"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginBottom="5dp"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginTop="5dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/shape_room_edit"
+                    android:paddingLeft="5dp"
+                    android:paddingRight="5dp"
+                    android:textSize="14sp" />
+
+                <TextView
+                    android:id="@+id/room_send_tv"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginRight="10dp"
+                    android:background="@drawable/shape_room_send"
+                    android:gravity="center"
+                    android:paddingBottom="5dp"
+                    android:paddingLeft="10dp"
+                    android:paddingRight="10dp"
+                    android:paddingTop="5dp"
+                    android:text="发送"
+                    android:textColor="@android:color/white" />
+
+            </LinearLayout>
+        </LinearLayout>
+        <!--开始准备按钮-->
+        <ImageButton
+            android:id="@+id/room_start_ib"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_above="@id/room_key_voice_v"
+            android:layout_centerHorizontal="true"
+            android:background="@null"
+            android:src="@mipmap/button_start" />
+        <!--聊天布局-->
+        <ListView
+            android:id="@+id/room_chat_lv"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_above="@id/room_start_ib"
+            android:layout_below="@id/room_myrole_v"
+            android:layout_marginBottom="0dp"
+            android:layout_marginLeft="70dp"
+            android:layout_marginRight="70dp"
+            android:layout_marginTop="0dp"
+            android:background="@null"
+            android:divider="@null"
+            android:dividerHeight="0dp"
+            android:elevation="0dp"
+            android:listSelector="@android:color/transparent"
+            android:paddingBottom="5dp" />
+
+        <!--聊天表情面板-->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="gone">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="表情" />
+        </LinearLayout>
+
+
+    </RelativeLayout>
+</LinearLayout>

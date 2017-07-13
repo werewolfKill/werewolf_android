@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="60dp"
+    android:layout_height="60dp"
+    android:layout_gravity="center_horizontal"
+    android:layout_marginTop="1dp">
+    <!--显示空与头像-->
+    <ImageView
+        android:id="@+id/role_head_iv"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:src="@mipmap/icon_vacancy" />
+    <!--显示数字-->
+    <ImageView
+        android:id="@+id/role_number_iv"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:src="@mipmap/icon_number_normal" />
+
+    <TextView
+        android:id="@+id/role_number_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:minWidth="25dp"
+        android:textColor="@android:color/white"
+        android:textSize="15sp" />
+    <!--显示死亡状态-->
+    <ImageView
+        android:id="@+id/role_die_iv"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:src="@mipmap/room_dead" />
+    <!--显示说话状态-->
+    <ImageView
+        android:id="@+id/role_speaking_iv"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:src="@mipmap/icon_room_speaking"
+        android:visibility="gone" />
+    <!--显示准备状态-->
+    <ImageView
+        android:id="@+id/role_ready_iv"
+        android:layout_width="60dp"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true" />
+    <!--显示锁定状态-->
+    <ImageView
+        android:id="@+id/role_lock_iv"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:src="@mipmap/icon_lock" />
+
+</RelativeLayout>
