@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<resources>
+    <string name="app_name">新狼人杀</string>
+
+    <string name="msg_welcome_message">Welcome to Open Voice Call!</string>
+
+    <string name="label_channel_name_hint">Channel name</string>
+
+    <string name="label_join">Join</string>
+
+    <string name="msg_no_network_connection">No network connection, please check the network settings</string>
+    //页面-game
+    <string name="setting">设置</string>
+    //页面-消息
+    <string name="search">查找</string>
+    <string name="contacts">好友</string>
+    //页面-游戏
+    <string name="invite">邀请</string>
+    <string name="help">帮助</string>
+
+
+    // DO NOT TRANSLATE
+    <string name="bit_rate_value_with_unit">%d kbps</string>
+</resources>

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resources>
+    <color name="agora_blue">#FF00A0EB</color>
+    <!--状态栏 主色-->
+    <color name="colorPrimary">#2E2A3A</color>
+    <!--次色-->
+    <color name="color_2">#474351</color>
+    <color name="color_alpha">#AA000000</color>
+    <!--fragment背景-->
+    <color name="bg_fragment">#F1F5F8</color>
+
+    <color name="bg_key_broad">#35206E</color>
+    <color name="bg_room_role">#4B4562</color>
+    <!--文本颜色-->
+    <color name="text_red">#F24C4E</color>
+    <color name="text_gray">#A4A4A4</color>
+    <color name="text_blue">#019FE8</color>
+
+
+    <!---->
+    <color name="lightColorAccent">#30FF4081</color>
+    <color name="dark_black">#CC262626</color>
+    <color name="transparent_75_white">#ACFFFFFF</color>
+    <color name="dark_gray">#FF55585A</color>
+
+    <!---->
+
+</resources>
