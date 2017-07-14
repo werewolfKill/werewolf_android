@@ -1,5 +1,6 @@
 package com.zinglabs.zwerewolf.ui;
 
+import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.CountDownTimer;
@@ -200,7 +201,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
             @Override
             public void onClick(View v) {
                 //弹出对话框，确定退出游戏界面
-//                startActivity(new Intent(GameActivity.this, MainActivity.class));
+                startActivity(new Intent(GameActivity.this, MainActivity.class));
                 finish();
             }
         });
@@ -235,6 +236,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                 int action = event.getAction();
 
                // RtcEngine rtcEngine = rtcEngine();
+                // TODO
                 switch (action) {
                     case MotionEvent.ACTION_DOWN:
 //                        EventBus.getDefault().post(new MsgEvent(MsgEvent.ROOM_OVER));
@@ -258,20 +260,21 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
 
     private void autoChat() {
         int time = new Random().nextInt(7) * 1000 + 3000;
-        mHandler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                mHandler.sendEmptyMessage(GameStateMessage.GAME_SPEAK);
-            }
+            mHandler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    mHandler.sendEmptyMessage(GameStateMessage.GAME_SPEAK);
+                }
         }, time);
     }
 
+    // 邀请和帮助样式
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.activity_game, menu);
         return true;
     }
-
+    // 邀请和帮助触发方法
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
@@ -288,7 +291,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-            case R.id.room_key_switch_ib:
+            case R.id.room_key_switch_ib: // 聊天模式切换
                 AppUtil.closeBoard(GameActivity.this);
                 if (voice_v.isShown()) {
                     keyIb.setBackgroundResource(R.drawable.room_im_voice_selected);
@@ -300,7 +303,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                     key_v.setVisibility(View.GONE);
                 }
                 break;
-            case R.id.room_send_tv:
+            case R.id.room_send_tv: // 发送文字
                 String msg = et.getText().toString().trim();
                 if (msg == null || msg.length() < 1) {
                     return;

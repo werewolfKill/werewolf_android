@@ -95,6 +95,7 @@ public class RoleView extends RelativeLayout implements View.OnClickListener {
                     head_iv.setVisibility(View.VISIBLE);
                     number_iv.setVisibility(View.VISIBLE);
                     number_tv.setVisibility(View.VISIBLE);
+                    head_iv.setImageResource(R.mipmap.app_icon);
 //                    head_iv.setImageResource(arr_role[number % arr_role.length]);
                     if (mRoleData == null) {
                         return;
