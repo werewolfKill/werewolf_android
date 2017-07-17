@@ -1,11 +1,11 @@
 package com.zinglabs.zwerewolf.ui;
 
 import android.graphics.drawable.Drawable;
+import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.BounceInterpolator;
@@ -14,6 +14,9 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.zinglabs.zwerewolf.R;
+import com.zinglabs.zwerewolf.im.IMLoginClient;
+
+
 
 public class MainActivity extends AppCompatActivity {
     private int[] arr_tab = new int[]{R.mipmap.icon_tab_game, R.mipmap.icon_tab_message};
@@ -45,7 +48,7 @@ public class MainActivity extends AppCompatActivity {
         tag_v = (LinearLayout) findViewById(R.id.main_tag_v);
         vp = (ViewPager) findViewById(R.id.main_vp);
 
-
+        IMLoginClient.instance().connect("192.168.0.151",8090);
         final Fragment[] arr_fg = new Fragment[]{new HomeFragment(), new MessageFragment()};
         vp.setOffscreenPageLimit(arr_fg.length);
 

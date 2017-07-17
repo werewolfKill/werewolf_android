@@ -31,6 +31,7 @@ import com.zinglabs.zwerewolf.data.UserData;
 import com.zinglabs.zwerewolf.event.GameStateMessage;
 import com.zinglabs.zwerewolf.event.MsgEvent;
 import com.zinglabs.zwerewolf.manager.DialogManager;
+import com.zinglabs.zwerewolf.manager.IMMessageManager;
 import com.zinglabs.zwerewolf.role.Role;
 import com.zinglabs.zwerewolf.utils.AppUtil;
 import com.zinglabs.zwerewolf.utils.DateUtil;
@@ -309,9 +310,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                     return;
                 }
                 et.setText("");
-                GameChatData gameChatData = new GameChatData(GameChatData.CHAT, new Date().getTime() + "", UserData.user().getNickName(), "", msg);
-                MsgEvent msgEvent = new MsgEvent(MsgEvent.ROOM_CHAT, null, gameChatData);
-                EventBus.getDefault().post(msgEvent);
+                IMMessageManager.sendSingleMsgReq(1314,msg);
                 break;
             //开局
             case R.id.room_start_ib:
