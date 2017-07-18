@@ -48,7 +48,6 @@ public class MainActivity extends AppCompatActivity {
         tag_v = (LinearLayout) findViewById(R.id.main_tag_v);
         vp = (ViewPager) findViewById(R.id.main_vp);
 
-        IMLoginClient.instance().connect("192.168.0.151",8090);
         final Fragment[] arr_fg = new Fragment[]{new HomeFragment(), new MessageFragment()};
         vp.setOffscreenPageLimit(arr_fg.length);
 

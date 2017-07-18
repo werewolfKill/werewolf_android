@@ -1,0 +1,24 @@
+<?xml version"1.0" encoding"utf-8"?>
+<resources>
+    <string name="VERSION">1</string> <!--版本号-->
+    <string name="RESERVED">0</string><!--保留字段-->
+    <!--测试服务-->
+    <string name="SID_TEST">-1</string> <!--测试服务-->
+    <string name="CID_TEST_TEST_REQ">1</string>
+    <string name="CID_TEST_TEST_RSP">2</string>
+    <!--登录服务-->
+    <string name="SID_LOGIN">0</string><!--登录-->
+    <string name="CID_LOGIN_OUT">1</string> <!--发送登录IP和端口-->
+    <string name="CID_LOGIN_IN">2</string> <!--获取成功成功-->
+    <!--用户服务-->
+    <string name="SID_USER">1</string>
+    <string name="CID_USER_LOGIN_REQ">1</string>
+    <string name="CID_USER_LOGIN_RESP">2</string>
+    <string name="CID_USER_ONLINE_REQ">3</string>
+    <string name="CID_USER_ONLINE_RESP">4</string>
+    <!-- 消息服务 -->
+    <string name="SID_MSG">2</string>
+    <string name="CID_MSG_SEND_SINGLE_REQ">1</string>
+    <string name="CID_MSG_RECEIVE_SINGLE_OUT">2</string>
+
+</resources>
