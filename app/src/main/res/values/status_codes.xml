@@ -1,4 +1,4 @@
-<?xml version"1.0" encoding"utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="VERSION">1</string> <!--版本号-->
     <string name="RESERVED">0</string><!--保留字段-->
