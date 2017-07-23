@@ -157,7 +157,7 @@ public class SimpleController implements Role.OnRoleStateChangeListener {
                         //修改倒计时内容
                         Message msg_system_timer = new Message();
                         msg_system_timer.what = GameStateMessage.COUNTDOWNTIMER;
-                        msg_system_timer.obj = new GameStateMessage(prophet, String.format(Constants.TEXT_WAIT_ACTION, prophet.getName()), prophet.ACTION_TIME);
+                        msg_system_timer.obj = new GameStateMessage(prophet, String.format(Constants.TEXT_WAIT_ACTION, prophet.getName()), Prophet.ACTION_TIME);
                         handler.sendMessage(msg_system_timer);
                         runnable = new Runnable() {
                             @Override
@@ -171,7 +171,7 @@ public class SimpleController implements Role.OnRoleStateChangeListener {
                                 doStage(LANGREN);
                             }
                         };
-                        new GameTask(prophet.getRoleActionTime(), runnable).start();
+                        new GameTask(Role.getRoleActionTime(), runnable).start();
                     } else {
                         doStage(LANGREN);
                     }
@@ -209,7 +209,7 @@ public class SimpleController implements Role.OnRoleStateChangeListener {
                                 doStage(NVWU);
                             }
                         };
-                        new GameTask(wolf.getRoleActionTime(), runnable).start();
+                        new GameTask(Role.getRoleActionTime(), runnable).start();
                     } else {
                         doStage(NVWU);
                     }
@@ -227,7 +227,7 @@ public class SimpleController implements Role.OnRoleStateChangeListener {
                         //修改倒计时内容
                         Message msg_system_timer = new Message();
                         msg_system_timer.what = GameStateMessage.COUNTDOWNTIMER;
-                        msg_system_timer.obj = new GameStateMessage(witch, String.format(Constants.TEXT_WAIT_ACTION, witch.getName()), witch.ACTION_TIME);
+                        msg_system_timer.obj = new GameStateMessage(witch, String.format(Constants.TEXT_WAIT_ACTION, witch.getName()), Witch.ACTION_TIME);
                         handler.sendMessage(msg_system_timer);
                         runnable = new Runnable() {
                             @Override
@@ -247,7 +247,7 @@ public class SimpleController implements Role.OnRoleStateChangeListener {
                                 doStage(LIEREN);
                             }
                         };
-                        new GameTask(witch.getRoleActionTime(), runnable).start();
+                        new GameTask(Role.getRoleActionTime(), runnable).start();
                     } else {
                         doStage(LIEREN);
                     }

@@ -6,11 +6,17 @@ import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 
 import com.zinglabs.zwerewolf.R;
-import com.zinglabs.zwerewolf.event.MsgEvent;
-import com.zinglabs.zwerewolf.im.IMLoginClient;
+import com.zinglabs.zwerewolf.constant.GlobalData;
+import com.zinglabs.zwerewolf.constant.ProtocolConstant;
+import com.zinglabs.zwerewolf.entity.User;
+import com.zinglabs.zwerewolf.event.UserLoginEvent;
+import com.zinglabs.zwerewolf.im.IMClient;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
+
+import java.util.HashMap;
+import java.util.Map;
 
 
 public class SplashActivity extends AppCompatActivity {
@@ -23,26 +29,21 @@ public class SplashActivity extends AppCompatActivity {
         EventBus.getDefault().register(this);
         init();
     }
-
+    Map userMap = new HashMap();
     private void init() {
-        IMLoginClient.instance().connect("192.168.0.151",8090);
-        mHandle.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                if (isFinishing()) {
-                    return;
-                }
-                startActivity(new Intent(SplashActivity.this, MainActivity.class));
-                finish();
-            }
-        }, 1500);
+        userMap.put("name","张三"+((int)(Math.random()*100)));
+        userMap.put("password","11111");
+        IMClient.getInstance().send(ProtocolConstant.SID_USER + "/" + ProtocolConstant.CID_USER_LOGIN_REQ ,userMap);
     }
 
     @Subscribe
-    public void onEvent(MsgEvent event) {
-        switch (event.getMsgType()) {
-
-        }
+    public void onEvent(UserLoginEvent event) {
+        User user = new User(event.getUserId(),(String) userMap.get("name"));
+        GlobalData globalData = (GlobalData)getApplication();
+        globalData.setUser(user);
+        Intent intent = new Intent(SplashActivity.this, MainActivity.class);
+        startActivity(intent);
+        finish();
     }
 
 }

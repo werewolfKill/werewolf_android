@@ -1,7 +1,11 @@
 package com.zinglabs.zwerewolf.ui;
 
+import android.Manifest;
+import android.content.Context;
+import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
@@ -14,8 +18,9 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.zinglabs.zwerewolf.R;
-import com.zinglabs.zwerewolf.im.IMLoginClient;
 
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -26,7 +31,7 @@ public class MainActivity extends AppCompatActivity {
     private ViewPager vp;
 
     private ScaleAnimation scaleAnimation;
-
+    private Context context;
     //    public native String stringFromJNI();
     static {
 //        System.loadLibrary("native-lib");
@@ -36,6 +41,15 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        context = getApplicationContext();
+        List<String> permissionNeeded = new ArrayList<>();
+        if (!hasPermission(context, Manifest.permission.RECORD_AUDIO)) {
+            permissionNeeded.add(Manifest.permission.RECORD_AUDIO);
+        }
+        if(!permissionNeeded.isEmpty()){
+            ActivityCompat.requestPermissions(this, permissionNeeded.toArray(new String[permissionNeeded.size()]), 80);
+        }
 
         init();
         initTagbar();
@@ -91,7 +105,10 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
-
+    public boolean hasPermission(Context context, String permName) {
+        int perm = context.checkCallingOrSelfPermission(permName);
+        return perm == PackageManager.PERMISSION_GRANTED;
+    }
     private void initTagbar() {
         for (int i = 0; i < arr_tab.length; i++) {
             final int j = i;

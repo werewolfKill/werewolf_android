@@ -1,13 +1,13 @@
 package com.zinglabs.zwerewolf.im;
 
 
-import com.zinglabs.zwerewolf.manager.IMTestManager;
-import com.zinglabs.zwerewolf.manager.IMUserManager;
+import com.zinglabs.zwerewolf.config.Constants;
+import com.zinglabs.zwerewolf.config.ProcessorTable;
 
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-import io.netty.channel.Channel;
+import io.netty.channel.ChannelHandlerContext;
 
 /**
  * author: vector.huang
@@ -16,47 +16,54 @@ import io.netty.channel.Channel;
 public class IMClient {
 
     private static IMClient instance;
-    private static Lock lock = new ReentrantLock();
-
     private int userId;
+    private ThreadSocket threadSocket;
+    private  Lock lock = new ReentrantLock();
 
-    private IMClient() {
+    public void setUserId(int userId) {
+        this.userId = userId;
+    }
+    static {
+        instance = new IMClient();
     }
 
-    public static IMClient instance() {
-        if (instance == null) {
-            lock.lock();
-            if (instance == null) {
-                instance = new IMClient();
-            }
-            lock.unlock();
-            lock = null;
-        }
+    private IMClient(){
+
+    }
+
+    public static IMClient getInstance() {
         return instance;
     }
 
-    private ThreadSocket threadSocket;
-
     public void connect(String host, int port) {
-        threadSocket = new ThreadSocket();
-        threadSocket.setOnChannelActiveListener(ctx -> {
-            System.out.println("连接的业务服务器可以开始发送请求了");
-            IMTestManager.testReq("Test");
-            IMUserManager.loginReq("黄廉温","1234567890");
-        });
-        threadSocket.connect(host, port);
+
     }
 
-    public void close(){
+    public void close() {
         System.out.println("业务服务器开始关闭...");
         threadSocket.close();
     }
 
-    public Channel channel(){
-        return threadSocket.channel();
+    public void send(String requestMapping,Object param) {
+        String[] requestMappingArr = requestMapping.split("/");
+        if (threadSocket == null) {
+            lock.lock();
+            if (threadSocket == null) {
+                threadSocket = new ThreadSocket();
+                threadSocket.setOnChannelActiveListener(ctx -> {
+                    ProcessorTable.get(Short.parseShort(requestMappingArr[0])).doSend(Short.parseShort(requestMappingArr[1]),threadSocket.channel(),param);
+                });
+                threadSocket.connect(Constants.app_host, Constants.app_port);
+            }else{
+                lock = null;
+                ProcessorTable.get(Short.parseShort(requestMappingArr[0])).doSend(Short.parseShort(requestMappingArr[1]),threadSocket.channel(),param);
+            }
+            lock.unlock();
+        }else{
+            ProcessorTable.get(Short.parseShort(requestMappingArr[0])).doSend(Short.parseShort(requestMappingArr[1]),threadSocket.channel(),param);
+        }
     }
-
-    public void setUserId(int userId) {
-        this.userId = userId;
+    public interface ConnectCallListener extends ThreadSocket.OnChannelActiveListener {
+        void onChannelActive(ChannelHandlerContext ctx);
     }
 }

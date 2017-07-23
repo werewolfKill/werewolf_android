@@ -1,5 +1,6 @@
 package com.zinglabs.zwerewolf.ui;
 
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -23,15 +24,18 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.zinglabs.zwerewolf.R;
+import com.zinglabs.zwerewolf.constant.GlobalData;
+import com.zinglabs.zwerewolf.constant.ProtocolConstant;
 import com.zinglabs.zwerewolf.controller.SimpleController;
 import com.zinglabs.zwerewolf.data.GameChatData;
 import com.zinglabs.zwerewolf.data.RoleBuild;
 import com.zinglabs.zwerewolf.data.RoleData;
 import com.zinglabs.zwerewolf.data.UserData;
+import com.zinglabs.zwerewolf.entity.User;
 import com.zinglabs.zwerewolf.event.GameStateMessage;
 import com.zinglabs.zwerewolf.event.MsgEvent;
+import com.zinglabs.zwerewolf.im.IMClient;
 import com.zinglabs.zwerewolf.manager.DialogManager;
-import com.zinglabs.zwerewolf.manager.IMMessageManager;
 import com.zinglabs.zwerewolf.role.Role;
 import com.zinglabs.zwerewolf.utils.AppUtil;
 import com.zinglabs.zwerewolf.utils.DateUtil;
@@ -39,9 +43,11 @@ import com.zinglabs.zwerewolf.widget.RoleView;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -70,6 +76,8 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
     private View key_v;
     private EditText et;
     private ImageButton startIB;
+    private GlobalData globalData;
+    private Context context;
     // 面板View
     private KPSwitchPanelLinearLayout mPanelLayout;
 
@@ -118,27 +126,27 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
 
                 //接收到聊天信息
                 case GameStateMessage.CHAT:
-                    gameChatData = new GameChatData(GameChatData.CHAT, DateUtil.nowLongStr(), GameChatData.SYSTEM_CHAT, "", gameStateMessage.getText());
+                    // GameChatData.SYSTEM_CHAT
+                    gameChatData = new GameChatData(GameChatData.CHAT, DateUtil.nowLongStr(), new User(GameChatData.SYSTEM_CHAT), 111, gameStateMessage.getText());
                     chatAdapter.update(gameChatData);
                     break;
 
                 //游戏开始界面变化
                 case GameStateMessage.GAME_START:
-                    gameChatData = new GameChatData(GameChatData.CHAT, DateUtil.nowLongStr(), GameChatData.SYSTEM_CHAT, "", gameStateMessage.getText());
-                        chatAdapter.update(gameChatData);
+                    gameChatData = new GameChatData(GameChatData.CHAT, DateUtil.nowLongStr(), new User(GameChatData.SYSTEM_CHAT), 111, gameStateMessage.getText());
+                    chatAdapter.update(gameChatData);
 
-                        for (RoleView roleView : roleViewList) {
-                            if (roleView.hasRole()) {
-                                roleView.unReady();
-                            }
+                    for (RoleView roleView : roleViewList) {
+                        if (roleView.hasRole()) {
+                            roleView.unReady();
+                        }
                     }
                     break;
 
                 //游戏结束界面变化
                 case GameStateMessage.GAME_OVER:
                     DialogManager.dismissDialog();
-
-                    gameChatData = new GameChatData(GameChatData.CHAT, DateUtil.nowLongStr(), GameChatData.SYSTEM_CHAT, "", gameStateMessage.getText());
+                    gameChatData = new GameChatData(GameChatData.CHAT, DateUtil.nowLongStr(), new User(GameChatData.SYSTEM_CHAT), 111, gameStateMessage.getText());
                     chatAdapter.update(gameChatData);
                     for (RoleView roleView : roleViewList) {
                         if (roleView.hasRole()) {
@@ -157,7 +165,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                     if (curStage.equals(SimpleController.TAOLUN) || curStage.equals(SimpleController.TOUPIAO)) {
                         List<Integer> alive_List = simpleController.getAliveList();
                         int i = new Random().nextInt(alive_List.size());
-                        roleViewList.get(alive_List.get(i)-1).chat();
+                        roleViewList.get(alive_List.get(i) - 1).chat();
                         autoChat();
                     }
                     break;
@@ -167,7 +175,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                     for (int i = 0; i < roleViewList.size(); i++) {
                         RoleView roleView = roleViewList.get(i);
                         if (!roleView.hasRole()) continue;
-                        Role role1 = simpleController.getRole(i+1);
+                        Role role1 = simpleController.getRole(i + 1);
                         if (!aliveList.contains(roleView.getmRoleData().getNumber())) {
                             roleView.die();
                         } else if (role1 != null && role1.getState().equals(Role.STATE_TALK)) {
@@ -185,13 +193,16 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game);
-
+        context = getApplicationContext();
         EventBus.getDefault().register(this);
         init();
-        // initUIandEvent();
+          // initUIandEvent();
     }
 
     private void init() {
+
+        globalData = (GlobalData) getApplication();
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         toolbar.setTitle("");
@@ -213,6 +224,8 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
         bar_right = (LinearLayout) findViewById(R.id.room_bar_right);
 
         lv = (ListView) findViewById(R.id.room_chat_lv);
+        GameChatData timeData = new GameChatData(GameChatData.DATE, new Date().getTime() + "", globalData.getUser(), 111, null);
+        chatAdapter.addData(timeData);
         lv.setAdapter(chatAdapter);
 
         myRoleBg_v = findViewById(R.id.room_myrolebg_v);
@@ -235,16 +248,22 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
             @Override
             public boolean onTouch(View v, MotionEvent event) {
                 int action = event.getAction();
-
-               // RtcEngine rtcEngine = rtcEngine();
+                // RtcEngine rtcEngine = rtcEngine();
                 // TODO
                 switch (action) {
                     case MotionEvent.ACTION_DOWN:
-//                        EventBus.getDefault().post(new MsgEvent(MsgEvent.ROOM_OVER));
+                        //showToast("开始发言");
                         //开始发言，反之取消发言
-                       // rtcEngine.muteLocalAudioStream(false);
+                        // rtcEngine.muteLocalAudioStream(false);
+                        IMClient.getInstance().send(ProtocolConstant.SID_MSG + "/" + ProtocolConstant.CID_MSG_VOICE_REQ, new HashMap() {{
+                            put("from", globalData.getUser().getId());
+                        }});
                         break;
                     case MotionEvent.ACTION_UP:
+                        IMClient.getInstance().send(ProtocolConstant.SID_MSG + "/" + ProtocolConstant.CID_MSG_VOICE_INTERRUPT_REQ, new HashMap() {{
+                            put("from", globalData.getUser().getId());
+                        }});
+                        //showToast("结束发言");
                         //rtcEngine.muteLocalAudioStream(true);
                         break;
                 }
@@ -261,11 +280,11 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
 
     private void autoChat() {
         int time = new Random().nextInt(7) * 1000 + 3000;
-            mHandler.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    mHandler.sendEmptyMessage(GameStateMessage.GAME_SPEAK);
-                }
+        mHandler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                mHandler.sendEmptyMessage(GameStateMessage.GAME_SPEAK);
+            }
         }, time);
     }
 
@@ -275,15 +294,16 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
         getMenuInflater().inflate(R.menu.activity_game, menu);
         return true;
     }
+
     // 邀请和帮助触发方法
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_game_invite:
-               // showToast("invite");
+                // showToast("invite");
                 break;
             case R.id.menu_game_help:
-               // showToast("help");
+                // showToast("help");
                 break;
         }
         return super.onOptionsItemSelected(item);
@@ -310,7 +330,12 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                     return;
                 }
                 et.setText("");
-                IMMessageManager.sendSingleMsgReq(1314,msg);
+                Map param = new HashMap();
+                param.put("from", globalData.getUser().getId());
+                //param.put("to",1111);
+                param.put("content", msg);
+                IMClient.getInstance().send(ProtocolConstant.SID_MSG + "/" + ProtocolConstant.CID_MSG_TEXT_REQ, param);
+                //MessageService.sendSingleMsgReq(1314,msg);
                 break;
             //开局
             case R.id.room_start_ib:
@@ -320,7 +345,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-    @Subscribe
+    @Subscribe(threadMode = ThreadMode.MAIN)
     public void onEvent(MsgEvent event) {
         switch (event.getMsgType()) {
             case MsgEvent.ROOM_CHAT:
@@ -416,7 +441,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                 if (i == random) {
                     //模拟用户为房主
                     curPlayerNumber = i;
-                    roleData = RoleBuild.build(i, UserData.user());
+                    roleData = RoleBuild.build(i, new UserData());
                     roleData.setOwner(true);
                 }
                 roleView.setup(roleData);
@@ -443,7 +468,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
     protected void onDestroy() {
         EventBus.getDefault().unregister(this);
         clear();
-       // deInitUIandEvent();
+        // deInitUIandEvent();
         super.onDestroy();
     }
 
@@ -453,7 +478,10 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
         private List<GameChatData> datas = new ArrayList<GameChatData>();
 
         public GameChatAdapter() {
-            GameChatData timeData = new GameChatData(GameChatData.DATE, new Date().getTime() + "", UserData.user().getNickName(), "", null);
+
+        }
+
+        public void addData(GameChatData timeData) {
             datas.add(timeData);
         }
 
@@ -536,32 +564,33 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                     viewHolder.time_tv.setVisibility(View.VISIBLE);
                     break;
                 case GameChatData.ENTRY:
-                    viewHolder.entry_tv.setText(data.getFrom() + " 进入房间");
+                    viewHolder.entry_tv.setText(data.getUser().getUsername() + " 进入房间");
                     viewHolder.entry_tv.setVisibility(View.VISIBLE);
                     break;
                 case GameChatData.CHAT:
                     //判断消息是否从本角色发出
-                    String nickName = UserData.user().getNickName();
-                    String from = data.getFrom();
-                    if (nickName != null && nickName.equals(from)) {
+                    int userId = globalData.getUser().getId();
+                    int fromUserId = data.getUser().getId();
+                    String fromUserName = data.getUser().getUsername();
+                    if (userId == fromUserId) {
                         //本玩家聊天
                         viewHolder.mine_tv.setVisibility(View.VISIBLE);
                         viewHolder.mine_msg_tv.setVisibility(View.VISIBLE);
-                        viewHolder.mine_tv.setText(data.getFrom());
+                        viewHolder.mine_tv.setText(data.getUser().getUsername());
                         viewHolder.mine_msg_tv.setText(data.getText());
                     } else {
                         //判断是否系统聊天
                         viewHolder.other_tv.setVisibility(View.VISIBLE);
                         viewHolder.other_msg_tv.setVisibility(View.VISIBLE);
                         viewHolder.other_msg_tv.setText(data.getText());
-                        if (GameChatData.SYSTEM_CHAT.equals(from)) {
+                        if (GameChatData.SYSTEM_CHAT.equals(fromUserName)) {
                             Drawable drawable = getResources().getDrawable(R.mipmap.icon_room_system);
                             drawable.setBounds(0, 0, drawable.getMinimumWidth(), drawable.getMinimumHeight());
                             viewHolder.other_tv.setCompoundDrawables(drawable, null, null, null);
                             viewHolder.other_tv.setText(GameChatData.SYSTEM_NAME);
                         } else {
                             viewHolder.other_tv.setCompoundDrawables(null, null, null, null);
-                            viewHolder.other_tv.setText(data.getFrom());
+                            viewHolder.other_tv.setText(fromUserName);
                         }
                     }
                     break;

@@ -34,10 +34,7 @@ public class AppUtil {
      * 检查activity是否安全
      */
     public static boolean isSafe(Activity activity) {
-        if (activity == null || activity.isFinishing() || activity.isDestroyed()) {
-            return false;
-        }
-        return true;
+        return !(activity == null || activity.isFinishing() || activity.isDestroyed());
     }
 
     /**
@@ -127,7 +124,7 @@ public class AppUtil {
         }
         final View v = ((Activity) context).getWindow().peekDecorView();
         if (v != null && v.getWindowToken() != null) {
-            InputMethodManager imm = (InputMethodManager) context.getSystemService(context.INPUT_METHOD_SERVICE);
+            InputMethodManager imm = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
             imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
         }
     }
