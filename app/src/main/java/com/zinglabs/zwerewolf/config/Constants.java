@@ -11,7 +11,8 @@ public class Constants {
     public static int CHANNEL = AudioFormat.CHANNEL_IN_MONO;
     public static int ENCODING = AudioFormat.ENCODING_PCM_16BIT;
 
-    public  static final String app_host = "192.168.0.102";
+//    public  static final String app_host = "192.168.0.102";
+    public static final String app_host="10.0.0.103";
     public static final int app_port = 8080;
     //---系统发言
     public static final String TEXT_START_ALLOT = "游戏开始，本轮共有%d个狼人，%d个预言家，%d个女巫，%d个猎人，%d个村民";

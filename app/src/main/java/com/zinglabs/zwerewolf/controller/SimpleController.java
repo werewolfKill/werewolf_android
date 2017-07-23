@@ -5,18 +5,24 @@ import android.os.Handler;
 import android.os.Message;
 
 import com.zinglabs.zwerewolf.config.Constants;
+import com.zinglabs.zwerewolf.constant.GlobalData;
+import com.zinglabs.zwerewolf.constant.ProtocolConstant;
 import com.zinglabs.zwerewolf.event.GameStateMessage;
+import com.zinglabs.zwerewolf.im.IMClient;
 import com.zinglabs.zwerewolf.role.Huntsman;
 import com.zinglabs.zwerewolf.role.Prophet;
 import com.zinglabs.zwerewolf.role.Role;
 import com.zinglabs.zwerewolf.role.Villager;
 import com.zinglabs.zwerewolf.role.Witch;
 import com.zinglabs.zwerewolf.role.Wolf;
+import com.zinglabs.zwerewolf.utils.IMClientUtil;
 import com.zinglabs.zwerewolf.utils.LogUtil;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Random;
 
 /**
@@ -96,6 +102,14 @@ public class SimpleController implements Role.OnRoleStateChangeListener {
 
         //进入天黑阶段
         doStage(TIANHEI);
+    }
+    public void startGame(){
+        Map<String,Object> param = new HashMap<>();
+        param.put("userId", new Random().nextInt(100));  //模拟用户id
+
+        //向服务器发送准备游戏通知
+        IMClientUtil.sendMsg(ProtocolConstant.SID_GAME,ProtocolConstant.CID_GAME_READY,param);
+
     }
 
     public void stopGame() {
