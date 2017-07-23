@@ -1,5 +1,7 @@
 package com.zinglabs.zwerewolf.data;
 
+import com.zinglabs.zwerewolf.entity.User;
+
 /**
  * Created by Administrator on 2017/3/8.
  */
@@ -13,29 +15,19 @@ public class GameChatData {
     public static final String SYSTEM_CHAT = "LRSwzc25151";
     public static final String SYSTEM_NAME = "法官";//系统角色-法官
 
-    public GameChatData() {
-    }
 
     private int type;//内容类型
     private String date;//发送时间
-    private String from;//发件人
-    private String to;//收件人
+    private User user;//发件人
+    private int toId;//收件人
     private String text;//文本
 
-    public GameChatData(int type, String date, String from, String to, String text) {
+    public GameChatData(int type, String date, User user, int toId, String text) {
         this.type = type;
         this.date = date;
-        this.from = from;
-        this.to = to;
+        this.user = user;
+        this.toId = toId;
         this.text = text;
-    }
-
-    public String getDate() {
-        return date;
-    }
-
-    public void setDate(String date) {
-        this.date = date;
     }
 
     public int getType() {
@@ -46,20 +38,28 @@ public class GameChatData {
         this.type = type;
     }
 
-    public String getTo() {
-        return to;
+    public String getDate() {
+        return date;
     }
 
-    public void setTo(String to) {
-        this.to = to;
+    public void setDate(String date) {
+        this.date = date;
     }
 
-    public String getFrom() {
-        return from;
+    public User getUser() {
+        return user;
     }
 
-    public void setFrom(String from) {
-        this.from = from;
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    public int getToId() {
+        return toId;
+    }
+
+    public void setToId(int toId) {
+        this.toId = toId;
     }
 
     public String getText() {

@@ -1,5 +1,7 @@
 package com.zinglabs.zwerewolf.data;
 
+import android.app.Application;
+
 /**
  * 用户信息
  * Created by Administrator on 2017/3/8.
@@ -12,9 +14,6 @@ public class UserData {
     private String level;//等级
     private String cion;//金币
 
-
-    private UserData() {
-    }
     public String getUserId() {
         return userId;
     }
@@ -55,22 +54,4 @@ public class UserData {
         this.cion = cion;
     }
 
-
-    private static UserData userData;
-
-    /**
-     * 模拟用户信息
-     *
-     * @return
-     */
-    public static UserData user() {
-        if (userData == null) {
-            userData = new UserData();
-            userData.setUserId("25151");
-            userData.setHeadImgUrl("http://www.wzc25151.com/myimg/1.jpg");
-            userData.setNickName("wzc25151");
-            userData.setCion("666");
-        }
-        return userData;
-    }
 }

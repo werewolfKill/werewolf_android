@@ -153,11 +153,7 @@ public class AutoScrollViewPager extends ViewPager {
 
         @Override
         public void onPageScrollStateChanged(int state) {
-            if (state == ViewPager.SCROLL_STATE_IDLE) {
-                isDragging = false;
-            } else {
-                isDragging = true;
-            }
+            isDragging = state != ViewPager.SCROLL_STATE_IDLE;
         }
     };
 

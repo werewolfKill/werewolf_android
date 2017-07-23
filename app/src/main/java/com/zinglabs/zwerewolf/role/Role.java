@@ -148,7 +148,7 @@ public abstract class Role {
         this.onRoleStateChangeListener = onRoleStateChangeListener;
     }
 
-    public static interface OnRoleStateChangeListener {
+    public interface OnRoleStateChangeListener {
         void onStateChange();
     }
 }

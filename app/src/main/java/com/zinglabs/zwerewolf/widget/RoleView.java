@@ -15,6 +15,7 @@ import com.zinglabs.zwerewolf.config.Constants;
 import com.zinglabs.zwerewolf.controller.SimpleController;
 import com.zinglabs.zwerewolf.data.GameChatData;
 import com.zinglabs.zwerewolf.data.RoleData;
+import com.zinglabs.zwerewolf.entity.User;
 import com.zinglabs.zwerewolf.event.MsgEvent;
 import com.zinglabs.zwerewolf.utils.AppUtil;
 import com.zinglabs.zwerewolf.utils.DateUtil;
@@ -168,7 +169,7 @@ public class RoleView extends RelativeLayout implements View.OnClickListener {
         if (mRoleData != null) {
             mHandler.sendEmptyMessage(STATE_UNREADY);
             //发送消息玩家进场
-            GameChatData gameChatData = new GameChatData(GameChatData.ENTRY, DateUtil.nowLongStr(), mRoleData.getNickName(), "", "");
+            GameChatData gameChatData = new GameChatData(GameChatData.ENTRY, DateUtil.nowLongStr(),new User(mRoleData.getNickName()) , 111, "");
             MsgEvent msgEvent = new MsgEvent(MsgEvent.ROOM_CHAT, null, gameChatData);
             EventBus.getDefault().post(msgEvent);
         } else {
@@ -229,7 +230,7 @@ public class RoleView extends RelativeLayout implements View.OnClickListener {
         if (mRoleData != null) {
 //            mHandler.sendEmptyMessage(STATE_UNREADY);
 
-            GameChatData gameChatData = new GameChatData(GameChatData.CHAT, DateUtil.nowLongStr(), mRoleData.getNumber() + "号" + mRoleData.getNickName(), "", arrChat[new Random().nextInt(arrChat.length)]);
+            GameChatData gameChatData = new GameChatData(GameChatData.CHAT, DateUtil.nowLongStr(), new User(mRoleData.getNumber() + "号" + mRoleData.getNickName()), 111, arrChat[new Random().nextInt(arrChat.length)]);
             MsgEvent msgEvent = new MsgEvent(MsgEvent.ROOM_CHAT, null, gameChatData);
             EventBus.getDefault().post(msgEvent);
         }
