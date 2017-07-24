@@ -108,7 +108,7 @@ public class SimpleController implements Role.OnRoleStateChangeListener {
         param.put("userId", new Random().nextInt(100));  //模拟用户id
 
         //向服务器发送准备游戏通知
-        IMClientUtil.sendMsg(ProtocolConstant.SID_GAME,ProtocolConstant.CID_GAME_READY,param);
+        IMClientUtil.sendMsg(ProtocolConstant.SID_GAME,ProtocolConstant.CID_GAME_READY_REQ,param);
 
     }
 
