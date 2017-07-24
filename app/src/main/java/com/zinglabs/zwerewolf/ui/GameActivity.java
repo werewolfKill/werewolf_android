@@ -279,13 +279,13 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
     private SimpleController simpleController;
 
     private void autoChat() {
-        int time = new Random().nextInt(7) * 1000 + 3000;
-        mHandler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                mHandler.sendEmptyMessage(GameStateMessage.GAME_SPEAK);
-            }
-        }, time);
+//        int time = new Random().nextInt(7) * 1000 + 3000;
+//        mHandler.postDelayed(new Runnable() {
+//            @Override
+//            public void run() {
+//                mHandler.sendEmptyMessage(GameStateMessage.GAME_SPEAK);
+//            }
+//        }, time);
     }
 
     // 邀请和帮助样式
@@ -340,7 +340,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
             //开局
             case R.id.room_start_ib:
                 startIB.setVisibility(View.GONE);
-                simpleController.startGame(playerCount);
+                simpleController.startGame();
                 break;
         }
     }

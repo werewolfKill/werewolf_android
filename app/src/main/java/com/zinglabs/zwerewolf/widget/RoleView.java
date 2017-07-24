@@ -227,13 +227,12 @@ public class RoleView extends RelativeLayout implements View.OnClickListener {
      * 模拟发言，可以删除该方法
      */
     public void chat() {
-        if (mRoleData != null) {
-//            mHandler.sendEmptyMessage(STATE_UNREADY);
-
-            GameChatData gameChatData = new GameChatData(GameChatData.CHAT, DateUtil.nowLongStr(), new User(mRoleData.getNumber() + "号" + mRoleData.getNickName()), 111, arrChat[new Random().nextInt(arrChat.length)]);
-            MsgEvent msgEvent = new MsgEvent(MsgEvent.ROOM_CHAT, null, gameChatData);
-            EventBus.getDefault().post(msgEvent);
-        }
+//        if (mRoleData != null) {
+//
+//            GameChatData gameChatData = new GameChatData(GameChatData.CHAT, DateUtil.nowLongStr(), new User(mRoleData.getNumber() + "号" + mRoleData.getNickName()), 111, arrChat[new Random().nextInt(arrChat.length)]);
+//            MsgEvent msgEvent = new MsgEvent(MsgEvent.ROOM_CHAT, null, gameChatData);
+//            EventBus.getDefault().post(msgEvent);
+//        }
     }
 
     /**

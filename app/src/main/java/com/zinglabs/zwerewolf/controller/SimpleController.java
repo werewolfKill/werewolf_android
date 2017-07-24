@@ -105,7 +105,9 @@ public class SimpleController implements Role.OnRoleStateChangeListener {
     }
     public void startGame(){
         Map<String,Object> param = new HashMap<>();
-        param.put("userId", new Random().nextInt(100));  //模拟用户id
+        param.put("fromId", new Random().nextInt(100));  //模拟用户id
+        param.put("roomId", new Random().nextInt(10000));  //模拟房间id
+        param.put("content", 0);  //设为0
 
         //向服务器发送准备游戏通知
         IMClientUtil.sendMsg(ProtocolConstant.SID_GAME,ProtocolConstant.CID_GAME_READY_REQ,param);
