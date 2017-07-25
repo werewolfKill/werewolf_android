@@ -9,10 +9,21 @@ public class User {
     private int id;
     private String username;
 
-    public User(int id,String username){
+    private int roomId; //房间号
+    public User(int id, String username){
         this.id = id;
         this.username = username;
     }
+
+    public int getRoomId() {
+        return roomId;
+    }
+
+    public void setRoomId(int roomId) {
+        this.roomId = roomId;
+    }
+
+
     public User(int id){
         this.id = id;
     }

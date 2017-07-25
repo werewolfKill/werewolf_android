@@ -27,6 +27,7 @@ import com.zinglabs.zwerewolf.R;
 import com.zinglabs.zwerewolf.constant.GlobalData;
 import com.zinglabs.zwerewolf.constant.ProtocolConstant;
 import com.zinglabs.zwerewolf.controller.SimpleController;
+import com.zinglabs.zwerewolf.data.BusinessData;
 import com.zinglabs.zwerewolf.data.GameChatData;
 import com.zinglabs.zwerewolf.data.RoleBuild;
 import com.zinglabs.zwerewolf.data.RoleData;
@@ -50,6 +51,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Random;
 
 import cn.dreamtobe.kpswitch.widget.KPSwitchPanelLinearLayout;
@@ -67,6 +69,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
     private LinearLayout bar_left;
     private LinearLayout bar_right;
     private List<RoleView> roleViewList = new ArrayList<RoleView>();
+    private Map<Integer,RoleView> roleViewMap = new HashMap<>();
     private View myRoleBg_v;
     private View myRole_v;
     private TextView myRole_tv;
@@ -337,16 +340,21 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                 IMClient.getInstance().send(ProtocolConstant.SID_MSG + "/" + ProtocolConstant.CID_MSG_TEXT_REQ, param);
                 //MessageService.sendSingleMsgReq(1314,msg);
                 break;
-            //开局
+            //开局或准备
             case R.id.room_start_ib:
                 startIB.setVisibility(View.GONE);
-                simpleController.startGame();
+                GlobalData globalData = (GlobalData)getApplication();
+                User user = globalData.getUser();
+                user.setRoomId(new Random().nextInt(10000));  //模拟房间号
+                simpleController.startGame(user);
                 break;
         }
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onEvent(MsgEvent event) {
+        String msg = event.getMsgStr();
+        Object param = event.getObj();
         switch (event.getMsgType()) {
             case MsgEvent.ROOM_CHAT:
                 chatAdapter.update(event.getObj());
@@ -400,6 +408,14 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
 //                    }
 //                }
                 break;
+            case MsgEvent.GAME_READY:  //准备游戏
+                BusinessData businessData = (BusinessData)param;
+                int fromId = businessData.getFromId();
+                RoleView roleView = roleViewMap.get(fromId);
+                if(roleView!=null){
+                    roleView.ready();
+                }
+                break;
         }
     }
 
@@ -426,8 +442,6 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void simulate() {
-        //模拟角色，随机房主，号码大于1
-        int random = new Random().nextInt(10) + 1;
         for (int i = 1; i <= 16; i++) {
             RoleView roleView = new RoleView(GameActivity.this);
             roleViewList.add(roleView);
@@ -438,13 +452,13 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
             }
             if (i <= playerCount) {
                 RoleData roleData = RoleBuild.build(i);
-                if (i == random) {
-                    //模拟用户为房主
+                if (i == 1) { //设置1号用户为房主
                     curPlayerNumber = i;
                     roleData = RoleBuild.build(i, new UserData());
                     roleData.setOwner(true);
                 }
                 roleView.setup(roleData);
+                roleViewMap.put(i,roleView);
             }
         }
     }

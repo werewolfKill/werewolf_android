@@ -12,6 +12,8 @@ public class MsgEvent {
     public static final int ROOM_ROLE = 0xb3;//游戏角色分配
     public static final int ROOM_ROLE_STATE_CHANGE = 0xb4;//角色状态变化，掉线，死亡
 
+    public static final int GAME_READY=0xc1; //玩家准备
+
 
     private int msgType;
     private String msgStr;

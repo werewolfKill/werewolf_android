@@ -36,6 +36,7 @@ public class RoleView extends RelativeLayout implements View.OnClickListener {
     public static final int STATE_UNREADY = 0xa3;//位置解锁，有人，未准备；显示头像，号码，语音
     public static final int STATE_READY = 0xa4;//位置解锁，有人，已准备；显示头像，号码，语音，准备状态
     public static final int STATE_SPEAKING = 0xa5;//位置解锁，有人，正在说话；显示头像，号码，语音
+    public static final int STATE_ME = 0xa6;//位置解锁，有人，表示自己；显示头像，号码，语音
 
     private AppCompatActivity activity;
     private View root;
@@ -205,19 +206,19 @@ public class RoleView extends RelativeLayout implements View.OnClickListener {
         }
         if (mRoleData != null) {
             //判断当前是否准备
-            if (mRoleData.getState() == STATE_LOCK) {
-                mHandler.sendEmptyMessage(STATE_NOBODY);
-            } else if (mRoleData.getState() == STATE_NOBODY) {
-                mHandler.sendEmptyMessage(STATE_UNREADY);
-            } else if (mRoleData.getState() == STATE_UNREADY) {
-                mHandler.sendEmptyMessage(STATE_READY);
-            } else if (mRoleData.getState() == STATE_READY) {
-                mHandler.sendEmptyMessage(STATE_LOCK);
-            }
-            if (mRoleData.isOwner()) {
+//            if (mRoleData.getState() == STATE_LOCK) {
+//                mHandler.sendEmptyMessage(STATE_NOBODY);
+//            } else if (mRoleData.getState() == STATE_NOBODY) {
+//                mHandler.sendEmptyMessage(STATE_UNREADY);
+//            } else if (mRoleData.getState() == STATE_UNREADY) {
+//                mHandler.sendEmptyMessage(STATE_READY);
+//            } else if (mRoleData.getState() == STATE_READY) {
+//                mHandler.sendEmptyMessage(STATE_LOCK);
+//            }
+//            if (mRoleData.isOwner()) {
 //                MsgEvent msgEvent = new MsgEvent(MsgEvent.ROOM_START);
 //                EventBus.getDefault().post(msgEvent);
-            }
+//            }
         } else {
             //activity.showToast("位置不可开启");
         }
@@ -240,6 +241,11 @@ public class RoleView extends RelativeLayout implements View.OnClickListener {
      */
     public void ready() {
         mHandler.sendEmptyMessage(STATE_READY);
+    }
+
+    public void setMe(){
+        mHandler.sendEmptyMessage(STATE_ME);
+
     }
 
     /**

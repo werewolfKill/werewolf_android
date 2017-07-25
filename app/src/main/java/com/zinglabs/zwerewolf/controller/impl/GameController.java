@@ -33,6 +33,8 @@ public class GameController implements BaseController {
         switch (command){
             case ProtocolConstant.CID_GAME_READY_RESP: //准备游戏
                 System.out.println(fromId+"号玩家已准备好");
+                MsgEvent msgEvent = new MsgEvent(MsgEvent.GAME_READY, null, businessData);
+                EventBus.getDefault().post(msgEvent);
                 break;
             case ProtocolConstant.CID_GAME_KILL_RES_RESP:  //狼人杀人信息
                 System.out.println(fromId+"击杀"+reply+"号玩家");
