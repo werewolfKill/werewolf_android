@@ -2,7 +2,7 @@ package com.zinglabs.zwerewolf.service;
 
 import com.zinglabs.zwerewolf.constant.ProtocolConstant;
 import com.zinglabs.zwerewolf.data.BusinessData;
-import com.zinglabs.zwerewolf.entity.BnsRequest;
+import com.zinglabs.zwerewolf.entity.RequestBody;
 import com.zinglabs.zwerewolf.entity.Packet;
 import com.zinglabs.zwerewolf.utils.ByteUtil;
 
@@ -19,7 +19,7 @@ import io.netty.channel.Channel;
 
 public class BusinessService {
 
-    public void send(Channel channel, BnsRequest reqBody) {
+    public void send4Game(Channel channel, RequestBody reqBody) {
         ByteBuf body = channel.alloc().buffer();
 
 
@@ -27,8 +27,20 @@ public class BusinessService {
                 .writeInt(reqBody.getRoomId())
                 .writeInt(reqBody.getContent());
 
-        Packet packet = new Packet(body.readableBytes() + 12, ProtocolConstant.SID_GAME
-                , ProtocolConstant.CID_USER_LOGIN_REQ, body);
+        Packet packet = new Packet(body.readableBytes() + 12, reqBody.getServiceId()
+                , reqBody.getCommandId(), body);
+        channel.writeAndFlush(packet);
+
+    }
+
+    public void send4Business(Channel channel, RequestBody reqBody) {
+        ByteBuf body = channel.alloc().buffer();
+
+        body.writeInt(reqBody.getFromId())
+                .writeInt(reqBody.getContent());
+
+        Packet packet = new Packet(body.readableBytes() + 12, reqBody.getServiceId()
+                , reqBody.getCommandId(), body);
         channel.writeAndFlush(packet);
 
     }

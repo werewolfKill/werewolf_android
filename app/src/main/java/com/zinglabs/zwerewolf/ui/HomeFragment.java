@@ -14,6 +14,14 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.zinglabs.zwerewolf.R;
+import com.zinglabs.zwerewolf.constant.GlobalData;
+import com.zinglabs.zwerewolf.constant.ProtocolConstant;
+import com.zinglabs.zwerewolf.entity.User;
+import com.zinglabs.zwerewolf.utils.IMClientUtil;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Random;
 
 
 /**
@@ -86,8 +94,13 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
     }
 
     private void createRoom(){
-        showToast("暂未开发...");
-        System.out.println("创建房间");
+        showToast("创建房间中...");
+        Bundle bundle = getArguments();
+        int userId = bundle.getInt("userId");
+        Map<String,Integer> param = new HashMap<>();
+        param.put("fromId",userId);
+        param.put("content",userId);
+        IMClientUtil.sendMsg(ProtocolConstant.SID_BNS,ProtocolConstant.CID_BNS_CRE_ROOM_REQ,param);
 
     }
 

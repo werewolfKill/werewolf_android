@@ -3,8 +3,7 @@ package com.zinglabs.zwerewolf.controller.impl;
 import com.zinglabs.zwerewolf.constant.ProtocolConstant;
 import com.zinglabs.zwerewolf.controller.BaseController;
 import com.zinglabs.zwerewolf.data.BusinessData;
-import com.zinglabs.zwerewolf.data.GameChatData;
-import com.zinglabs.zwerewolf.entity.BnsRequest;
+import com.zinglabs.zwerewolf.entity.RequestBody;
 import com.zinglabs.zwerewolf.event.MsgEvent;
 import com.zinglabs.zwerewolf.service.BusinessService;
 
@@ -49,8 +48,8 @@ public class GameController implements BaseController {
         Integer fromId = (Integer) map.get("fromId");
         Integer roomId = (Integer)map.get("roomId");
         Integer content = (Integer)map.get("content");
-        BnsRequest reqBody = new BnsRequest(ProtocolConstant.SID_GAME,command,fromId,roomId,content);
-        businessService.send(channel,reqBody);
+        RequestBody reqBody = new RequestBody(ProtocolConstant.SID_GAME,command,fromId,roomId,content);
+        businessService.send4Game(channel,reqBody);
 
     }
 }

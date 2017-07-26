@@ -11,6 +11,8 @@ public class MsgEvent {
     public static final int ROOM_OVER = 0xb2;//游戏结束
     public static final int ROOM_ROLE = 0xb3;//游戏角色分配
     public static final int ROOM_ROLE_STATE_CHANGE = 0xb4;//角色状态变化，掉线，死亡
+    public static final int ROOM_CREATE_SUC = 0xb5;  //创建房间成功
+    public static final int ROOM_CREATE_FAIL = 0xb6;  //创建房间失败
 
     public static final int GAME_READY=0xc1; //玩家准备
 

@@ -18,6 +18,8 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.zinglabs.zwerewolf.R;
+import com.zinglabs.zwerewolf.constant.GlobalData;
+import com.zinglabs.zwerewolf.entity.User;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -62,7 +64,15 @@ public class MainActivity extends AppCompatActivity {
         tag_v = (LinearLayout) findViewById(R.id.main_tag_v);
         vp = (ViewPager) findViewById(R.id.main_vp);
 
-        final Fragment[] arr_fg = new Fragment[]{new HomeFragment(), new MessageFragment()};
+        GlobalData globalData = (GlobalData)getApplication();
+        User user = globalData.getUser();
+        Fragment homeFg = new HomeFragment();
+        Fragment msgFg = new MessageFragment();
+        Bundle userBl = new Bundle();
+        userBl.putInt("userId",user.getId());
+        homeFg.setArguments(userBl);
+
+        final Fragment[] arr_fg = new Fragment[]{homeFg,msgFg};
         vp.setOffscreenPageLimit(arr_fg.length);
 
         vp.setAdapter(new FragmentStatePagerAdapter(getSupportFragmentManager()) {

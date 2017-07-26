@@ -6,13 +6,20 @@ package com.zinglabs.zwerewolf.entity;
  * @email wthfeng@126.com
  */
 
-public class BnsRequest {
+public class RequestBody {
 
-    public BnsRequest(short serviceId, short commandId, int fromId, int roomId, int content) {
+    public RequestBody(short serviceId, short commandId, int fromId, int roomId, int content) {
         this.serviceId = serviceId;
         this.commandId = commandId;
         this.fromId = fromId;
         this.roomId = roomId;
+        this.content = content;
+    }
+
+    public RequestBody(short serviceId, short commandId, int fromId, int content) {
+        this.serviceId = serviceId;
+        this.commandId = commandId;
+        this.fromId = fromId;
         this.content = content;
     }
 
