@@ -14,14 +14,16 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.zinglabs.zwerewolf.R;
-import com.zinglabs.zwerewolf.constant.GlobalData;
+import com.zinglabs.zwerewolf.config.Constants;
 import com.zinglabs.zwerewolf.constant.ProtocolConstant;
-import com.zinglabs.zwerewolf.entity.User;
+import com.zinglabs.zwerewolf.event.HomeFragmentEvent;
 import com.zinglabs.zwerewolf.utils.IMClientUtil;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Random;
 
 
 /**
@@ -32,6 +34,15 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
     private AppCompatActivity activity;
     private View root;
 
+
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        EventBus.getDefault().register(this);
+
+    }
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -39,6 +50,12 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
         root = inflater.inflate(R.layout.fragment_home, container, false);
         init();
         return root;
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        EventBus.getDefault().unregister(this);
     }
 
     private void init() {
@@ -96,10 +113,11 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
     private void createRoom(){
         showToast("创建房间中...");
         Bundle bundle = getArguments();
-        int userId = bundle.getInt("userId");
+        int userId = bundle.getInt("userId",0);
         Map<String,Integer> param = new HashMap<>();
+        //TODO 弹框选择游戏模式,现默认12人经典局
         param.put("fromId",userId);
-        param.put("content",userId);
+        param.put("content", Constants.MODEL_12_YNLS);
         IMClientUtil.sendMsg(ProtocolConstant.SID_BNS,ProtocolConstant.CID_BNS_CRE_ROOM_REQ,param);
 
     }
@@ -107,6 +125,28 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
     private void showToast(String str){
 
         Toast.makeText(activity,str,Toast.LENGTH_SHORT).show();
+
+    }
+
+    @Subscribe
+    public void onEvent(HomeFragmentEvent event) {
+        int userId = event.getUserId();
+        int roomId = event.getRoomId();
+        int modelId = event.getModelId();
+        int code = event.getCode();
+        switch (code){
+            case HomeFragmentEvent.CREATE_ROOM_SUC:
+                Intent roomIntent =  new Intent(activity, GameActivity.class);
+                roomIntent.putExtra("roomId",roomId);
+                roomIntent.putExtra("modelId",modelId);
+                roomIntent.putExtra("ownerId",userId);
+                roomIntent.putExtra("curUserId",userId);
+                startActivity(roomIntent);
+                break;
+            case HomeFragmentEvent.CREATE_ROOM_FAIL:
+                showToast("创建房间失败");
+
+        }
 
     }
 }

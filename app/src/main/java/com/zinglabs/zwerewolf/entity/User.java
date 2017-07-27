@@ -6,8 +6,11 @@ package com.zinglabs.zwerewolf.entity;
  */
 public class User {
 
-    private int id;
-    private String username;
+    private int id;  //用户id
+
+    private String username;  //用户昵称
+
+    private int number;  //用户在房间编号
 
     private int roomId; //房间号
     public User(int id, String username){

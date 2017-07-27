@@ -8,9 +8,10 @@ package com.zinglabs.zwerewolf.role;
 public class Villager extends Role {
     public static final String NAME = "村民";
 
-    public Villager(int number) {
-        this.number = number;
+    public Villager() {
     }
+
+
 
     @Override
     public int doRoleAction() {

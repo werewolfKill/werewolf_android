@@ -5,7 +5,9 @@ import com.zinglabs.zwerewolf.controller.BaseController;
 import com.zinglabs.zwerewolf.data.BusinessData;
 import com.zinglabs.zwerewolf.entity.RequestBody;
 import com.zinglabs.zwerewolf.event.MsgEvent;
+import com.zinglabs.zwerewolf.role.Role;
 import com.zinglabs.zwerewolf.service.BusinessService;
+import com.zinglabs.zwerewolf.utils.RoleUtil;
 
 import org.greenrobot.eventbus.EventBus;
 
@@ -28,15 +30,23 @@ public class GameController implements BaseController {
         BusinessData businessData = businessService.receive(body);
         int fromId = businessData.getFromId();
         int reply = businessData.getReply();
+        MsgEvent msgEvent = null;
 
-        switch (command){
+        switch (command) {
             case ProtocolConstant.CID_GAME_READY_RESP: //准备游戏
-                System.out.println(fromId+"号玩家已准备好");
-                MsgEvent msgEvent = new MsgEvent(MsgEvent.GAME_READY, null, businessData);
+                System.out.println(fromId + "号玩家已准备好");
+                msgEvent = new MsgEvent(MsgEvent.GAME_READY, null, businessData);
                 EventBus.getDefault().post(msgEvent);
                 break;
+            case ProtocolConstant.CID_GAME_START_RESP:  //开始游戏
+                Role role = RoleUtil.getRole(reply);
+                System.out.println("开始游戏,您的角色是"+role.getName());
+                msgEvent = new MsgEvent(MsgEvent.GAME_START, null, businessData);
+                EventBus.getDefault().post(msgEvent);
+                break;
+
             case ProtocolConstant.CID_GAME_KILL_RES_RESP:  //狼人杀人信息
-                System.out.println(fromId+"击杀"+reply+"号玩家");
+                System.out.println(fromId + "击杀" + reply + "号玩家");
                 break;
         }
 
@@ -44,12 +54,12 @@ public class GameController implements BaseController {
 
     @Override
     public void doSend(short command, Channel channel, Object param) {
-        Map map = (Map)param;
+        Map map = (Map) param;
         Integer fromId = (Integer) map.get("fromId");
-        Integer roomId = (Integer)map.get("roomId");
-        Integer content = (Integer)map.get("content");
-        RequestBody reqBody = new RequestBody(ProtocolConstant.SID_GAME,command,fromId,roomId,content);
-        businessService.send4Game(channel,reqBody);
+        Integer roomId = (Integer) map.get("roomId");
+        Integer content = (Integer) map.get("content");
+        RequestBody reqBody = new RequestBody(ProtocolConstant.SID_GAME, command, fromId, roomId, content);
+        businessService.send4Game(channel, reqBody);
 
     }
 }

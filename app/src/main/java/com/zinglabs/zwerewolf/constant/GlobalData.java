@@ -2,6 +2,7 @@ package com.zinglabs.zwerewolf.constant;
 
 import android.app.Application;
 
+import com.zinglabs.zwerewolf.entity.Room;
 import com.zinglabs.zwerewolf.entity.User;
 
 /**
@@ -9,7 +10,25 @@ import com.zinglabs.zwerewolf.entity.User;
  */
 
 public class GlobalData extends Application {
+
+    /**
+     * 用户数据信息
+     */
     private User user;
+
+
+    /**
+     * 房间信息
+     */
+    private Room room;
+
+    public Room getRoom() {
+        return room;
+    }
+
+    public void setRoom(Room room) {
+        this.room = room;
+    }
 
     public User getUser() {
         return user;

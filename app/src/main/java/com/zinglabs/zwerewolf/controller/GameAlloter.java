@@ -71,7 +71,7 @@ public class GameAlloter {
         for (Map.Entry<String, Integer> entry : elementMap.entrySet()) {
             for (int i = 0; i < entry.getValue(); i++) {
                 Integer index = list.remove(new Random().nextInt(list.size()));
-                deployMap.put(index, Role.newInstance(entry.getKey(), index));
+//                deployMap.put(index, Role.newInstance(entry.getKey(), index));
             }
         }
         String srt_deploy = "";

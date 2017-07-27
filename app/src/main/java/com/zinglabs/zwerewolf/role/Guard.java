@@ -1,20 +1,19 @@
 package com.zinglabs.zwerewolf.role;
 
-
-
 /**
- * 猎人
- * Created by Administrator on 2017/3/9.
+ * @user wangtonghe
+ * @date 2017/7/27
+ * @email wthfeng@126.com
  */
 
-public class Huntsman extends Role {
-    public static final String NAME = "猎人";
+public class Guard extends Role {
+    public static final String NAME = "守卫";
     private boolean isHunting;//是否行动中
     public static final long ACTION_TIME = 15 * 1000;
 
 
 
-    public Huntsman() {
+    public Guard() {
     }
 
     @Override
@@ -24,7 +23,7 @@ public class Huntsman extends Role {
 
     @Override
     public void onStateChange() {
-       // LogUtil.e("猎人死亡触发技能");
+        // LogUtil.e("猎人死亡触发技能");
     }
 
     public boolean isHunting() {
@@ -39,5 +38,4 @@ public class Huntsman extends Role {
     public String getName() {
         return NAME;
     }
-
 }

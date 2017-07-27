@@ -183,19 +183,20 @@
         </LinearLayout>
         <!--开始准备按钮-->
         <ImageButton
-            android:id="@+id/room_start_ib"
+            android:id="@+id/room_ready_ib"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_above="@id/room_key_voice_v"
             android:layout_centerHorizontal="true"
             android:background="@null"
-            android:src="@mipmap/button_start" />
+            android:src="@mipmap/button_ready" />
+
         <!--聊天布局-->
         <ListView
             android:id="@+id/room_chat_lv"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_above="@id/room_start_ib"
+            android:layout_above="@id/room_ready_ib"
             android:layout_below="@id/room_myrole_v"
             android:layout_marginBottom="0dp"
             android:layout_marginLeft="70dp"

@@ -11,9 +11,6 @@ public class Wolf extends Role {
     public static final String NAME = "狼人";
     public static final long ACTION_TIME = 15 * 1000;
 
-    public Wolf(int number) {
-        this.number = number;
-    }
 
     /**
      * 独有行动是否弃权

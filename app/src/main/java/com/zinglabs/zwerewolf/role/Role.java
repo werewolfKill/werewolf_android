@@ -125,22 +125,22 @@ public abstract class Role {
      */
     public abstract String getName();
 
-    public static Role newInstance(String name, int number) {
-        switch (name) {
-            case Wolf.NAME:
-                return new Wolf(number);
-            case Witch.NAME:
-                return new Witch(number);
-            case Prophet.NAME:
-                return new Prophet(number);
-            case Villager.NAME:
-                return new Villager(number);
-            case Huntsman.NAME:
-                return new Huntsman(number);
-            default:
-                return null;
-        }
-    }
+//    public static Role newInstance(String name, int number) {
+//        switch (name) {
+//            case Wolf.NAME:
+//                return new Wolf(number);
+//            case Witch.NAME:
+//                return new Witch(number);
+//            case Prophet.NAME:
+//                return new Prophet(number);
+//            case Villager.NAME:
+//                return new Villager(number);
+//            case Huntsman.NAME:
+//                return new Huntsman(number);
+//            default:
+//                return null;
+//        }
+//    }
 
     private OnRoleStateChangeListener onRoleStateChangeListener;
 

@@ -7,6 +7,7 @@ import android.os.Message;
 import com.zinglabs.zwerewolf.config.Constants;
 import com.zinglabs.zwerewolf.constant.GlobalData;
 import com.zinglabs.zwerewolf.constant.ProtocolConstant;
+import com.zinglabs.zwerewolf.entity.Room;
 import com.zinglabs.zwerewolf.entity.User;
 import com.zinglabs.zwerewolf.event.GameStateMessage;
 import com.zinglabs.zwerewolf.im.IMClient;
@@ -80,40 +81,54 @@ public class SimpleController implements Role.OnRoleStateChangeListener {
         return null;
     }
 
-//    public void startGame(int players) {
-//        winer = Role.WIN_NO;
-//        isGameing = true;
-//        bout = 1;
-//        //生成角色组成情况
-//        elementMap = GameAlloter.getElementMap(players);
-//        //生成角色部署情况
-//        deployMap = GameAlloter.getDeployMap(elementMap, players);
-//
-//        //将角色部署情况显示到界面
-//        Message msg_role_deploy = new Message();
-//        msg_role_deploy.what = GameStateMessage.ROLE_DEPLOY;
-//        msg_role_deploy.obj = deployMap;
-//        handler.sendMessage(msg_role_deploy);
-//
-//        //生成幸存者集合
-//        aliveList = GameAlloter.updateAliver(aliveList, deployMap);
-//        for (Map.Entry<Integer, Role> entry : deployMap.entrySet()) {
-//            entry.getValue().setOnRoleStateChangeListener(this);
-//        }
-//
-//        //进入天黑阶段
-//        doStage(TIANHEI);
-//    }
-    public void startGame(User user){
+    public void startGame(int players) {
+        winer = Role.WIN_NO;
+        isGameing = true;
+        bout = 1;
+        //生成角色组成情况
+        elementMap = GameAlloter.getElementMap(players);
+        //生成角色部署情况
+        deployMap = GameAlloter.getDeployMap(elementMap, players);
+
+        //将角色部署情况显示到界面
+        Message msg_role_deploy = new Message();
+        msg_role_deploy.what = GameStateMessage.ROLE_DEPLOY;
+        msg_role_deploy.obj = deployMap;
+        handler.sendMessage(msg_role_deploy);
+
+        //生成幸存者集合
+        aliveList = GameAlloter.updateAliver(aliveList, deployMap);
+        for (Map.Entry<Integer, Role> entry : deployMap.entrySet()) {
+            entry.getValue().setOnRoleStateChangeListener(this);
+        }
+
+        //进入天黑阶段
+        doStage(TIANHEI);
+    }
+    public void readyGame(Room room){
         Map<String,Object> param = new HashMap<>();
-        int userId = user.getId();
-        int roomId = user.getRoomId();
-        param.put("fromId", userId);  //模拟用户id
-        param.put("roomId", roomId);  //模拟房间id
+        int userId = room.getCurUserId();
+        int roomId = room.getRoomId();
+        param.put("fromId", userId);
+        param.put("roomId", roomId);
         param.put("content", 0);  //设为0
 
         //向服务器发送准备游戏通知
         IMClientUtil.sendMsg(ProtocolConstant.SID_GAME,ProtocolConstant.CID_GAME_READY_REQ,param);
+
+    }
+
+    public void startGame(Room room){
+        Map<String,Object> param = new HashMap<>();
+        int userId = room.getCurUserId();
+        int roomId = room.getRoomId();
+        param.put("fromId", userId);
+        param.put("roomId", roomId);
+        param.put("content", 0);  //设为0
+
+        //向服务器发送开始游戏通知
+        IMClientUtil.sendMsg(ProtocolConstant.SID_GAME,ProtocolConstant.CID_GAME_START_REQ,param);
+
 
     }
 

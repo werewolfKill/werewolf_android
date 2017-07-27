@@ -32,6 +32,7 @@ import com.zinglabs.zwerewolf.data.GameChatData;
 import com.zinglabs.zwerewolf.data.RoleBuild;
 import com.zinglabs.zwerewolf.data.RoleData;
 import com.zinglabs.zwerewolf.data.UserData;
+import com.zinglabs.zwerewolf.entity.Room;
 import com.zinglabs.zwerewolf.entity.User;
 import com.zinglabs.zwerewolf.event.GameStateMessage;
 import com.zinglabs.zwerewolf.event.MsgEvent;
@@ -40,6 +41,7 @@ import com.zinglabs.zwerewolf.manager.DialogManager;
 import com.zinglabs.zwerewolf.role.Role;
 import com.zinglabs.zwerewolf.utils.AppUtil;
 import com.zinglabs.zwerewolf.utils.DateUtil;
+import com.zinglabs.zwerewolf.utils.RoleUtil;
 import com.zinglabs.zwerewolf.widget.RoleView;
 
 import org.greenrobot.eventbus.EventBus;
@@ -51,10 +53,11 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Random;
 
 import cn.dreamtobe.kpswitch.widget.KPSwitchPanelLinearLayout;
+
+import static com.zinglabs.zwerewolf.R.id.room_ready_ib;
 
 
 /**
@@ -79,7 +82,9 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
     private View key_v;
     private EditText et;
     private ImageButton startIB;
+    private ImageButton readyIB;
     private GlobalData globalData;
+
     private Context context;
     // 面板View
     private KPSwitchPanelLinearLayout mPanelLayout;
@@ -156,7 +161,6 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                             roleView.unReady();
                         }
                     }
-
                     startIB.setVisibility(View.VISIBLE);
                     myRole_v.setVisibility(View.GONE);
                     myRoleBg_v.setVisibility(View.GONE);
@@ -199,13 +203,18 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
         context = getApplicationContext();
         EventBus.getDefault().register(this);
         init();
-          // initUIandEvent();
     }
 
     private void init() {
 
         globalData = (GlobalData) getApplication();
-
+        Intent roomIntent = getIntent();
+        int roomId =  roomIntent.getIntExtra("roomId",0);
+        int modelId = roomIntent.getIntExtra("modelId",0);
+        int ownerId = roomIntent.getIntExtra("ownerId",0);
+        int curUserId = roomIntent.getIntExtra("curUserId",0);
+        Room room = new Room(roomId,modelId,ownerId,curUserId);
+        globalData.setRoom(room);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         toolbar.setTitle("");
@@ -243,9 +252,8 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
         et = (EditText) findViewById(R.id.room_et);
 
         findViewById(R.id.room_send_tv).setOnClickListener(this);
-
-        startIB = (ImageButton) findViewById(R.id.room_start_ib);
-        startIB.setOnClickListener(this);
+        readyIB = (ImageButton) findViewById(R.id.room_ready_ib);
+        readyIB.setOnClickListener(this);
 
         voice_v.setOnTouchListener(new View.OnTouchListener() {
             @Override
@@ -314,6 +322,8 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onClick(View v) {
+        GlobalData globalData = (GlobalData)getApplication();
+        Room room = globalData.getRoom();
         switch (v.getId()) {
             case R.id.room_key_switch_ib: // 聊天模式切换
                 AppUtil.closeBoard(GameActivity.this);
@@ -340,13 +350,15 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                 IMClient.getInstance().send(ProtocolConstant.SID_MSG + "/" + ProtocolConstant.CID_MSG_TEXT_REQ, param);
                 //MessageService.sendSingleMsgReq(1314,msg);
                 break;
-            //开局或准备
-            case R.id.room_start_ib:
-                startIB.setVisibility(View.GONE);
-                GlobalData globalData = (GlobalData)getApplication();
-                User user = globalData.getUser();
-                user.setRoomId(new Random().nextInt(10000));  //模拟房间号
-                simpleController.startGame(user);
+            //准备
+            case room_ready_ib:
+                if(room.isOwner()){
+//                    readyIB.setVisibility(View.GONE);
+                    simpleController.startGame(room);
+                }else {
+                    readyIB.setVisibility(View.GONE);
+                    simpleController.readyGame(room);
+                }
                 break;
         }
     }
@@ -355,21 +367,26 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
     public void onEvent(MsgEvent event) {
         String msg = event.getMsgStr();
         Object param = event.getObj();
+        BusinessData businessData = null;
         switch (event.getMsgType()) {
             case MsgEvent.ROOM_CHAT:
                 chatAdapter.update(event.getObj());
                 break;
-            case MsgEvent.ROOM_START:
-                //所有玩家进入分配角色阶段
-//                if (gameController.isGameing()) {
-//                    return;
-//                }
-//                gameController.gameStart(playerCount);
-//                for (RoleView roleView : roleViewList) {
-//                    if (roleView.hasRole()) {
-//                        roleView.unReady();
-//                    }
-//        }
+            case MsgEvent.GAME_READY:  //准备游戏
+                 businessData = (BusinessData)param;
+                int fromId = businessData.getFromId();
+                RoleView roleView = roleViewMap.get(fromId);
+                if(roleView!=null){
+                    roleView.ready();
+                }
+                break;
+            case MsgEvent.GAME_START:  //游戏开始
+                businessData = (BusinessData)param;
+                Role role = RoleUtil.getRole(businessData.getReply());
+                String roleMsg = "您的角色是"+role.getName();
+                GameChatData chat = new GameChatData(GameChatData.CHAT, new Date().getTime() + "", new User(0,"LRSwzc25151"), 111, roleMsg);
+                chatAdapter.update(chat);
+                title_tv.setText(role.getName()+"****"+globalData.getRoom().getRoomId()+"号房间");
                 break;
             case MsgEvent.ROOM_OVER:
 //                if (!gameController.isGameing()) {
@@ -408,14 +425,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
 //                    }
 //                }
                 break;
-            case MsgEvent.GAME_READY:  //准备游戏
-                BusinessData businessData = (BusinessData)param;
-                int fromId = businessData.getFromId();
-                RoleView roleView = roleViewMap.get(fromId);
-                if(roleView!=null){
-                    roleView.ready();
-                }
-                break;
+
         }
     }
 

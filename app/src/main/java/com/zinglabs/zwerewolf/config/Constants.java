@@ -12,8 +12,27 @@ public class Constants {
     public static int ENCODING = AudioFormat.ENCODING_PCM_16BIT;
 
 //    public  static final String app_host = "192.168.0.102";
-    public static final String app_host="10.2.4.110";
+    public static final String app_host="10.0.0.101";
     public static final int app_port = 8080;
+
+    //游戏模式
+    public static final int MODEL_12_YNLS =1;  //12人预女列守经典版
+    public static final int MODEL_12_YNLB =2;  //12人预女列白版
+    public static final int MODEL_9 =3;  //9人局
+    public static final int MODEL_10 =4;  //10人局
+
+    //角色对应关系
+    public static final int ROLE_CODE_OF_WOLF = 1;  //狼
+    public static final int ROLE_CODE_OF_PROPHET = 2;  //预言家
+    public static final int ROLE_CODE_OF_VILLAGER = 3;  //村民
+    public static final int ROLE_CODE_OF_WITCH = 4;  //女巫
+    public static final int ROLE_CODE_OF_HUNTSMAN = 5;  //猎人
+    public static final int ROLE_CODE_OF_GUARD = 6;  //守卫
+    public static final int ROLE_CODE_OF_IDIOT = 7;  //白痴
+
+
+
+
     //---系统发言
     public static final String TEXT_START_ALLOT = "游戏开始，本轮共有%d个狼人，%d个预言家，%d个女巫，%d个猎人，%d个村民";
     public static final String TEXT_DAY_DARK = "天黑请闭眼，第%d夜开始，大家出来活动吧";

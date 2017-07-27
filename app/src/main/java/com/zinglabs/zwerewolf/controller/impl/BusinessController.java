@@ -4,8 +4,10 @@ import com.zinglabs.zwerewolf.constant.ProtocolConstant;
 import com.zinglabs.zwerewolf.controller.BaseController;
 import com.zinglabs.zwerewolf.data.BusinessData;
 import com.zinglabs.zwerewolf.entity.RequestBody;
+import com.zinglabs.zwerewolf.event.HomeFragmentEvent;
 import com.zinglabs.zwerewolf.event.MsgEvent;
 import com.zinglabs.zwerewolf.service.BusinessService;
+import com.zinglabs.zwerewolf.ui.HomeFragment;
 
 import org.greenrobot.eventbus.EventBus;
 
@@ -34,9 +36,9 @@ public class BusinessController implements BaseController {
 
         switch (command) {
             case ProtocolConstant.CID_BNS_CRE_ROOM_RESP: //创建房间
-                int code = reply > 0 ? MsgEvent.ROOM_CREATE_SUC : MsgEvent.ROOM_CREATE_FAIL;
-                MsgEvent msgEvent = new MsgEvent(code, null, businessData);
-                EventBus.getDefault().post(msgEvent);
+                int code = reply > 0 ? HomeFragmentEvent.CREATE_ROOM_SUC : HomeFragmentEvent.CREATE_ROOM_FAIL;
+                HomeFragmentEvent event = new HomeFragmentEvent(reply,fromId,1,code);
+                EventBus.getDefault().post(event);
                 break;
         }
 

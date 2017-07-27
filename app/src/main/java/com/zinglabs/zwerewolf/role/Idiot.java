@@ -1,14 +1,16 @@
 package com.zinglabs.zwerewolf.role;
 
 /**
- * 预言家
- * Created by Administrator on 2017/3/9.
+ * 角色 白痴类
+ * @user wangtonghe
+ * @date 2017/7/27
+ * @email wthfeng@126.com
  */
 
-public class Prophet extends Role {
-    public static final String NAME = "预言家";
-    public static final long ACTION_TIME = 15 * 1000;
+public class Idiot extends Role {
 
+    public static final String NAME = "白痴";
+    public static final long ACTION_TIME = 15 * 1000;
 
 
     @Override
@@ -25,5 +27,4 @@ public class Prophet extends Role {
     public String getName() {
         return NAME;
     }
-
 }

@@ -14,9 +14,6 @@ public class Witch extends Role {
     private int panacea = 1;//初始灵药数目
     private int poison = 1;//初始毒药数目
 
-    public Witch(int number) {
-        this.number = number;
-    }
 
     @Override
     public int doRoleAction() {
