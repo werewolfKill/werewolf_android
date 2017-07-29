@@ -1,12 +1,14 @@
 package com.zinglabs.zwerewolf.role;
 
+import java.io.Serializable;
+
 /**
  * @user wangtonghe
  * @date 2017/7/29
  * @email wthfeng@126.com
  */
 
-public class UserRole {
+public class UserRole implements Serializable{
     private int usrId;
 
     private String userName;

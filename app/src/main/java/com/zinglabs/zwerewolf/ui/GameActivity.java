@@ -65,7 +65,7 @@ import static com.zinglabs.zwerewolf.R.id.room_ready_ib;
  * Created by Administrator on 2017/3/7.
  */
 
-public class GameActivity extends AppCompatActivity implements View.OnClickListener,HomeFragment.FragmentListener {
+public class GameActivity extends AppCompatActivity implements View.OnClickListener{
     private final int lvSize = 120;//定义可显示的最多聊天数量
     private int curPlayerNumber = -1;//当前玩家持有的编号，默认是房主
     private TextView title_tv;
@@ -84,6 +84,10 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
     private ImageButton startIB;
     private ImageButton readyIB;
     private GlobalData globalData;
+
+    private int curPlayerPos;
+    private int curUserId;
+    private Role curRole;
 
     private Context context;
     // 面板View
@@ -208,17 +212,14 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
     private void init() {
 
         globalData = (GlobalData) getApplication();
-        Intent roomIntent = getIntent();
-        int roomId =  roomIntent.getIntExtra("roomId",0);
-        int modelId = roomIntent.getIntExtra("modelId",0);
-        int ownerId = roomIntent.getIntExtra("ownerId",0);
-        int curUserId = roomIntent.getIntExtra("curUserId",0);
-        Room room = new Room(roomId,modelId,ownerId,curUserId);
+        Room room = (Room)getIntent().getSerializableExtra("room");
+        User user = globalData.getUser();
+        room.setCurUserId(user.getId());
         globalData.setRoom(room);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        toolbar.setTitle(roomId+"房间，准备中");
-        setTitle(roomId+"房间，准备中");
+        toolbar.setTitle(room.getRoomId()+"房间，准备中");
+        setTitle(room.getRoomId()+"房间，准备中...");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         toolbar.setNavigationIcon(R.mipmap.icon_nav_back);
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
@@ -236,7 +237,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
         bar_right = (LinearLayout) findViewById(R.id.room_bar_right);
 
         lv = (ListView) findViewById(R.id.room_chat_lv);
-        GameChatData timeData = new GameChatData(GameChatData.DATE, new Date().getTime() + "", globalData.getUser(), 111, null);
+        GameChatData timeData = new GameChatData(GameChatData.DATE, new Date().getTime() + "", user, 111, null);
         chatAdapter.addData(timeData);
         lv.setAdapter(chatAdapter);
 
@@ -281,9 +282,16 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                 return false;
             }
         });
-        int roomNum = RoomUtil.getNumByModal(modelId);
+        int roomNum = RoomUtil.getNumByModal(room.getModelId());
+        int userId = room.getCurUserId();
+        int owner = room.getOwnerId();
+        int curUserPos = room.getPlayers().get(userId).getPosition();
+        int ownerPos = room.getPlayers().get(owner).getPosition();
+        this.curUserId = userId;
+        this.curPlayerPos = curUserPos;
+        this.curRole = room.getPlayers().get(userId).getRole();
 
-        simulate(roomNum);
+        simulate(roomNum,curUserPos,ownerPos);
 
         simpleController = new SimpleController(mHandler);
     }
@@ -367,7 +375,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onEvent(MsgEvent event) {
         String msg = event.getMsgStr();
-        Object param = event.getObj();
+        Object obj = event.getObj();
         BusinessData businessData = null;
         switch (event.getMsgType()) {
 
@@ -375,7 +383,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                 chatAdapter.update(event.getObj());
                 break;
             case MsgEvent.GAME_READY:  //准备游戏
-                 businessData = (BusinessData)param;
+                 businessData = (BusinessData)obj;
                 int fromId = businessData.getFromId();
                 RoleView roleView = roleViewMap.get(fromId);
                 if(roleView!=null){
@@ -383,12 +391,13 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                 }
                 break;
             case MsgEvent.GAME_START:  //游戏开始
-                businessData = (BusinessData)param;
+                businessData = (BusinessData)obj;
+                Room room =globalData.getRoom();
                 Role role = RoleUtil.getRole(businessData.getReply());
                 String roleMsg = "您的角色是"+role.getName();
                 GameChatData chat = new GameChatData(GameChatData.CHAT, new Date().getTime() + "", new User(0,"LRSwzc25151"), 111, roleMsg);
                 chatAdapter.update(chat);
-                title_tv.setText(role.getName()+"****"+globalData.getRoom().getRoomId()+"号房间");
+                setTitle("您是"+this.curPlayerPos+"号"+role.getName());
                 break;
             case MsgEvent.ROOM_OVER:
 //                if (!gameController.isGameing()) {
@@ -453,7 +462,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
         }.start();
     }
 
-    private void simulate(int roomNum) {
+    private void simulate(int roomNum,int curUserId,int owner) {
         for (int i = 1; i <= 16; i++) {
             RoleView roleView = new RoleView(GameActivity.this);
             roleViewList.add(roleView);
@@ -464,7 +473,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
             }
             if (i <= roomNum) {
                 RoleData roleData = RoleBuild.build(i);
-                if (i == 1) { //设置1号用户为房主
+                if (i == owner) { //设置1号用户为房主
                     curPlayerNumber = i;
                     roleData = RoleBuild.build(i, new UserData());
                     roleData.setOwner(true);
@@ -500,11 +509,6 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
 
     private GameChatAdapter chatAdapter = new GameChatAdapter();
 
-    @Override
-    public void sendRoomMsg(Room room) {
-        System.out.println("接受消息："+room.getRoomId());
-
-    }
 
     private class GameChatAdapter extends BaseAdapter {
         private List<GameChatData> datas = new ArrayList<GameChatData>();

@@ -35,13 +35,6 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
     private AppCompatActivity activity;
     private View root;
 
-    private FragmentListener listener = null;
-
-    public interface FragmentListener {
-        void sendRoomMsg(Room room);
-    }
-
-
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -97,7 +90,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
                 showToast("暂未开发...");
                 break;
             case R.id.home_search_iv:  //搜索房间
-                showToast("暂未开发...");
+                searchRoom();
                 break;
             case R.id.home_create_iv:  //创建房间
                 createRoom();
@@ -128,6 +121,17 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
 
     }
 
+    private void searchRoom(){
+        Bundle bundle = getArguments();
+        int userId = bundle.getInt("userId", 0);
+        Map<String, Integer> param = new HashMap<>();
+        //TODO 弹框输入房间号
+        param.put("fromId", userId);
+        param.put("content", 10001);
+        IMClientUtil.sendMsg(ProtocolConstant.SID_BNS, ProtocolConstant.CID_BNS_FIND_ROOM_REQ, param);
+
+    }
+
     private void showToast(String str) {
 
         Toast.makeText(activity, str, Toast.LENGTH_SHORT).show();
@@ -142,21 +146,27 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
         int code = event.getCode();
         Room room = event.getRoom();
         Intent roomIntent;
+        Bundle bundle;
         switch (code) {
             case HomeFragmentEvent.CREATE_ROOM_SUC:
                 roomIntent = new Intent(activity, GameActivity.class);
-                roomIntent.putExtra("roomId", roomId);
-                roomIntent.putExtra("modelId", modelId);
-                roomIntent.putExtra("ownerId", userId);
-                roomIntent.putExtra("curUserId", userId);
+                bundle = new Bundle();
+                bundle.putSerializable("room", room);
+                roomIntent.putExtras(bundle);
                 startActivity(roomIntent);
+
+//                roomIntent = new Intent();
+//                roomIntent.setClass(activity, GameActivity.class);
+//                Bundle bundle1 = new Bundle();
+//                bundle1.putSerializable("room", room);
+//                roomIntent.putExtras(bundle1);
+//                this.startActivity(roomIntent);
                 break;
             case HomeFragmentEvent.SEARCH_ROOM_SUC:
+                bundle = new Bundle();
                 roomIntent = new Intent(activity, GameActivity.class);
-                roomIntent.putExtra("roomId", roomId);
-                roomIntent.putExtra("modelId", modelId);
-                roomIntent.putExtra("ownerId", room.getOwnerId());
-                roomIntent.putExtra("curUserId", userId);
+                bundle.putSerializable("room", room);
+                roomIntent.putExtras(bundle);
                 startActivity(roomIntent);
                 break;
 

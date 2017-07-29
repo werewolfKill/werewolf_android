@@ -2,9 +2,8 @@ package com.zinglabs.zwerewolf.entity;
 
 import com.zinglabs.zwerewolf.role.UserRole;
 
-import java.util.HashMap;
+import java.io.Serializable;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * 房间信息
@@ -13,7 +12,7 @@ import java.util.Set;
  * @email wthfeng@126.com
  */
 
-public class Room {
+public class Room implements Serializable {
 
     /**
      * 房间id

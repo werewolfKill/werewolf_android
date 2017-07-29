@@ -24,15 +24,24 @@
             app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
             app:titleTextAppearance="@style/ToolbarTitle">
 
+            <!--<TextView-->
+                <!--android:id="@+id/game_title_tv"-->
+                <!--android:layout_width="wrap_content"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:layout_gravity="center"-->
+                <!--android:drawableLeft="@mipmap/icon_navigation"-->
+                <!--android:drawableRight="@mipmap/icon_nevigation_lock"-->
+                <!--android:gravity="center"-->
+                <!--android:text=""-->
+                <!--android:textColor="@android:color/white" />-->
+
             <TextView
                 android:id="@+id/game_title_tv"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:drawableLeft="@mipmap/icon_navigation"
-                android:drawableRight="@mipmap/icon_nevigation_lock"
                 android:gravity="center"
-                android:text="简单25151房"
+                android:text=""
                 android:textColor="@android:color/white" />
 
         </android.support.v7.widget.Toolbar>
