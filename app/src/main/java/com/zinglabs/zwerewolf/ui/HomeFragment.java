@@ -16,6 +16,7 @@ import android.widget.Toast;
 import com.zinglabs.zwerewolf.R;
 import com.zinglabs.zwerewolf.config.Constants;
 import com.zinglabs.zwerewolf.constant.ProtocolConstant;
+import com.zinglabs.zwerewolf.entity.Room;
 import com.zinglabs.zwerewolf.event.HomeFragmentEvent;
 import com.zinglabs.zwerewolf.utils.IMClientUtil;
 
@@ -34,6 +35,11 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
     private AppCompatActivity activity;
     private View root;
 
+    private FragmentListener listener = null;
+
+    public interface FragmentListener {
+        void sendRoomMsg(Room room);
+    }
 
 
     @Override
@@ -65,7 +71,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
         toolbar.findViewById(R.id.menu_home_setting).setOnClickListener(this);
 
         ImageView head_iv = (ImageView) root.findViewById(R.id.home_head_iv);
-       // GlideUtil.into(activity, R.mipmap.my_head, head_iv, GlideUtil.CIRCLE);
+        // GlideUtil.into(activity, R.mipmap.my_head, head_iv, GlideUtil.CIRCLE);
 
         root.findViewById(R.id.home_easy_iv).setOnClickListener(this);
 
@@ -101,30 +107,30 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
     }
 
     private void easy() {
-     //加入房间之前的参数
-      String channel = "wzc25151";
-     //  App.mAudioSettings.mChannelName = channel;
-       Intent i = new Intent(activity, GameActivity.class);
-       i.putExtra("ecHANEL", channel);
-       startActivity(i);
+        //加入房间之前的参数
+        String channel = "wzc25151";
+        //  App.mAudioSettings.mChannelName = channel;
+        Intent i = new Intent(activity, GameActivity.class);
+        i.putExtra("ecHANEL", channel);
+        startActivity(i);
         startActivity(new Intent(activity, GameActivity.class));
     }
 
-    private void createRoom(){
+    private void createRoom() {
         showToast("创建房间中...");
         Bundle bundle = getArguments();
-        int userId = bundle.getInt("userId",0);
-        Map<String,Integer> param = new HashMap<>();
+        int userId = bundle.getInt("userId", 0);
+        Map<String, Integer> param = new HashMap<>();
         //TODO 弹框选择游戏模式,现默认12人经典局
-        param.put("fromId",userId);
+        param.put("fromId", userId);
         param.put("content", Constants.MODEL_12_YNLS);
-        IMClientUtil.sendMsg(ProtocolConstant.SID_BNS,ProtocolConstant.CID_BNS_CRE_ROOM_REQ,param);
+        IMClientUtil.sendMsg(ProtocolConstant.SID_BNS, ProtocolConstant.CID_BNS_CRE_ROOM_REQ, param);
 
     }
 
-    private void showToast(String str){
+    private void showToast(String str) {
 
-        Toast.makeText(activity,str,Toast.LENGTH_SHORT).show();
+        Toast.makeText(activity, str, Toast.LENGTH_SHORT).show();
 
     }
 
@@ -134,18 +140,38 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
         int roomId = event.getRoomId();
         int modelId = event.getModelId();
         int code = event.getCode();
-        switch (code){
+        Room room = event.getRoom();
+        Intent roomIntent;
+        switch (code) {
             case HomeFragmentEvent.CREATE_ROOM_SUC:
-                Intent roomIntent =  new Intent(activity, GameActivity.class);
-                roomIntent.putExtra("roomId",roomId);
-                roomIntent.putExtra("modelId",modelId);
-                roomIntent.putExtra("ownerId",userId);
-                roomIntent.putExtra("curUserId",userId);
+                roomIntent = new Intent(activity, GameActivity.class);
+                roomIntent.putExtra("roomId", roomId);
+                roomIntent.putExtra("modelId", modelId);
+                roomIntent.putExtra("ownerId", userId);
+                roomIntent.putExtra("curUserId", userId);
                 startActivity(roomIntent);
                 break;
-            case HomeFragmentEvent.CREATE_ROOM_FAIL:
-                showToast("创建房间失败");
+            case HomeFragmentEvent.SEARCH_ROOM_SUC:
+                roomIntent = new Intent(activity, GameActivity.class);
+                roomIntent.putExtra("roomId", roomId);
+                roomIntent.putExtra("modelId", modelId);
+                roomIntent.putExtra("ownerId", room.getOwnerId());
+                roomIntent.putExtra("curUserId", userId);
+                startActivity(roomIntent);
+                break;
 
+            case HomeFragmentEvent.CREATE_ROOM_FAIL:
+                showToast("房间创建失败");
+                break;
+            case HomeFragmentEvent.SEARCH_ROOM_NOT_EXIST:
+                showToast("房间不存在，请输入正确的房间号");
+                break;
+            case HomeFragmentEvent.SEARCH_ROOM_ALREADY_FULL:
+                showToast("该房间已满");
+                break;
+            case HomeFragmentEvent.SEARCH_ROOM_FAIL:
+                showToast("搜索失败");
+                break;
         }
 
     }

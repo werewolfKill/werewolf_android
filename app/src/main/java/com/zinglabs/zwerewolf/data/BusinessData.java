@@ -1,5 +1,8 @@
 package com.zinglabs.zwerewolf.data;
 
+import java.util.Map;
+import java.util.Objects;
+
 /**
  * 业务通用消息体
  * @user wangtonghe
@@ -11,6 +14,16 @@ public class BusinessData {
 
     private int fromId; //发送者的ID，为0表示服务器
     private int  reply; //回复码
+
+    private Map<String,Object> param;  //其他参数
+
+    public Map<String, Object> getParam() {
+        return param;
+    }
+
+    public void setParam(Map<String, Object> param) {
+        this.param = param;
+    }
 
     public int getFromId() {
         return fromId;

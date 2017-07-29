@@ -1,5 +1,9 @@
 package com.zinglabs.zwerewolf.entity;
 
+import com.zinglabs.zwerewolf.role.UserRole;
+
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -26,15 +30,30 @@ public class Room {
      */
     private int ownerId;
 
-    /**
-     * 房间玩家集合
-     */
-    private Set<User> userSet;
 
     /**
      * 当前用户id
      */
     private int curUserId;
+
+    /**
+     * 当前用户人数
+     */
+    private int curNumber;
+
+    /**
+     * 房间玩家集合
+     */
+    private Map<Integer,UserRole> players;
+
+
+    public int getCurNumber() {
+        return curNumber;
+    }
+
+    public void setCurNumber(int curNumber) {
+        this.curNumber = curNumber;
+    }
 
     public int getRoomId() {
         return roomId;
@@ -42,6 +61,10 @@ public class Room {
 
     public void setRoomId(int roomId) {
         this.roomId = roomId;
+    }
+
+    public Room(){
+
     }
 
     public Room(int roomId, int modelId, int ownerId, int curUserId) {
@@ -72,13 +95,6 @@ public class Room {
         this.ownerId = ownerId;
     }
 
-    public Set<User> getUserSet() {
-        return userSet;
-    }
-
-    public void setUserSet(Set<User> userSet) {
-        this.userSet = userSet;
-    }
 
     public int getCurUserId() {
         return curUserId;
@@ -91,5 +107,13 @@ public class Room {
     public boolean isOwner(){
 
         return this.ownerId!=0&&this.curUserId==this.ownerId;
+    }
+
+    public Map<Integer, UserRole> getPlayers() {
+        return players;
+    }
+
+    public void setPlayers(Map<Integer, UserRole> players) {
+        this.players = players;
     }
 }

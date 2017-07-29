@@ -1,5 +1,7 @@
 package com.zinglabs.zwerewolf.event;
 
+import com.zinglabs.zwerewolf.entity.Room;
+
 /**
  * 主页面Event通知类
  * @user wangtonghe
@@ -15,7 +17,14 @@ public class HomeFragmentEvent {
 
     public static final int SEARCH_ROOM_SUC = 3;
 
-    public static final int SEARCH_ROOM_FAIL = 4;
+    public static final int SEARCH_ROOM_NOT_EXIST = 4;
+
+    public static final int SEARCH_ROOM_ALREADY_FULL = 5;
+
+    public static final int SEARCH_ROOM_FAIL = 6;
+
+
+
 
 
 
@@ -25,16 +34,32 @@ public class HomeFragmentEvent {
 
     private int modelId;  //游戏模式
 
+    private Room room;
+
+
+
     /**
      * 命令模式
      */
     private int code;
+
+    public HomeFragmentEvent(){
+
+    }
 
     public HomeFragmentEvent(int roomId, int userId, int modelId,int code) {
         this.roomId = roomId;
         this.userId = userId;
         this.modelId = modelId;
         this.code=code;
+    }
+
+    public Room getRoom() {
+        return room;
+    }
+
+    public void setRoom(Room room) {
+        this.room = room;
     }
 
     public int getCode() {

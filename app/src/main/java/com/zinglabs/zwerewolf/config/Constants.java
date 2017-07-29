@@ -12,7 +12,7 @@ public class Constants {
     public static int ENCODING = AudioFormat.ENCODING_PCM_16BIT;
 
 //    public  static final String app_host = "192.168.0.102";
-    public static final String app_host="10.0.0.101";
+    public static final String app_host="10.2.4.101";
     public static final int app_port = 8080;
 
     //游戏模式
@@ -29,6 +29,11 @@ public class Constants {
     public static final int ROLE_CODE_OF_HUNTSMAN = 5;  //猎人
     public static final int ROLE_CODE_OF_GUARD = 6;  //守卫
     public static final int ROLE_CODE_OF_IDIOT = 7;  //白痴
+
+    //搜索房间结果
+    public static final int ROOM_SEARCH_SUCCESS = 0;  //搜索房间并进入
+    public static final int ROOM_SEARCH_NOT_EXIST = -1;  //搜索房间不存在
+    public static final int ROOM_SEARCH_ALREADY_FULL = -2; //搜索房间已满
 
 
 

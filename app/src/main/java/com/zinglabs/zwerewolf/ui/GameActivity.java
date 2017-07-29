@@ -42,6 +42,7 @@ import com.zinglabs.zwerewolf.role.Role;
 import com.zinglabs.zwerewolf.utils.AppUtil;
 import com.zinglabs.zwerewolf.utils.DateUtil;
 import com.zinglabs.zwerewolf.utils.RoleUtil;
+import com.zinglabs.zwerewolf.utils.RoomUtil;
 import com.zinglabs.zwerewolf.widget.RoleView;
 
 import org.greenrobot.eventbus.EventBus;
@@ -64,9 +65,8 @@ import static com.zinglabs.zwerewolf.R.id.room_ready_ib;
  * Created by Administrator on 2017/3/7.
  */
 
-public class GameActivity extends AppCompatActivity implements View.OnClickListener {
+public class GameActivity extends AppCompatActivity implements View.OnClickListener,HomeFragment.FragmentListener {
     private final int lvSize = 120;//定义可显示的最多聊天数量
-    private int playerCount = 10;//模拟玩家人数
     private int curPlayerNumber = -1;//当前玩家持有的编号，默认是房主
     private TextView title_tv;
     private LinearLayout bar_left;
@@ -217,8 +217,8 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
         globalData.setRoom(room);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        toolbar.setTitle("");
-        setTitle("");
+        toolbar.setTitle(roomId+"房间，准备中");
+        setTitle(roomId+"房间，准备中");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         toolbar.setNavigationIcon(R.mipmap.icon_nav_back);
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
@@ -281,8 +281,9 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                 return false;
             }
         });
+        int roomNum = RoomUtil.getNumByModal(modelId);
 
-        simulate();
+        simulate(roomNum);
 
         simpleController = new SimpleController(mHandler);
     }
@@ -369,6 +370,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
         Object param = event.getObj();
         BusinessData businessData = null;
         switch (event.getMsgType()) {
+
             case MsgEvent.ROOM_CHAT:
                 chatAdapter.update(event.getObj());
                 break;
@@ -451,7 +453,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
         }.start();
     }
 
-    private void simulate() {
+    private void simulate(int roomNum) {
         for (int i = 1; i <= 16; i++) {
             RoleView roleView = new RoleView(GameActivity.this);
             roleViewList.add(roleView);
@@ -460,7 +462,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
             } else {
                 bar_right.addView(roleView);
             }
-            if (i <= playerCount) {
+            if (i <= roomNum) {
                 RoleData roleData = RoleBuild.build(i);
                 if (i == 1) { //设置1号用户为房主
                     curPlayerNumber = i;
@@ -497,6 +499,12 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private GameChatAdapter chatAdapter = new GameChatAdapter();
+
+    @Override
+    public void sendRoomMsg(Room room) {
+        System.out.println("接受消息："+room.getRoomId());
+
+    }
 
     private class GameChatAdapter extends BaseAdapter {
         private List<GameChatData> datas = new ArrayList<GameChatData>();

@@ -46,8 +46,11 @@ public class BusinessService {
     }
 
     public BusinessData receive(ByteBuf byteBuf) {
-        return ByteUtil.encodeBnsType(byteBuf);
+        return ByteUtil.resolveBusiness(byteBuf);
 
+    }
+    public BusinessData receiveRoomMsg(ByteBuf byteBuf){
+        return ByteUtil.resolveRoomMsg(byteBuf);
     }
 
 
