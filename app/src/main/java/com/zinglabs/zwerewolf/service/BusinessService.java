@@ -53,5 +53,10 @@ public class BusinessService {
         return ByteUtil.resolveRoomMsg(byteBuf);
     }
 
+    public BusinessData receiveStartMsg(ByteBuf byteBuf){
+
+        return ByteUtil.resolveStartMsg(byteBuf);
+    }
+
 
 }

@@ -97,6 +97,9 @@ public interface ProtocolConstant {
     //开始游戏确认
     short CID_GAME_START_RESP =4;
 
+    //开始游戏失败
+    short CID_GAME_START_FAIL =-1;
+
     //进入天黑（开始游戏）
     short CID_GAME_DARK=5;
 

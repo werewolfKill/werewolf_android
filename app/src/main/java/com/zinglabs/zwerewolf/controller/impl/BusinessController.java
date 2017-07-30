@@ -58,10 +58,10 @@ public class BusinessController implements BaseController {
                     roomId = room.getRoomId();
                     event = new HomeFragmentEvent(roomId, fromId, modalId, HomeFragmentEvent.SEARCH_ROOM_SUC);
                     event.setRoom(room);
-                } else if (reply == Constants.ROOM_SEARCH_NOT_EXIST) {
+                } else if (reply == Constants.ROOM_NOT_EXIST) {
                     event = new HomeFragmentEvent();
                     event.setCode(HomeFragmentEvent.SEARCH_ROOM_NOT_EXIST);
-                } else if (reply == Constants.ROOM_SEARCH_ALREADY_FULL) {
+                } else if (reply == Constants.ROOM_ALREADY_FULL) {
                     event = new HomeFragmentEvent();
                     event.setCode(HomeFragmentEvent.SEARCH_ROOM_ALREADY_FULL);
                 } else {

@@ -32,10 +32,9 @@ public class Constants {
 
     //搜索房间结果
     public static final int ROOM_SEARCH_SUCCESS = 0;  //搜索房间并进入
-    public static final int ROOM_SEARCH_NOT_EXIST = -1;  //搜索房间不存在
-    public static final int ROOM_SEARCH_ALREADY_FULL = -2; //搜索房间已满
-
-
+    public static final int ROOM_NOT_EXIST = -1;  //搜索房间不存在
+    public static final int ROOM_ALREADY_FULL = -2; //搜索房间已满
+    public static final int ROOM_NOT_ENOUGH_NUM = -3; //房间人数不够
 
 
     //---系统发言

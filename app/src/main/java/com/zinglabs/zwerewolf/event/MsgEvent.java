@@ -15,7 +15,10 @@ public class MsgEvent {
 
 
     public static final int GAME_READY=0xc1; //玩家准备
-    public static final int GAME_START=0xc2; //玩家准备
+    public static final int GAME_START=0xc2; //房主开始游戏
+    public static final int GAME_NOT_ENOUGH_NUM=0xc3; //没有足够人数
+    public static final int GAME_START_FAIL=0xc4; //未知原因导致开始游戏失败
+
 
 
     private int msgType;

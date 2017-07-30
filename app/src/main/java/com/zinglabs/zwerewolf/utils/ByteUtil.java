@@ -4,7 +4,9 @@ import com.zinglabs.zwerewolf.data.BusinessData;
 import com.zinglabs.zwerewolf.entity.Room;
 import com.zinglabs.zwerewolf.role.UserRole;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -64,6 +66,24 @@ public class ByteUtil {
             msgBody.setParam(param);
         }
         return msgBody;
+    }
+
+    public static BusinessData resolveStartMsg(ByteBuf body){
+        BusinessData msgBody = new BusinessData();
+        msgBody.setFromId(body.readInt());
+        msgBody.setReply(body.readInt());
+        int num = body.readInt();
+        Map<String, Object> param = new HashMap<>();
+        if (num>0) {
+            Integer[] wolfs = new Integer[num];
+            for(int i=0;i<num;i++){
+               wolfs[i]= body.readInt();
+            }
+            param.put("wolfs",wolfs);
+            msgBody.setParam(param);
+        }
+        return msgBody;
+
     }
 
 

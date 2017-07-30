@@ -24,6 +24,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.zinglabs.zwerewolf.R;
+import com.zinglabs.zwerewolf.config.Constants;
 import com.zinglabs.zwerewolf.constant.GlobalData;
 import com.zinglabs.zwerewolf.constant.ProtocolConstant;
 import com.zinglabs.zwerewolf.controller.SimpleController;
@@ -39,10 +40,13 @@ import com.zinglabs.zwerewolf.event.MsgEvent;
 import com.zinglabs.zwerewolf.im.IMClient;
 import com.zinglabs.zwerewolf.manager.DialogManager;
 import com.zinglabs.zwerewolf.role.Role;
+import com.zinglabs.zwerewolf.role.UserRole;
+import com.zinglabs.zwerewolf.role.Wolf;
 import com.zinglabs.zwerewolf.utils.AppUtil;
 import com.zinglabs.zwerewolf.utils.DateUtil;
 import com.zinglabs.zwerewolf.utils.RoleUtil;
 import com.zinglabs.zwerewolf.utils.RoomUtil;
+import com.zinglabs.zwerewolf.utils.ToastUtil;
 import com.zinglabs.zwerewolf.widget.RoleView;
 
 import org.greenrobot.eventbus.EventBus;
@@ -50,6 +54,7 @@ import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -65,14 +70,14 @@ import static com.zinglabs.zwerewolf.R.id.room_ready_ib;
  * Created by Administrator on 2017/3/7.
  */
 
-public class GameActivity extends AppCompatActivity implements View.OnClickListener{
+public class GameActivity extends AppCompatActivity implements View.OnClickListener {
     private final int lvSize = 120;//定义可显示的最多聊天数量
     private int curPlayerNumber = -1;//当前玩家持有的编号，默认是房主
     private TextView title_tv;
     private LinearLayout bar_left;
     private LinearLayout bar_right;
     private List<RoleView> roleViewList = new ArrayList<RoleView>();
-    private Map<Integer,RoleView> roleViewMap = new HashMap<>();
+    private Map<Integer, RoleView> roleViewMap = new HashMap<>();
     private View myRoleBg_v;
     private View myRole_v;
     private TextView myRole_tv;
@@ -212,14 +217,14 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
     private void init() {
 
         globalData = (GlobalData) getApplication();
-        Room room = (Room)getIntent().getSerializableExtra("room");
+        Room room = (Room) getIntent().getSerializableExtra("room");
         User user = globalData.getUser();
         room.setCurUserId(user.getId());
         globalData.setRoom(room);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        toolbar.setTitle(room.getRoomId()+"房间，准备中");
-        setTitle(room.getRoomId()+"房间，准备中...");
+        toolbar.setTitle(room.getRoomId() + "房间，准备中");
+        setTitle(room.getRoomId() + "房间，准备中...");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         toolbar.setNavigationIcon(R.mipmap.icon_nav_back);
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
@@ -291,7 +296,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
         this.curPlayerPos = curUserPos;
         this.curRole = room.getPlayers().get(userId).getRole();
 
-        simulate(roomNum,curUserPos,ownerPos);
+        simulate(roomNum, curUserPos, ownerPos);
 
         simpleController = new SimpleController(mHandler);
     }
@@ -331,7 +336,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onClick(View v) {
-        GlobalData globalData = (GlobalData)getApplication();
+        GlobalData globalData = (GlobalData) getApplication();
         Room room = globalData.getRoom();
         switch (v.getId()) {
             case R.id.room_key_switch_ib: // 聊天模式切换
@@ -361,10 +366,10 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                 break;
             //准备
             case room_ready_ib:
-                if(room.isOwner()){
-//                    readyIB.setVisibility(View.GONE);
+                if (room.isOwner()) {
+                    readyIB.setVisibility(View.GONE);
                     simpleController.startGame(room);
-                }else {
+                } else {
                     readyIB.setVisibility(View.GONE);
                     simpleController.readyGame(room);
                 }
@@ -383,21 +388,34 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                 chatAdapter.update(event.getObj());
                 break;
             case MsgEvent.GAME_READY:  //准备游戏
-                 businessData = (BusinessData)obj;
+                businessData = (BusinessData) obj;
                 int fromId = businessData.getFromId();
                 RoleView roleView = roleViewMap.get(fromId);
-                if(roleView!=null){
+                if (roleView != null) {
                     roleView.ready();
                 }
                 break;
             case MsgEvent.GAME_START:  //游戏开始
-                businessData = (BusinessData)obj;
-                Room room =globalData.getRoom();
+                businessData = (BusinessData) obj;
+                Room room = globalData.getRoom();
+                int roleId = businessData.getReply();
+                if (roleId == Constants.ROLE_CODE_OF_WOLF) {
+                    Integer[] wolfs = (Integer[]) businessData.getParam().get("wolfs");
+                    setWolfRole(wolfs, room.getPlayers());
+                }
                 Role role = RoleUtil.getRole(businessData.getReply());
-                String roleMsg = "您的角色是"+role.getName();
-                GameChatData chat = new GameChatData(GameChatData.CHAT, new Date().getTime() + "", new User(0,"LRSwzc25151"), 111, roleMsg);
+                String roleMsg = "您的角色是" + role.getName();
+                GameChatData chat = new GameChatData(GameChatData.CHAT, new Date().getTime() + "", new User(0, "LRSwzc25151"), 111, roleMsg);
                 chatAdapter.update(chat);
-                setTitle("您是"+this.curPlayerPos+"号"+role.getName());
+                setTitle("您是" + this.curPlayerPos + "号" + role.getName());
+                break;
+            case MsgEvent.GAME_NOT_ENOUGH_NUM:  //游戏人数不足
+                ToastUtil.showToast(this,"游戏人数不足，不能开局");
+                readyIB.setVisibility(View.VISIBLE);
+                break;
+            case MsgEvent.GAME_START_FAIL:
+                ToastUtil.showToast(this,"开局失败！");
+                readyIB.setVisibility(View.VISIBLE);
                 break;
             case MsgEvent.ROOM_OVER:
 //                if (!gameController.isGameing()) {
@@ -462,7 +480,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
         }.start();
     }
 
-    private void simulate(int roomNum,int curUserId,int owner) {
+    private void simulate(int roomNum, int curUserId, int owner) {
         for (int i = 1; i <= 16; i++) {
             RoleView roleView = new RoleView(GameActivity.this);
             roleViewList.add(roleView);
@@ -479,7 +497,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                     roleData.setOwner(true);
                 }
                 roleView.setup(roleData);
-                roleViewMap.put(i,roleView);
+                roleViewMap.put(i, roleView);
             }
         }
     }
@@ -496,6 +514,15 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
         if (chatAdapter != null) {
             chatAdapter.clear();
             chatAdapter = null;
+        }
+    }
+
+    private void setWolfRole(Integer[] wolfs, Map<Integer, UserRole> players) {
+        for (int i = 0; i < wolfs.length; i++) {
+            UserRole userRole = players.get(wolfs[i]);
+            System.out.println(userRole.getPosition() + "号是狼");
+            userRole.setRole(new Wolf());
+
         }
     }
 

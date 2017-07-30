@@ -1,5 +1,6 @@
 package com.zinglabs.zwerewolf.controller.impl;
 
+import com.zinglabs.zwerewolf.config.Constants;
 import com.zinglabs.zwerewolf.constant.ProtocolConstant;
 import com.zinglabs.zwerewolf.controller.BaseController;
 import com.zinglabs.zwerewolf.data.BusinessData;
@@ -11,7 +12,9 @@ import com.zinglabs.zwerewolf.utils.RoleUtil;
 
 import org.greenrobot.eventbus.EventBus;
 
+import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
@@ -27,26 +30,39 @@ public class GameController implements BaseController {
 
     @Override
     public void doAccept(short command, ByteBuf body) {
-        BusinessData businessData = businessService.receive(body);
-        int fromId = businessData.getFromId();
-        int reply = businessData.getReply();
+        BusinessData businessData;
+
         MsgEvent msgEvent = null;
+        int fromId, reply;
 
         switch (command) {
             case ProtocolConstant.CID_GAME_READY_RESP: //准备游戏
+                businessData = businessService.receive(body);
+                fromId = businessData.getFromId();
                 System.out.println(fromId + "号玩家已准备好");
                 msgEvent = new MsgEvent(MsgEvent.GAME_READY, null, businessData);
                 EventBus.getDefault().post(msgEvent);
                 break;
             case ProtocolConstant.CID_GAME_START_RESP:  //开始游戏
+                businessData = businessService.receiveStartMsg(body);
+                fromId = businessData.getFromId();
+                reply = businessData.getReply();
                 Role role = RoleUtil.getRole(reply);
-                System.out.println("开始游戏,您的角色是"+role.getName());
+                System.out.println("开始游戏,您的角色是" + role.getName());
                 msgEvent = new MsgEvent(MsgEvent.GAME_START, null, businessData);
                 EventBus.getDefault().post(msgEvent);
                 break;
-
+            case ProtocolConstant.CID_GAME_START_FAIL:  //开始失败
+                businessData = businessService.receiveStartMsg(body);
+                reply = businessData.getReply();
+                if(reply== Constants.ROOM_NOT_ENOUGH_NUM){
+                    msgEvent = new MsgEvent(MsgEvent.GAME_NOT_ENOUGH_NUM, null, businessData);
+                    EventBus.getDefault().post(msgEvent);
+                }else{
+                    msgEvent = new MsgEvent(MsgEvent.GAME_START_FAIL, null, businessData);
+                    EventBus.getDefault().post(msgEvent);
+                }
             case ProtocolConstant.CID_GAME_KILL_RES_RESP:  //狼人杀人信息
-                System.out.println(fromId + "击杀" + reply + "号玩家");
                 break;
         }
 
