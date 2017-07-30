@@ -389,7 +389,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
         BusinessData businessData;
         int curPos = this.curPlayerPos;
         RoleView roleView = roleViewMap.get(curPos);
-        roleView.setMe();
+//        roleView.setMe();
 
         switch (event.getMsgType()) {
 

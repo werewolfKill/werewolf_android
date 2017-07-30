@@ -1,15 +1,20 @@
 package com.zinglabs.zwerewolf.ui;
 
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.annotation.StringDef;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
@@ -19,6 +24,7 @@ import com.zinglabs.zwerewolf.constant.ProtocolConstant;
 import com.zinglabs.zwerewolf.entity.Room;
 import com.zinglabs.zwerewolf.event.HomeFragmentEvent;
 import com.zinglabs.zwerewolf.utils.IMClientUtil;
+import com.zinglabs.zwerewolf.utils.MathUtil;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -34,6 +40,9 @@ import java.util.Map;
 public class HomeFragment extends Fragment implements View.OnClickListener {
     private AppCompatActivity activity;
     private View root;
+
+    private EditText select_room_et;
+
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -64,6 +73,8 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
         toolbar.findViewById(R.id.menu_home_setting).setOnClickListener(this);
 
         ImageView head_iv = (ImageView) root.findViewById(R.id.home_head_iv);
+
+        select_room_et = new EditText(getActivity());
         // GlideUtil.into(activity, R.mipmap.my_head, head_iv, GlideUtil.CIRCLE);
 
         root.findViewById(R.id.home_easy_iv).setOnClickListener(this);
@@ -110,26 +121,20 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
     }
 
     private void createRoom() {
-        showToast("创建房间中...");
         Bundle bundle = getArguments();
         int userId = bundle.getInt("userId", 0);
         Map<String, Integer> param = new HashMap<>();
-        //TODO 弹框选择游戏模式,现默认12人经典局
         param.put("fromId", userId);
-        param.put("content", Constants.MODEL_12_YNLS);
-        IMClientUtil.sendMsg(ProtocolConstant.SID_BNS, ProtocolConstant.CID_BNS_CRE_ROOM_REQ, param);
+        showModalChoice(param);
 
     }
 
-    private void searchRoom(){
+    private void searchRoom() {
         Bundle bundle = getArguments();
         int userId = bundle.getInt("userId", 0);
         Map<String, Integer> param = new HashMap<>();
-        //TODO 弹框输入房间号
         param.put("fromId", userId);
-        param.put("content", 10001);
-        IMClientUtil.sendMsg(ProtocolConstant.SID_BNS, ProtocolConstant.CID_BNS_FIND_ROOM_REQ, param);
-
+        showSearchRoomDialog(param);
     }
 
     private void showToast(String str) {
@@ -154,13 +159,6 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
                 bundle.putSerializable("room", room);
                 roomIntent.putExtras(bundle);
                 startActivity(roomIntent);
-
-//                roomIntent = new Intent();
-//                roomIntent.setClass(activity, GameActivity.class);
-//                Bundle bundle1 = new Bundle();
-//                bundle1.putSerializable("room", room);
-//                roomIntent.putExtras(bundle1);
-//                this.startActivity(roomIntent);
                 break;
             case HomeFragmentEvent.SEARCH_ROOM_SUC:
                 bundle = new Bundle();
@@ -183,6 +181,63 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
                 showToast("搜索失败");
                 break;
         }
+
+    }
+
+    private void showModalChoice(Map<String, Integer> param) {
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity(), android.R.style.Theme_Holo_Light_Dialog);
+        builder.setTitle("请选择游戏模式");
+        //    指定下拉列表的显示数据
+        final String[] modals = {"9人局", "10人局", "12人-预女猎守", "12人-预女猎白"};
+        builder.setItems(modals, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                int modal = Constants.MODEL_12_YNLS;
+                if (which == 0) {
+                    modal = Constants.MODEL_9;
+                } else if (which == 1) {
+                    modal = Constants.MODEL_10;
+                } else if (which == 3) {
+                    modal = Constants.MODEL_12_YNLB;
+                }
+                param.put("content", modal);
+                IMClientUtil.sendMsg(ProtocolConstant.SID_BNS, ProtocolConstant.CID_BNS_CRE_ROOM_REQ, param);
+            }
+        });
+        //    设置一个下拉的列表选择项
+        builder.setNegativeButton("取消", null);
+
+        builder.show();
+    }
+
+    private void showSearchRoomDialog(Map<String, Integer> param) {
+        AlertDialog.Builder serchDialog = new AlertDialog.Builder(getActivity())
+                .setTitle("请输入房间号")
+                .setIcon(android.R.drawable.ic_dialog_info)
+                .setView(select_room_et)
+                .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        String roomNum = select_room_et.getText().toString();
+                        if (roomNum.trim().length() == 0) {
+                            new AlertDialog.Builder(getActivity()).setTitle("提示").setMessage("请输入房间号")
+                                    .setPositiveButton("确定",null).show();
+
+                            return;
+                        }
+                        if (!MathUtil.isNumeric(roomNum)) {
+                            new AlertDialog.Builder(getActivity()).setTitle("提示").setMessage("请输入正确房间号")
+                                    .setPositiveButton("确定",null).show();
+                            return;
+                        }
+                        param.put("content", Integer.parseInt(roomNum));
+                        IMClientUtil.sendMsg(ProtocolConstant.SID_BNS, ProtocolConstant.CID_BNS_FIND_ROOM_REQ, param);
+
+                    }
+                })
+                .setNegativeButton("取消", null);
+        serchDialog.show();
 
     }
 }
