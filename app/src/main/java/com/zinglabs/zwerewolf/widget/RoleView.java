@@ -138,6 +138,8 @@ public class RoleView extends RelativeLayout implements View.OnClickListener {
                     number_tv.setVisibility(View.VISIBLE);
                     speaking_iv.setVisibility(View.VISIBLE);
                     break;
+                case STATE_ME:
+
             }
         }
     };

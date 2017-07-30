@@ -33,14 +33,18 @@ public class GameController implements BaseController {
         BusinessData businessData;
 
         MsgEvent msgEvent = null;
-        int fromId, reply;
+        int fromId, reply,code;
 
         switch (command) {
             case ProtocolConstant.CID_GAME_READY_RESP: //准备游戏
                 businessData = businessService.receive(body);
-                fromId = businessData.getFromId();
-                System.out.println(fromId + "号玩家已准备好");
-                msgEvent = new MsgEvent(MsgEvent.GAME_READY, null, businessData);
+                reply = businessData.getReply();
+                if(reply==0){
+                    code= MsgEvent.GAME_LEAVE;
+                }else{
+                    code= MsgEvent.GAME_READY;
+                }
+                msgEvent = new MsgEvent(code, null, businessData);
                 EventBus.getDefault().post(msgEvent);
                 break;
             case ProtocolConstant.CID_GAME_START_RESP:  //开始游戏
@@ -52,7 +56,7 @@ public class GameController implements BaseController {
                 msgEvent = new MsgEvent(MsgEvent.GAME_START, null, businessData);
                 EventBus.getDefault().post(msgEvent);
                 break;
-            case ProtocolConstant.CID_GAME_START_FAIL:  //开始失败
+            case ProtocolConstant.CID_GAME_START_FAIL:  //开始游戏失败
                 businessData = businessService.receiveStartMsg(body);
                 reply = businessData.getReply();
                 if(reply== Constants.ROOM_NOT_ENOUGH_NUM){

@@ -63,6 +63,7 @@ import java.util.Random;
 
 import cn.dreamtobe.kpswitch.widget.KPSwitchPanelLinearLayout;
 
+import static com.zinglabs.zwerewolf.R.id.cancel_action;
 import static com.zinglabs.zwerewolf.R.id.room_ready_ib;
 
 
@@ -370,7 +371,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                     readyIB.setVisibility(View.GONE);
                     simpleController.startGame(room);
                 } else {
-                    readyIB.setVisibility(View.GONE);
+//                    readyIB.setVisibility(View.GONE);
                     simpleController.readyGame(room);
                 }
                 break;
@@ -381,19 +382,21 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
     public void onEvent(MsgEvent event) {
         String msg = event.getMsgStr();
         Object obj = event.getObj();
-        BusinessData businessData = null;
+        BusinessData businessData;
+        int curPos = this.curPlayerPos;
+        RoleView roleView = roleViewMap.get(curPos);
+        roleView.setMe();
+
         switch (event.getMsgType()) {
 
             case MsgEvent.ROOM_CHAT:
                 chatAdapter.update(event.getObj());
                 break;
+            case MsgEvent.GAME_LEAVE:  //离开
+                roleView.unReady();
+                break;
             case MsgEvent.GAME_READY:  //准备游戏
-                businessData = (BusinessData) obj;
-                int fromId = businessData.getFromId();
-                RoleView roleView = roleViewMap.get(fromId);
-                if (roleView != null) {
-                    roleView.ready();
-                }
+                roleView.ready();
                 break;
             case MsgEvent.GAME_START:  //游戏开始
                 businessData = (BusinessData) obj;
@@ -410,11 +413,11 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                 setTitle("您是" + this.curPlayerPos + "号" + role.getName());
                 break;
             case MsgEvent.GAME_NOT_ENOUGH_NUM:  //游戏人数不足
-                ToastUtil.showToast(this,"游戏人数不足，不能开局");
+                ToastUtil.showToast(this, "游戏人数不足，不能开局");
                 readyIB.setVisibility(View.VISIBLE);
                 break;
             case MsgEvent.GAME_START_FAIL:
-                ToastUtil.showToast(this,"开局失败！");
+                ToastUtil.showToast(this, "开局失败！");
                 readyIB.setVisibility(View.VISIBLE);
                 break;
             case MsgEvent.ROOM_OVER:
@@ -491,7 +494,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
             }
             if (i <= roomNum) {
                 RoleData roleData = RoleBuild.build(i);
-                if (i == owner) { //设置1号用户为房主
+                if (i == owner) { //设置房主
                     curPlayerNumber = i;
                     roleData = RoleBuild.build(i, new UserData());
                     roleData.setOwner(true);

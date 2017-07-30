@@ -14,6 +14,7 @@ public class MsgEvent {
     public static final int ROOM_ENTER = 0xb5;//玩家进入房间
 
 
+    public static final int GAME_LEAVE=0xc0; //玩家离开
     public static final int GAME_READY=0xc1; //玩家准备
     public static final int GAME_START=0xc2; //房主开始游戏
     public static final int GAME_NOT_ENOUGH_NUM=0xc3; //没有足够人数
