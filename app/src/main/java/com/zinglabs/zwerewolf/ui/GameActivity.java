@@ -19,6 +19,7 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -90,6 +91,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
     private ImageButton startIB;
     private ImageButton readyIB;
     private GlobalData globalData;
+    private ImageView ready_iv;
 
     private int curPlayerPos;
     private int curUserId;
@@ -258,6 +260,8 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
         key_v = findViewById(R.id.room_key_v);
         et = (EditText) findViewById(R.id.room_et);
 
+        ready_iv = (ImageView)findViewById(R.id.role_ready_iv);
+
         findViewById(R.id.room_send_tv).setOnClickListener(this);
         readyIB = (ImageButton) findViewById(R.id.room_ready_ib);
         readyIB.setOnClickListener(this);
@@ -402,15 +406,15 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                 businessData = (BusinessData) obj;
                 Room room = globalData.getRoom();
                 int roleId = businessData.getReply();
-                if (roleId == Constants.ROLE_CODE_OF_WOLF) {
-                    Integer[] wolfs = (Integer[]) businessData.getParam().get("wolfs");
-                    setWolfRole(wolfs, room.getPlayers());
-                }
                 Role role = RoleUtil.getRole(businessData.getReply());
                 String roleMsg = "您的角色是" + role.getName();
+                if (roleId == Constants.ROLE_CODE_OF_WOLF) {
+                    Integer[] wolfs = (Integer[]) businessData.getParam().get("wolfs");
+                    roleMsg +=getOthersStr(wolfs, room.getPlayers(),curPlayerPos);
+                }
                 GameChatData chat = new GameChatData(GameChatData.CHAT, new Date().getTime() + "", new User(0, "LRSwzc25151"), 111, roleMsg);
                 chatAdapter.update(chat);
-                setTitle("您是" + this.curPlayerPos + "号" + role.getName());
+                setTitle("您是" + this.curPlayerPos + "号" + role.getName()); //设置标题
                 break;
             case MsgEvent.GAME_NOT_ENOUGH_NUM:  //游戏人数不足
                 ToastUtil.showToast(this, "游戏人数不足，不能开局");
@@ -520,13 +524,20 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-    private void setWolfRole(Integer[] wolfs, Map<Integer, UserRole> players) {
+    private String getOthersStr(Integer[] wolfs, Map<Integer, UserRole> players,int curPos) {
+        String str = " ";
+        if(wolfs.length>0){
+            str+=",你的狼同伴是:";
+        }
         for (int i = 0; i < wolfs.length; i++) {
             UserRole userRole = players.get(wolfs[i]);
-            System.out.println(userRole.getPosition() + "号是狼");
+            int pos = userRole.getPosition();
+            if(pos!=curPos){
+                str+=pos +"号 ";
+            }
             userRole.setRole(new Wolf());
-
         }
+        return str;
     }
 
     @Override
