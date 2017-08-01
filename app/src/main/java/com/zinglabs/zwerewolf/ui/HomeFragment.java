@@ -4,6 +4,7 @@ package com.zinglabs.zwerewolf.ui;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Looper;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringDef;
 import android.support.v4.app.Fragment;
@@ -16,6 +17,8 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.zinglabs.zwerewolf.R;
@@ -40,6 +43,8 @@ import java.util.Map;
 public class HomeFragment extends Fragment implements View.OnClickListener {
     private AppCompatActivity activity;
     private View root;
+
+    private View rl;
 
     private EditText select_room_et;
 
@@ -74,7 +79,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
 
         ImageView head_iv = (ImageView) root.findViewById(R.id.home_head_iv);
 
-        select_room_et = new EditText(getActivity());
+//        select_room_et = new EditText(true);
         // GlideUtil.into(activity, R.mipmap.my_head, head_iv, GlideUtil.CIRCLE);
 
         root.findViewById(R.id.home_easy_iv).setOnClickListener(this);
@@ -138,8 +143,9 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
     }
 
     private void showToast(String str) {
-
+        Looper.prepare();
         Toast.makeText(activity, str, Toast.LENGTH_SHORT).show();
+        Looper.loop();
 
     }
 
@@ -212,32 +218,30 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
     }
 
     private void showSearchRoomDialog(Map<String, Integer> param) {
-        AlertDialog.Builder serchDialog = new AlertDialog.Builder(getActivity())
-                .setTitle("请输入房间号")
+
+        final EditText et = new EditText(getActivity());
+
+        new AlertDialog.Builder(getActivity()).setTitle("请输入房间号")
                 .setIcon(android.R.drawable.ic_dialog_info)
-                .setView(select_room_et)
+                .setView(et)
                 .setPositiveButton("确定", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        String roomNum = select_room_et.getText().toString();
+                    public void onClick(DialogInterface dialog, int which) {
+                        String roomNum = et.getText().toString();
                         if (roomNum.trim().length() == 0) {
                             new AlertDialog.Builder(getActivity()).setTitle("提示").setMessage("请输入房间号")
-                                    .setPositiveButton("确定",null).show();
-
+                                    .setPositiveButton("确定", null).show();
                             return;
                         }
                         if (!MathUtil.isNumeric(roomNum)) {
                             new AlertDialog.Builder(getActivity()).setTitle("提示").setMessage("请输入正确房间号")
-                                    .setPositiveButton("确定",null).show();
+                                    .setPositiveButton("确定", null).show();
                             return;
                         }
                         param.put("content", Integer.parseInt(roomNum));
                         IMClientUtil.sendMsg(ProtocolConstant.SID_BNS, ProtocolConstant.CID_BNS_FIND_ROOM_REQ, param);
-
                     }
                 })
-                .setNegativeButton("取消", null);
-        serchDialog.show();
-
+                .setNegativeButton("取消", null)
+                .show();
     }
 }

@@ -33,15 +33,17 @@ import java.util.Random;
  */
 
 public class SimpleController implements Role.OnRoleStateChangeListener {
-    private static final String TIANHEI = "天黑";
-    private static final String YUYAN = "预言家行动";
-    private static final String LANGREN = "狼人行动";
-    private static final String NVWU = "女巫行动";
-    private static final String LIEREN = "猎人行动";
-    private static final String TIANLIANG = "天亮";
-    public static final String TAOLUN = "讨论";
-    public static final String TOUPIAO = "投票";
-    private static final String TOUPIAOJIEGUO = "投票结果";
+    private static final String STAGE_DARK = "天黑";
+    private static final String STAGE_PROPHET = "预言家";
+    private static final String STAGE_WOLF = "狼人";
+    private static final String STAGE_WITCH = "女巫";
+    private static final String STAGE_HUNTSMAN = "猎人";
+    private static final String STAGE_GUARD= "守卫";
+    private static final String STAGE_IDIOT= "白痴";
+    private static final String STAGE_DAWN = "天亮";
+    public static final String STAGE_TALK = "讨论";
+    public static final String STAGE_VOTE = "投票";
+    private static final String STAGE_TOUPIAOJIEGUO = "投票结果";
 
     private int winer = Role.WIN_NO;//阵营不要放在role里
     private static boolean isGameing;
@@ -103,7 +105,7 @@ public class SimpleController implements Role.OnRoleStateChangeListener {
         }
 
         //进入天黑阶段
-        doStage(TIANHEI);
+        doStage(STAGE_DARK);
     }
     public void readyGame(Room room){
         Map<String,Object> param = new HashMap<>();
@@ -132,6 +134,70 @@ public class SimpleController implements Role.OnRoleStateChangeListener {
 
     }
 
+    public void startStage(Room room){
+        int modalId = room.getModelId();
+        int userId = room.getCurUserId();
+        int curPos = room.getPlayers().get(userId).getPosition();
+        Role role = room.getPlayers().get(userId).getRole();
+        doStage2(STAGE_DARK,role,bout);
+
+
+
+
+    }
+
+    private void doStage2(String stage,Role role,int bout){
+        switch (stage){
+            case STAGE_DARK:  //天黑
+                doDark(role,bout);
+                break;
+            case STAGE_DAWN:  //天亮
+
+                break;
+
+        }
+
+    }
+
+    private void doDark(Role role,int bout){  //天黑流程
+        Runnable runnable = null;
+        switch (role.getName()){
+            case STAGE_WOLF:     //狼人
+                Message msg_system_timer = new Message();
+                msg_system_timer.what = GameStateMessage.COUNTDOWNTIMER;  //倒计时
+                msg_system_timer.obj = new GameStateMessage(wolf, String.format(Constants.TEXT_WAIT_ACTION, role.getName()), Wolf.ACTION_TIME);
+                handler.sendMessage(msg_system_timer);
+                runnable = new Runnable() {
+                    @Override
+                    public void run() {
+                                Message msg_system_die = new Message();
+                                msg_system_die.what = GameStateMessage.CHAT;
+                                msg_system_die.obj = new GameStateMessage(role, String.format("[%d]号被狼杀", who));
+                                handler.sendMessage(msg_system_die);
+                                role.setState(Role.STATE_DIE_WOLF_KILL);
+
+                                nightDieList.add(who);
+                    }
+                };
+                new GameTask(Role.getRoleActionTime(), runnable).start();
+
+                break;
+            case STAGE_PROPHET:  //预言家
+                break;
+            case STAGE_GUARD:    //守卫
+                break;
+            case STAGE_WITCH:   //女巫
+                break;
+        }
+
+    }
+
+    public void doDawn(String role,int bout){  //天亮流程
+//        switch ()
+
+
+    }
+
     public void stopGame() {
         isGameing = false;
     }
@@ -152,14 +218,13 @@ public class SimpleController implements Role.OnRoleStateChangeListener {
         prophet = null;
         wolf = null;
         witch = null;
+        isGameing = true;
         Runnable runnable = null;
         if (isGameing) {
             curStage = stage;
-
-
             switch (stage) {
-                case TIANHEI:
-//第一回合天黑时法官发言，游戏角色组成情况
+                case STAGE_DARK:
+                    //第一回合天黑时法官发言，游戏角色组成情况
                     if (bout == 1) {
                         String str_element = String.format(Constants.TEXT_START_ALLOT, elementMap.get(Wolf.NAME), elementMap.get(Prophet.NAME), elementMap.get(Witch.NAME), elementMap.get(Huntsman.NAME), elementMap.get(Villager.NAME));
                         Message msg_system_chat = new Message();
@@ -167,20 +232,21 @@ public class SimpleController implements Role.OnRoleStateChangeListener {
                         msg_system_chat.obj = new GameStateMessage(null, str_element);
                         handler.sendMessage(msg_system_chat);
                     }
-//修改房间标题
+                   //修改房间标题
                     Message msg_room_title = new Message();
                     msg_room_title.what = GameStateMessage.ZHOUYE;
                     msg_room_title.obj = new GameStateMessage(null, "(第" + bout + "夜)");
                     handler.sendMessage(msg_room_title);
-//法官发言
+
+                    //法官发言
                     Message msg_system_chat = new Message();
                     msg_system_chat.what = GameStateMessage.CHAT;
                     msg_system_chat.obj = new GameStateMessage(null, String.format(Constants.TEXT_DAY_DARK, bout));
                     handler.sendMessage(msg_system_chat);
-                    doStage(YUYAN);
+                    doStage(STAGE_PROPHET);
                     break;
 
-                case YUYAN:
+                case STAGE_PROPHET:
                     for (Map.Entry<Integer, Role> entry : deployMap.entrySet()) {
                         if (entry.getValue().getName().equals(Prophet.NAME) && entry.getValue().isAlive()) {
                             prophet = (Prophet) entry.getValue();
@@ -202,16 +268,16 @@ public class SimpleController implements Role.OnRoleStateChangeListener {
                                     msg_system_chat.obj = new GameStateMessage(null, "预言家调查了[" + who + "]号的身份,他的身份是" + deployMap.get(who).getName());
                                     handler.sendMessage(msg_system_chat);
                                 }
-                                doStage(LANGREN);
+                                doStage(STAGE_WOLF);
                             }
                         };
                         new GameTask(Role.getRoleActionTime(), runnable).start();
                     } else {
-                        doStage(LANGREN);
+                        doStage(STAGE_WOLF);
                     }
                     break;
 
-                case LANGREN:
+                case STAGE_WOLF:
                     for (Map.Entry<Integer, Role> entry : deployMap.entrySet()) {
                         if (entry.getValue().getName().equals(Wolf.NAME) && entry.getValue().isAlive()) {
                             wolf = (Wolf) entry.getValue();
@@ -240,16 +306,16 @@ public class SimpleController implements Role.OnRoleStateChangeListener {
                                         nightDieList.add(who);
                                     }
                                 }
-                                doStage(NVWU);
+                                doStage(STAGE_WITCH);
                             }
                         };
                         new GameTask(Role.getRoleActionTime(), runnable).start();
                     } else {
-                        doStage(NVWU);
+                        doStage(STAGE_WITCH);
                     }
                     break;
 
-                case NVWU:
+                case STAGE_WITCH:
                     for (Map.Entry<Integer, Role> entry : deployMap.entrySet()) {
                         if (entry.getValue().getName().equals(Witch.NAME) && entry.getValue().isAlive()) {
                             witch = (Witch) entry.getValue();
@@ -278,16 +344,16 @@ public class SimpleController implements Role.OnRoleStateChangeListener {
                                     LogUtil.e(who + "被毒杀");
                                 } else {
                                 }
-                                doStage(LIEREN);
+                                doStage(STAGE_HUNTSMAN);
                             }
                         };
                         new GameTask(Role.getRoleActionTime(), runnable).start();
                     } else {
-                        doStage(LIEREN);
+                        doStage(STAGE_HUNTSMAN);
                     }
                     break;
 
-                case LIEREN:
+                case STAGE_HUNTSMAN:
                     Huntsman huntsman = null;
                     for (Map.Entry<Integer, Role> entry : deployMap.entrySet()) {
                         if (entry.getValue().getName().equals(Huntsman.NAME) && entry.getValue().isAlive()) {
@@ -296,10 +362,10 @@ public class SimpleController implements Role.OnRoleStateChangeListener {
                             break;
                         }
                     }
-                    doStage(TIANLIANG);
+                    doStage(STAGE_DAWN);
                     break;
 
-                case TIANLIANG:
+                case STAGE_DAWN:
                     bout++;
                     //修改房间标题
                     Message msg_room_title_1 = new Message();
@@ -317,10 +383,10 @@ public class SimpleController implements Role.OnRoleStateChangeListener {
                         msg_system_chat_1.obj = new GameStateMessage(null, Constants.TEXT_DAY_SAFE);
                     }
                     handler.sendMessage(msg_system_chat_1);
-                    doStage(TAOLUN);
+                    doStage(STAGE_TALK);
                     break;
 
-                case TAOLUN:
+                case STAGE_TALK:
                     int curSpeaker = 0;
                     for (Map.Entry<Integer, Role> entry : deployMap.entrySet()) {
                         if (entry.getValue().getState().equals(Role.STATE_TALK)) {
@@ -340,7 +406,7 @@ public class SimpleController implements Role.OnRoleStateChangeListener {
                             runnable = new Runnable() {
                                 @Override
                                 public void run() {
-                                    doStage(TOUPIAO);
+                                    doStage(STAGE_VOTE);
                                 }
                             };
                             new GameTask(1000, runnable).start();
@@ -380,13 +446,13 @@ public class SimpleController implements Role.OnRoleStateChangeListener {
                     runnable = new Runnable() {
                         @Override
                         public void run() {
-                            doStage(TAOLUN);
+                            doStage(STAGE_TALK);
                         }
                     };
                     new GameTask(Role.getCommonActionTime(), runnable).start();
                     break;
 
-                case TOUPIAO:
+                case STAGE_VOTE:
                     nightDieList.clear();
                     //修改倒计时内容
                     Message msg_system_timer_vote = new Message();
@@ -410,14 +476,14 @@ public class SimpleController implements Role.OnRoleStateChangeListener {
                                 handler.sendMessage(msg_system_chat_vote);
                                 role.setState(Role.STATE_DIE_VOTE);
                             }
-                            doStage(TOUPIAOJIEGUO);
+                            doStage(STAGE_TOUPIAOJIEGUO);
                         }
                     };
                     new GameTask(Role.getRoleActionTime(), runnable, false).start();
                     break;
 
-                case TOUPIAOJIEGUO:
-                    doStage(TIANHEI);
+                case STAGE_TOUPIAOJIEGUO:
+                    doStage(STAGE_DARK);
                     break;
             }
         }

@@ -129,7 +129,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                 //天亮天黑变化，修改房间标题
                 case GameStateMessage.ZHOUYE:
                     String zhouYe = gameStateMessage.getText();
-                    title_tv.setText("简单25151房" + gameStateMessage.getText());
+                    title_tv.setText(gameStateMessage.getText());
 
                     if (simpleController.isAlive(curPlayerNumber)) {
                         DialogManager.showGameDay(GameActivity.this, myRole_v, zhouYe, null, null);
@@ -181,7 +181,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                 //游戏内语音界面变化
                 case GameStateMessage.GAME_SPEAK:
                     String curStage = simpleController.getCurStage();
-                    if (curStage.equals(SimpleController.TAOLUN) || curStage.equals(SimpleController.TOUPIAO)) {
+                    if (curStage.equals(SimpleController.STAGE_TALK) || curStage.equals(SimpleController.STAGE_VOTE)) {
                         List<Integer> alive_List = simpleController.getAliveList();
                         int i = new Random().nextInt(alive_List.size());
                         roleViewList.get(alive_List.get(i) - 1).chat();
@@ -415,6 +415,8 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                 GameChatData chat = new GameChatData(GameChatData.CHAT, new Date().getTime() + "", new User(0, "LRSwzc25151"), 111, roleMsg);
                 chatAdapter.update(chat);
                 setTitle("您是" + this.curPlayerPos + "号" + role.getName()); //设置标题
+                simpleController.startStage(room);
+//                simpleController.startGame(12);
                 break;
             case MsgEvent.GAME_NOT_ENOUGH_NUM:  //游戏人数不足
                 ToastUtil.showToast(this, "游戏人数不足，不能开局");
