@@ -12,7 +12,15 @@ public class Huntsman extends Role {
     private boolean isHunting;//是否行动中
     public static final long ACTION_TIME = 15 * 1000;
 
+    private int id;
 
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
 
     public Huntsman() {
     }

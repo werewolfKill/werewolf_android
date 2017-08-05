@@ -23,4 +23,24 @@
 
     // DO NOT TRANSLATE
     <string name="bit_rate_value_with_unit">%d kbps</string>
+
+    <string name="default_player">1号</string>
+    
+    <string-array name="player_list">
+        <item>1号</item>
+        <item>2号</item>
+        <item>3号</item>
+        <item>4号</item>
+        <item>5号</item>
+        <item>6号</item>
+        <item>7号</item>
+        <item>8号</item>
+        <item>9号</item>
+        <item>10号</item>
+        <item>11号</item>
+        <item>12号</item>
+
+    </string-array>
+    
+ 
 </resources>

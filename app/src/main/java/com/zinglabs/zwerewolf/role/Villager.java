@@ -11,7 +11,15 @@ public class Villager extends Role {
     public Villager() {
     }
 
+    private int id;
 
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
 
     @Override
     public int doRoleAction() {

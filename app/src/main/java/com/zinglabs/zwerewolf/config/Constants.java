@@ -16,8 +16,8 @@ public class Constants {
     public static final int app_port = 8080;
 
     //游戏模式
-    public static final int MODEL_12_YNLS =1;  //12人预女列守经典版
-    public static final int MODEL_12_YNLB =2;  //12人预女列白版
+    public static final int MODEL_12_YNLS =1;  //12人预女猎守经典版
+    public static final int MODEL_12_YNLB =2;  //12人预女猎白版
     public static final int MODEL_9 =3;  //9人局
     public static final int MODEL_10 =4;  //10人局
 

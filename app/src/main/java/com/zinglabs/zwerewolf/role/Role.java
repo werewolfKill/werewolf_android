@@ -36,6 +36,8 @@ public abstract class Role {
     public static final String STATE_DIE_WOLF_KILL = "狼杀";//狼死中
     public static final String STATE_LOST = "掉线";//掉线中
 
+
+
     protected boolean isAlive = true;
 
     public boolean isAlive() {
@@ -141,6 +143,16 @@ public abstract class Role {
 //                return null;
 //        }
 //    }
+
+    private int id;
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
 
     private OnRoleStateChangeListener onRoleStateChangeListener;
 

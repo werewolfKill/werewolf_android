@@ -1,5 +1,6 @@
 package com.zinglabs.zwerewolf.controller;
 
+import android.app.Activity;
 import android.os.CountDownTimer;
 import android.os.Handler;
 import android.os.Message;
@@ -11,6 +12,7 @@ import com.zinglabs.zwerewolf.entity.Room;
 import com.zinglabs.zwerewolf.entity.User;
 import com.zinglabs.zwerewolf.event.GameStateMessage;
 import com.zinglabs.zwerewolf.im.IMClient;
+import com.zinglabs.zwerewolf.manager.DialogManager;
 import com.zinglabs.zwerewolf.role.Huntsman;
 import com.zinglabs.zwerewolf.role.Prophet;
 import com.zinglabs.zwerewolf.role.Role;
@@ -19,6 +21,7 @@ import com.zinglabs.zwerewolf.role.Witch;
 import com.zinglabs.zwerewolf.role.Wolf;
 import com.zinglabs.zwerewolf.utils.IMClientUtil;
 import com.zinglabs.zwerewolf.utils.LogUtil;
+import com.zinglabs.zwerewolf.utils.RoleUtil;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -38,8 +41,9 @@ public class SimpleController implements Role.OnRoleStateChangeListener {
     private static final String STAGE_WOLF = "狼人";
     private static final String STAGE_WITCH = "女巫";
     private static final String STAGE_HUNTSMAN = "猎人";
-    private static final String STAGE_GUARD= "守卫";
-    private static final String STAGE_IDIOT= "白痴";
+    private static final String STAGE_GUARD = "守卫";
+    private static final String STAGE_VILLAGER = "村民";
+    private static final String STAGE_IDIOT = "白痴";
     private static final String STAGE_DAWN = "天亮";
     public static final String STAGE_TALK = "讨论";
     public static final String STAGE_VOTE = "投票";
@@ -107,8 +111,9 @@ public class SimpleController implements Role.OnRoleStateChangeListener {
         //进入天黑阶段
         doStage(STAGE_DARK);
     }
-    public void readyGame(Room room){
-        Map<String,Object> param = new HashMap<>();
+
+    public void readyGame(Room room) {
+        Map<String, Object> param = new HashMap<>();
         int userId = room.getCurUserId();
         int roomId = room.getRoomId();
         param.put("fromId", userId);
@@ -116,12 +121,12 @@ public class SimpleController implements Role.OnRoleStateChangeListener {
         param.put("content", 0);  //设为0
 
         //向服务器发送准备游戏通知
-        IMClientUtil.sendMsg(ProtocolConstant.SID_GAME,ProtocolConstant.CID_GAME_READY_REQ,param);
+        IMClientUtil.sendMsg(ProtocolConstant.SID_GAME, ProtocolConstant.CID_GAME_READY_REQ, param);
 
     }
 
-    public void startGame(Room room){
-        Map<String,Object> param = new HashMap<>();
+    public void startGame(Room room) {
+        Map<String, Object> param = new HashMap<>();
         int userId = room.getCurUserId();
         int roomId = room.getRoomId();
         param.put("fromId", userId);
@@ -129,27 +134,21 @@ public class SimpleController implements Role.OnRoleStateChangeListener {
         param.put("content", 0);  //设为0
 
         //向服务器发送开始游戏通知
-        IMClientUtil.sendMsg(ProtocolConstant.SID_GAME,ProtocolConstant.CID_GAME_START_REQ,param);
+        IMClientUtil.sendMsg(ProtocolConstant.SID_GAME, ProtocolConstant.CID_GAME_START_REQ, param);
 
 
     }
 
-    public void startStage(Room room){
-        int modalId = room.getModelId();
-        int userId = room.getCurUserId();
-        int curPos = room.getPlayers().get(userId).getPosition();
-        Role role = room.getPlayers().get(userId).getRole();
-        doStage2(STAGE_DARK,role,bout);
-
-
+    public void startStage(Activity activity, Room room) {
+        doStage2(activity, STAGE_DARK, room);
 
 
     }
 
-    private void doStage2(String stage,Role role,int bout){
-        switch (stage){
+    private void doStage2(Activity activity, String stage, Room room) {
+        switch (stage) {
             case STAGE_DARK:  //天黑
-                doDark(role,bout);
+                doDark(activity, room);
                 break;
             case STAGE_DAWN:  //天亮
 
@@ -159,40 +158,79 @@ public class SimpleController implements Role.OnRoleStateChangeListener {
 
     }
 
-    private void doDark(Role role,int bout){  //天黑流程
+    private void doDark(Activity activity, Room room) {  //天黑流程
+        int userId = room.getCurUserId();
+        int roomId = room.getRoomId();
+        int curPos = room.getPlayers().get(userId).getPosition();
+        Role role = room.getPlayers().get(userId).getRole();
+        int modalId = room.getModelId();
+        int roleId = room.getPlayers().get(userId).getRole().getId();
         Runnable runnable = null;
-        switch (role.getName()){
+        long waitTime;
+        switch (role.getName()) {
             case STAGE_WOLF:     //狼人
-                Message msg_system_timer = new Message();
-                msg_system_timer.what = GameStateMessage.COUNTDOWNTIMER;  //倒计时
-                msg_system_timer.obj = new GameStateMessage(wolf, String.format(Constants.TEXT_WAIT_ACTION, role.getName()), Wolf.ACTION_TIME);
-                handler.sendMessage(msg_system_timer);
-                runnable = new Runnable() {
-                    @Override
-                    public void run() {
-                                Message msg_system_die = new Message();
-                                msg_system_die.what = GameStateMessage.CHAT;
-                                msg_system_die.obj = new GameStateMessage(role, String.format("[%d]号被狼杀", who));
-                                handler.sendMessage(msg_system_die);
-                                role.setState(Role.STATE_DIE_WOLF_KILL);
+                Map<String, Integer> killMap = new HashMap<>();
+                killMap.put("fromId", userId);
+                killMap.put("roomId", roomId);
+                String title = "您要击杀的人是：";
+                waitTime = RoleUtil.getWaitTime(roleId, modalId);
 
-                                nightDieList.add(who);
-                    }
-                };
-                new GameTask(Role.getRoleActionTime(), runnable).start();
+                DialogManager.showOperateDialog(activity, title, ProtocolConstant.CID_GAME_KILL_REQ, killMap,(int)waitTime);
 
                 break;
             case STAGE_PROPHET:  //预言家
+                Map<String, Integer> testMap = new HashMap<>();
+                testMap.put("fromId", userId);
+                testMap.put("content", userId);
+                testMap.put("roomId", roomId);
+                title = "您要验的人是：";
+                waitTime = RoleUtil.getWaitTime(roleId, modalId);
+
+                DialogManager.showOperateDialog(activity, title, ProtocolConstant.CID_GAME_VERIFY_REQ, testMap,(int)waitTime);
+
                 break;
             case STAGE_GUARD:    //守卫
+                Map<String, Integer> guardMap = new HashMap<>();
+                guardMap.put("fromId", userId);
+                guardMap.put("content", userId);
+                guardMap.put("roomId", roomId);
+                title = "您要守卫的人是：";
+                waitTime = RoleUtil.getWaitTime(roleId, modalId);
+
+                DialogManager.showOperateDialog(activity, title, ProtocolConstant.CID_GAME_GUARD_REQ, guardMap,(int)waitTime);
+
                 break;
             case STAGE_WITCH:   //女巫
+                waitTime = RoleUtil.getWaitTime(roleId, modalId);
+                showWaitDialog(role, waitTime);
+                Map<String, Integer> witchMap = new HashMap<>();
+                witchMap.put("fromId", userId);
+                witchMap.put("roomId", roomId);
+                waitTime = RoleUtil.getWaitTime(roleId, modalId);
+                DialogManager.showWitchSaveDialog(activity,5,witchMap,(int)waitTime);
                 break;
+
+            default:  //村民、猎人
+                waitTime = RoleUtil.getWaitTime(roleId, modalId);
+                DialogManager.showWaitOtherDialog(activity, (int)waitTime);
         }
 
     }
 
-    public void doDawn(String role,int bout){  //天亮流程
+    /**
+     * 展示等待对话框
+     *
+     * @param role 角色
+     */
+    private void showWaitDialog(Role role, long time) {
+        Message msg_system_timer = new Message();
+        msg_system_timer.what = GameStateMessage.COUNTDOWNTIMER;  //倒计时
+        msg_system_timer.obj = new GameStateMessage(wolf, String.format(Constants.TEXT_WAIT_ACTION, role.getName()), time);
+        handler.sendMessage(msg_system_timer);
+
+    }
+
+    public void doDawn(String role, int bout) {  //天亮流程
 //        switch ()
 
 
@@ -232,7 +270,7 @@ public class SimpleController implements Role.OnRoleStateChangeListener {
                         msg_system_chat.obj = new GameStateMessage(null, str_element);
                         handler.sendMessage(msg_system_chat);
                     }
-                   //修改房间标题
+                    //修改房间标题
                     Message msg_room_title = new Message();
                     msg_room_title.what = GameStateMessage.ZHOUYE;
                     msg_room_title.obj = new GameStateMessage(null, "(第" + bout + "夜)");

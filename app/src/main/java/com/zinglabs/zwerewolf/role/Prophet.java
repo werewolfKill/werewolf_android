@@ -9,7 +9,15 @@ public class Prophet extends Role {
     public static final String NAME = "预言家";
     public static final long ACTION_TIME = 15 * 1000;
 
+    private int id;
 
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
 
     @Override
     public int doRoleAction() {

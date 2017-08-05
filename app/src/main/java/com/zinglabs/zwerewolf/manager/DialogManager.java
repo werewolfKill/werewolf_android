@@ -9,18 +9,30 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
+import android.os.Looper;
 import android.provider.Settings;
 import android.text.TextUtils;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.PopupWindow;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.zinglabs.zwerewolf.R;
+import com.zinglabs.zwerewolf.config.Constants;
+import com.zinglabs.zwerewolf.constant.ProtocolConstant;
 import com.zinglabs.zwerewolf.utils.AppUtil;
+import com.zinglabs.zwerewolf.utils.IMClientUtil;
+import com.zinglabs.zwerewolf.utils.MathUtil;
+import com.zinglabs.zwerewolf.utils.RoleUtil;
+
+import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 
 
 /**
@@ -50,7 +62,6 @@ public class DialogManager {
         TextView day_info_tv = (TextView) room_day_v.findViewById(R.id.room_day_info_tv);
         TextView day_timer_tv = (TextView) room_day_v.findViewById(R.id.room_day_timer_tv);
         if (!TextUtils.isEmpty(str1)) {
-//            day_tv.setText(str1);
             if (str1.contains("天")) {
                 day_iv.setImageResource(R.mipmap.room_day);
             } else if (str1.contains("夜")) {
@@ -69,10 +80,30 @@ public class DialogManager {
         room_day_pw.setOutsideTouchable(false);
         room_day_pw.setFocusable(false);
 
-        if (!room_day_pw.isShowing()) {
-            room_day_pw.showAsDropDown(view);
+        room_day_pw.showAsDropDown(view);
+    }
+
+
+    public static void showWaitDialog(Activity activity, View view, long time) {
+        if (!AppUtil.isSafe(activity)) {
+            return;
         }
-//        pw.showAtLocation(context.getWindow().getDecorView(), Gravity.BOTTOM, 0, 0);
+        if (room_day_pw == null) {
+            room_day_v = LayoutInflater.from(activity).inflate(R.layout.pw_room_day, null);
+            room_day_pw = new PopupWindow(room_day_v, view.getWidth(), WindowManager.LayoutParams.WRAP_CONTENT, true);
+            room_day_pw.setTouchable(false);
+            room_day_pw.setBackgroundDrawable(null);
+        }
+        TextView day_timer_tv = (TextView) room_day_v.findViewById(R.id.room_day_timer_tv);
+
+        if (time > 0) {
+            day_timer_tv.setText(time + "s");
+        }
+        room_day_pw.setOutsideTouchable(false);
+        room_day_pw.setFocusable(false);
+
+        room_day_pw.showAsDropDown(view);
+
     }
 
     /**
@@ -103,14 +134,22 @@ public class DialogManager {
         progressDialog.show();
     }
 
+    public static void showWolfKillDialog(Activity activity) {
+
+
+    }
+
     /**
      * 隐藏所有对话框
      */
-    public static void dismissDialog() {
+    public static void dismissDialog(Activity activity) {
         if (room_day_pw != null) {
-            room_day_pw.dismiss();
+            if (activity != null && !activity.isFinishing()) {
+                room_day_pw.dismiss();
+            }
         }
         if (progressDialog != null) {
+
             progressDialog.dismiss();
         }
         if (pw != null) {
@@ -185,6 +224,113 @@ public class DialogManager {
         });
         builder.setCancelable(false);
         builder.show();
+    }
+
+    public static void showOperateDialog(Activity activity, String title, short cid, Map<String, Integer> param, int time) {
+
+        final EditText et = new EditText(activity);
+
+        new android.support.v7.app.AlertDialog.Builder(activity).setTitle(title)
+                .setIcon(android.R.drawable.ic_dialog_info)
+                .setView(et)
+                .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        String replyStr = et.getText().toString();
+                        if (replyStr.trim().length() == 0) {
+                            replyStr = String.valueOf(0);
+                        }
+                        if (!MathUtil.isNumeric(replyStr) || (Integer.parseInt(replyStr) < 0 || Integer.parseInt(replyStr) > 12)) {
+                            new android.support.v7.app.AlertDialog.Builder(activity).setTitle("提示").setMessage("请输入正确玩家编号")
+                                    .setPositiveButton("确定", null).show();
+                            return;
+                        }
+                        int reply = Integer.parseInt(replyStr);
+                        param.put("content", reply);
+                        IMClientUtil.sendMsg(ProtocolConstant.SID_GAME, cid, param);
+                        showWaitOtherDialog(activity, time);
+                    }
+                })
+                .setNegativeButton("取消", null)
+                .show();
+    }
+
+    public static void showWaitOtherDialog(Activity activity, int time) {
+
+        android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(activity, android.R.style.Theme_Holo_Light_Dialog);
+        builder.setTitle("请等待其他玩家操作...");
+        builder.setNegativeButton("取消", null);
+        builder.show();
+    }
+
+    public static void showWitchSaveDialog(Activity activity, int killed, Map<String, Integer> param, int time) {
+
+        android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(activity, android.R.style.Theme_Holo_Light_Dialog);
+        builder.setTitle(killed + "号玩家死亡，你是否要救？")
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .setPositiveButton("是", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        param.put("content", killed);
+                        IMClientUtil.sendMsg(ProtocolConstant.SID_GAME, ProtocolConstant.CID_GAME_SAVE_REQ, param);
+                    }
+                })
+                .setNegativeButton("否", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        showWitchPoisonDialog(activity, killed, param, time);
+
+                    }
+                });
+        builder.show();
+    }
+
+    public static void showWitchPoisonDialog(Activity activity, int killed, Map<String, Integer> param, int time) {
+
+        android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(activity, android.R.style.Theme_Holo_Light_Dialog);
+        builder.setTitle("您是否要毒人？")
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .setPositiveButton("是", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        String title = "请选择您要毒的人：";
+                        showOperateDialog(activity, title, ProtocolConstant.CID_GAME_POISON_REQ, param, time);
+                    }
+                })
+                .setNegativeButton("否",new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        showWaitOtherDialog(activity, time);
+                    }
+                } );
+        builder.show();
+    }
+
+    public static void showToast(Activity activity, String str) {
+        if (Looper.myLooper() == null) {
+            Looper.prepare();
+        }
+        Toast.makeText(activity, str, Toast.LENGTH_SHORT).show();
+        if (Looper.myLooper() == null) {
+            Looper.loop();
+        }
+    }
+
+    public static void showToast(Activity activity, String str, final int time) {
+        Toast toast = Toast.makeText(activity, str, Toast.LENGTH_LONG);
+        final Timer timer = new Timer();
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                toast.show();
+            }
+        }, 0, 3000);
+        new Timer().schedule(new TimerTask() {
+            @Override
+            public void run() {
+                toast.cancel();
+                timer.cancel();
+            }
+        }, time);
     }
 
 

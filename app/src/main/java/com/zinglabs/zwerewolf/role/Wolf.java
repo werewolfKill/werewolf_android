@@ -11,6 +11,15 @@ public class Wolf extends Role {
     public static final String NAME = "狼人";
     public static final long ACTION_TIME = 15 * 1000;
 
+    private int id;
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
 
     /**
      * 独有行动是否弃权

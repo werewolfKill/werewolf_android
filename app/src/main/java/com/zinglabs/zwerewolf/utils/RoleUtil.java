@@ -21,7 +21,7 @@ import com.zinglabs.zwerewolf.role.Wolf;
 
 public class RoleUtil {
 
-    public static final Role getRole(int roleCode) {
+    public static Role getRole(int roleCode) {
         Role role = null;
         switch (roleCode) {
             case Constants.ROLE_CODE_OF_VILLAGER:
@@ -53,6 +53,62 @@ public class RoleUtil {
 
         }
         return role;
+
+    }
+
+    public static long getWaitTime(int roleCode, int modal) {
+        int num = RoomUtil.getNumByModal(modal);
+        long action_time = 0, tmp_time = 0;
+
+        switch (roleCode) {
+            case Constants.ROLE_CODE_OF_GUARD:
+                action_time = Prophet.ACTION_TIME + Witch.ACTION_TIME + Wolf.ACTION_TIME;
+                break;
+            case Constants.ROLE_CODE_OF_PROPHET:
+                tmp_time =  Witch.ACTION_TIME + Wolf.ACTION_TIME;
+                if (num < 12) {
+                    action_time = tmp_time;
+                } else if (num == 12&&modal==Constants.MODEL_12_YNLS) {
+                    action_time = tmp_time+ Guard.ACTION_TIME;
+                }else {
+                    action_time = tmp_time;
+                }
+                break;
+
+            case Constants.ROLE_CODE_OF_WITCH:
+                tmp_time = Prophet.ACTION_TIME + Wolf.ACTION_TIME;
+                if (num < 12) {
+                    action_time = tmp_time;
+                } else if (num == 12&&modal==Constants.MODEL_12_YNLS) {
+                    action_time = tmp_time+ Guard.ACTION_TIME;
+                }else{
+                    action_time = tmp_time;
+
+                }
+                break;
+
+            case Constants.ROLE_CODE_OF_WOLF:
+                tmp_time = Prophet.ACTION_TIME + Witch.ACTION_TIME ;
+                if (num < 12) {
+                    action_time = tmp_time;
+                } else if (num == 12&&modal==Constants.MODEL_12_YNLS) {
+                    action_time = tmp_time+ Guard.ACTION_TIME;
+                }else{
+                    action_time = tmp_time;
+                }
+                break;
+            default:
+                tmp_time = Prophet.ACTION_TIME + Witch.ACTION_TIME +Wolf.ACTION_TIME;
+                if (num < 12) {
+                    action_time = tmp_time;
+                } else if (num == 12&&modal==Constants.MODEL_12_YNLS) {
+                    action_time = tmp_time+ Guard.ACTION_TIME;
+                }else{
+                    action_time = tmp_time;
+                }
+        }
+        return action_time;
+
 
     }
 

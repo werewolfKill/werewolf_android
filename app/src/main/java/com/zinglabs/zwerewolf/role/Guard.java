@@ -12,6 +12,15 @@ public class Guard extends Role {
     public static final long ACTION_TIME = 15 * 1000;
 
 
+    private int id;
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
 
     public Guard() {
     }

@@ -12,6 +12,15 @@ public class Idiot extends Role {
     public static final String NAME = "白痴";
     public static final long ACTION_TIME = 15 * 1000;
 
+    private int id;
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
 
     @Override
     public int doRoleAction() {

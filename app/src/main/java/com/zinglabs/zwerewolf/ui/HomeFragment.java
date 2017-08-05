@@ -4,9 +4,7 @@ package com.zinglabs.zwerewolf.ui;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Looper;
 import android.support.annotation.Nullable;
-import android.support.annotation.StringDef;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -14,18 +12,15 @@ import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
-import android.widget.Toast;
 
 import com.zinglabs.zwerewolf.R;
 import com.zinglabs.zwerewolf.config.Constants;
 import com.zinglabs.zwerewolf.constant.ProtocolConstant;
 import com.zinglabs.zwerewolf.entity.Room;
 import com.zinglabs.zwerewolf.event.HomeFragmentEvent;
+import com.zinglabs.zwerewolf.manager.DialogManager;
 import com.zinglabs.zwerewolf.utils.IMClientUtil;
 import com.zinglabs.zwerewolf.utils.MathUtil;
 
@@ -97,13 +92,13 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
                 easy();
                 break;
             case R.id.home_standard_iv: //标准模式
-                showToast("暂未开发,敬请期待...");
+                DialogManager.showToast(getActivity(),"暂未开发,敬请期待...");
                 break;
             case R.id.menu_home_setting:  //设置
-                showToast("暂未开发...");
+                DialogManager.showToast(getActivity(),"暂未开发...");
                 break;
             case R.id.home_help_iv:   //帮助
-                showToast("暂未开发...");
+                DialogManager.showToast(getActivity(),"暂未开发...");
                 break;
             case R.id.home_search_iv:  //搜索房间
                 searchRoom();
@@ -142,12 +137,6 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
         showSearchRoomDialog(param);
     }
 
-    private void showToast(String str) {
-        Looper.prepare();
-        Toast.makeText(activity, str, Toast.LENGTH_SHORT).show();
-        Looper.loop();
-
-    }
 
     @Subscribe
     public void onEvent(HomeFragmentEvent event) {
@@ -175,16 +164,16 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
                 break;
 
             case HomeFragmentEvent.CREATE_ROOM_FAIL:
-                showToast("房间创建失败");
+                DialogManager.showToast(getActivity(),"房间创建失败");
                 break;
             case HomeFragmentEvent.SEARCH_ROOM_NOT_EXIST:
-                showToast("房间不存在，请输入正确的房间号");
+                DialogManager.showToast(getActivity(),"房间不存在，请输入正确的房间号");
                 break;
             case HomeFragmentEvent.SEARCH_ROOM_ALREADY_FULL:
-                showToast("该房间已满");
+                DialogManager.showToast(getActivity(),"该房间已满");
                 break;
             case HomeFragmentEvent.SEARCH_ROOM_FAIL:
-                showToast("搜索失败");
+                DialogManager.showToast(getActivity(),"搜索失败");
                 break;
         }
 

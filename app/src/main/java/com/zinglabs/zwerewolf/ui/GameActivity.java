@@ -22,6 +22,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.zinglabs.zwerewolf.R;
@@ -47,7 +48,6 @@ import com.zinglabs.zwerewolf.utils.AppUtil;
 import com.zinglabs.zwerewolf.utils.DateUtil;
 import com.zinglabs.zwerewolf.utils.RoleUtil;
 import com.zinglabs.zwerewolf.utils.RoomUtil;
-import com.zinglabs.zwerewolf.utils.ToastUtil;
 import com.zinglabs.zwerewolf.widget.RoleView;
 
 import org.greenrobot.eventbus.EventBus;
@@ -55,7 +55,6 @@ import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -64,7 +63,6 @@ import java.util.Random;
 
 import cn.dreamtobe.kpswitch.widget.KPSwitchPanelLinearLayout;
 
-import static com.zinglabs.zwerewolf.R.id.cancel_action;
 import static com.zinglabs.zwerewolf.R.id.room_ready_ib;
 
 
@@ -98,6 +96,10 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
     private Role curRole;
 
     private Context context;
+
+
+    private Spinner spinner;
+    private BaseAdapter baseAdapter;
     // 面板View
     private KPSwitchPanelLinearLayout mPanelLayout;
 
@@ -140,7 +142,8 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
 
                 //倒计时内容
                 case GameStateMessage.COUNTDOWNTIMER:
-                    DialogManager.showGameDay(GameActivity.this, myRole_v, null, gameStateMessage.getText(), null);
+//                    DialogManager.showGameDay(GameActivity.this, myRole_v, null, gameStateMessage.getText(), null);
+                    DialogManager.showWaitDialog(GameActivity.this,myRole_tv,gameStateMessage.getTime());
                     doTimer(gameStateMessage.getTime());
                     break;
 
@@ -165,7 +168,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
 
                 //游戏结束界面变化
                 case GameStateMessage.GAME_OVER:
-                    DialogManager.dismissDialog();
+                    DialogManager.dismissDialog(GameActivity.this);
                     gameChatData = new GameChatData(GameChatData.CHAT, DateUtil.nowLongStr(), new User(GameChatData.SYSTEM_CHAT), 111, gameStateMessage.getText());
                     chatAdapter.update(gameChatData);
                     for (RoleView roleView : roleViewList) {
@@ -304,6 +307,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
         simulate(roomNum, curUserPos, ownerPos);
 
         simpleController = new SimpleController(mHandler);
+
     }
 
     private SimpleController simpleController;
@@ -358,7 +362,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                 break;
             case R.id.room_send_tv: // 发送文字
                 String msg = et.getText().toString().trim();
-                if (msg == null || msg.length() < 1) {
+                if ( msg.length() < 1) {
                     return;
                 }
                 et.setText("");
@@ -407,6 +411,8 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                 Room room = globalData.getRoom();
                 int roleId = businessData.getReply();
                 Role role = RoleUtil.getRole(businessData.getReply());
+                room.getPlayers().get(curUserId).setRole(role);
+                globalData.setRoom(room);
                 String roleMsg = "您的角色是" + role.getName();
                 if (roleId == Constants.ROLE_CODE_OF_WOLF) {
                     Integer[] wolfs = (Integer[]) businessData.getParam().get("wolfs");
@@ -415,15 +421,14 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                 GameChatData chat = new GameChatData(GameChatData.CHAT, new Date().getTime() + "", new User(0, "LRSwzc25151"), 111, roleMsg);
                 chatAdapter.update(chat);
                 setTitle("您是" + this.curPlayerPos + "号" + role.getName()); //设置标题
-                simpleController.startStage(room);
-//                simpleController.startGame(12);
+                simpleController.startStage(GameActivity.this,room);
                 break;
             case MsgEvent.GAME_NOT_ENOUGH_NUM:  //游戏人数不足
-                ToastUtil.showToast(this, "游戏人数不足，不能开局");
+                DialogManager.showToast(this, "游戏人数不足，不能开局");
                 readyIB.setVisibility(View.VISIBLE);
                 break;
             case MsgEvent.GAME_START_FAIL:
-                ToastUtil.showToast(this, "开局失败！");
+                DialogManager.showToast(this, "开局失败！");
                 readyIB.setVisibility(View.VISIBLE);
                 break;
             case MsgEvent.ROOM_OVER:
@@ -476,15 +481,13 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
         timer = new CountDownTimer(time, 1000) {
             @Override
             public void onTick(long millisUntilFinished) {
-//                day_v.setVisibility(View.VISIBLE);
-//                day_timer_tv.setText(millisUntilFinished / 1000 + " s");
-                DialogManager.showGameDay(GameActivity.this, myRole_v, null, null, millisUntilFinished / 1000 + " s");
+//                DialogManager.showGameDay(GameActivity.this, myRole_v, null, null, millisUntilFinished / 1000 + " s");
+                DialogManager.showWaitDialog(GameActivity.this,myRole_tv,millisUntilFinished/1000);
             }
 
             @Override
             public void onFinish() {
-//                day_v.setVisibility(View.GONE);
-                DialogManager.dismissDialog();
+                DialogManager.dismissDialog(GameActivity.this);
             }
         }.start();
     }
