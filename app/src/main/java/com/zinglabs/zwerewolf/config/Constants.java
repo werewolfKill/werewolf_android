@@ -36,6 +36,11 @@ public class Constants {
     public static final int ROOM_ALREADY_FULL = -2; //搜索房间已满
     public static final int ROOM_NOT_ENOUGH_NUM = -3; //房间人数不够
 
+    //    游戏过程状态码
+    public static final int GAME_STATUS_OVER_WOLF = -1;
+    public static final int GAME_STATUS_OVER_GOOD = 1;
+    public static final int GAME_STATUS_PROCESS= 0;
+
 
     //---系统发言
     public static final String TEXT_START_ALLOT = "游戏开始，本轮共有%d个狼人，%d个预言家，%d个女巫，%d个猎人，%d个村民";

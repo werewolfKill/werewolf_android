@@ -25,6 +25,7 @@ public class BusinessService {
 
         body.writeInt(reqBody.getFromId())
                 .writeInt(reqBody.getRoomId())
+                .writeInt(reqBody.getBout())
                 .writeInt(reqBody.getContent());
 
         Packet packet = new Packet(body.readableBytes() + 12, reqBody.getServiceId()
@@ -57,6 +58,12 @@ public class BusinessService {
 
         return ByteUtil.resolveStartMsg(byteBuf);
     }
+
+    public BusinessData receiveDawnMsg(ByteBuf byteBuf){
+
+        return ByteUtil.resolveDawnMsg(byteBuf);
+    }
+
 
 
 }

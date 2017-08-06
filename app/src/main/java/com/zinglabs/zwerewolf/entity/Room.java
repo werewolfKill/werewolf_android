@@ -46,6 +46,19 @@ public class Room implements Serializable {
     private Map<Integer,UserRole> players;
 
 
+    /**
+     * 表示第几天
+     */
+    private int bout ;
+
+    public int getBout() {
+        return bout;
+    }
+
+    public void setBout(int bout) {
+        this.bout = bout;
+    }
+
     public int getCurNumber() {
         return curNumber;
     }

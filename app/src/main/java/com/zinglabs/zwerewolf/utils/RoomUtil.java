@@ -1,6 +1,9 @@
 package com.zinglabs.zwerewolf.utils;
 
 import com.zinglabs.zwerewolf.config.Constants;
+import com.zinglabs.zwerewolf.role.UserRole;
+
+import java.util.Map;
 
 /**
  * @user wangtonghe
@@ -30,4 +33,8 @@ public class RoomUtil {
         }
         return number;
     }
+
+
 }
+
+

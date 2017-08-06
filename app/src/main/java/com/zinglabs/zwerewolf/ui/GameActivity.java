@@ -63,6 +63,7 @@ import java.util.Random;
 
 import cn.dreamtobe.kpswitch.widget.KPSwitchPanelLinearLayout;
 
+import static com.zinglabs.zwerewolf.R.id.cancel_action;
 import static com.zinglabs.zwerewolf.R.id.room_ready_ib;
 
 
@@ -143,7 +144,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                 //倒计时内容
                 case GameStateMessage.COUNTDOWNTIMER:
 //                    DialogManager.showGameDay(GameActivity.this, myRole_v, null, gameStateMessage.getText(), null);
-                    DialogManager.showWaitDialog(GameActivity.this,myRole_tv,gameStateMessage.getTime());
+                    DialogManager.showWaitDialog(GameActivity.this, myRole_tv, gameStateMessage.getTime());
                     doTimer(gameStateMessage.getTime());
                     break;
 
@@ -263,7 +264,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
         key_v = findViewById(R.id.room_key_v);
         et = (EditText) findViewById(R.id.room_et);
 
-        ready_iv = (ImageView)findViewById(R.id.role_ready_iv);
+        ready_iv = (ImageView) findViewById(R.id.role_ready_iv);
 
         findViewById(R.id.room_send_tv).setOnClickListener(this);
         readyIB = (ImageButton) findViewById(R.id.room_ready_ib);
@@ -362,7 +363,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                 break;
             case R.id.room_send_tv: // 发送文字
                 String msg = et.getText().toString().trim();
-                if ( msg.length() < 1) {
+                if (msg.length() < 1) {
                     return;
                 }
                 et.setText("");
@@ -393,7 +394,8 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
         BusinessData businessData;
         int curPos = this.curPlayerPos;
         RoleView roleView = roleViewMap.get(curPos);
-//        roleView.setMe();
+        int reply;
+        Room room;
 
         switch (event.getMsgType()) {
 
@@ -408,20 +410,22 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                 break;
             case MsgEvent.GAME_START:  //游戏开始
                 businessData = (BusinessData) obj;
-                Room room = globalData.getRoom();
+                room = globalData.getRoom();
                 int roleId = businessData.getReply();
                 Role role = RoleUtil.getRole(businessData.getReply());
+                curRole = role;
                 room.getPlayers().get(curUserId).setRole(role);
+                room.setBout(1);  //设置为第1天
                 globalData.setRoom(room);
                 String roleMsg = "您的角色是" + role.getName();
                 if (roleId == Constants.ROLE_CODE_OF_WOLF) {
                     Integer[] wolfs = (Integer[]) businessData.getParam().get("wolfs");
-                    roleMsg +=getOthersStr(wolfs, room.getPlayers(),curPlayerPos);
+                    roleMsg += getOthersStr(wolfs, room.getPlayers(), curPlayerPos);
                 }
                 GameChatData chat = new GameChatData(GameChatData.CHAT, new Date().getTime() + "", new User(0, "LRSwzc25151"), 111, roleMsg);
                 chatAdapter.update(chat);
                 setTitle("您是" + this.curPlayerPos + "号" + role.getName()); //设置标题
-                simpleController.startStage(GameActivity.this,room);
+                simpleController.startStage(GameActivity.this, room);
                 break;
             case MsgEvent.GAME_NOT_ENOUGH_NUM:  //游戏人数不足
                 DialogManager.showToast(this, "游戏人数不足，不能开局");
@@ -431,6 +435,21 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                 DialogManager.showToast(this, "开局失败！");
                 readyIB.setVisibility(View.VISIBLE);
                 break;
+            case MsgEvent.GAME_NOTIFY_WITCH:  //通知女巫某位玩家死亡
+                businessData = (BusinessData) obj;
+                reply = businessData.getReply();
+                room = globalData.getRoom();
+                simpleController.witchAction(GameActivity.this, room,reply);
+
+                break;
+
+
+            case MsgEvent.GAME_DAWN: //天亮了
+                businessData = (BusinessData) obj;
+                reply = businessData.getReply();
+
+
+
             case MsgEvent.ROOM_OVER:
 //                if (!gameController.isGameing()) {
 //                    return;
@@ -482,7 +501,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
             @Override
             public void onTick(long millisUntilFinished) {
 //                DialogManager.showGameDay(GameActivity.this, myRole_v, null, null, millisUntilFinished / 1000 + " s");
-                DialogManager.showWaitDialog(GameActivity.this,myRole_tv,millisUntilFinished/1000);
+                DialogManager.showWaitDialog(GameActivity.this, myRole_tv, millisUntilFinished / 1000);
             }
 
             @Override
@@ -529,16 +548,16 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-    private String getOthersStr(Integer[] wolfs, Map<Integer, UserRole> players,int curPos) {
+    private String getOthersStr(Integer[] wolfs, Map<Integer, UserRole> players, int curPos) {
         String str = " ";
-        if(wolfs.length>0){
-            str+=",你的狼同伴是:";
+        if (wolfs.length > 0) {
+            str += ",你的狼同伴是:";
         }
         for (int i = 0; i < wolfs.length; i++) {
             UserRole userRole = players.get(wolfs[i]);
             int pos = userRole.getPosition();
-            if(pos!=curPos){
-                str+=pos +"号 ";
+            if (pos != curPos) {
+                str += pos + "号 ";
             }
             userRole.setRole(new Wolf());
         }

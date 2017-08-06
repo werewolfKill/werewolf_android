@@ -68,6 +68,19 @@ public class GameController implements BaseController {
                 }
             case ProtocolConstant.CID_GAME_KILL_RES_RESP:  //狼人杀人信息
                 break;
+            case ProtocolConstant.CID_GAME_NOTIFY_WITCH_KILLED:  //通知女巫狼人杀人信息
+                businessData = businessService.receive(body);
+                reply = businessData.getReply();
+                System.out.println("狼人杀的是"+reply);
+                msgEvent = new MsgEvent(MsgEvent.GAME_NOTIFY_WITCH,null,businessData);
+                EventBus.getDefault().post(msgEvent);
+            case ProtocolConstant.CID_GAME_DAWN:    //天亮了
+                businessData = businessService.receiveDawnMsg(body);
+                reply = businessData.getReply();  //游戏是否结束
+                msgEvent = new MsgEvent(MsgEvent.GAME_DAWN, null, businessData);
+                EventBus.getDefault().post(msgEvent);
+
+
         }
 
     }
@@ -78,6 +91,8 @@ public class GameController implements BaseController {
         Integer fromId = (Integer) map.get("fromId");
         Integer roomId = (Integer) map.get("roomId");
         Integer content = (Integer) map.get("content");
+        Integer bout = (Integer) map.get("bout");
+
         RequestBody reqBody = new RequestBody(ProtocolConstant.SID_GAME, command, fromId, roomId, content);
         businessService.send4Game(channel, reqBody);
 

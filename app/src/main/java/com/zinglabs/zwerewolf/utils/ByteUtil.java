@@ -86,5 +86,23 @@ public class ByteUtil {
 
     }
 
+    public static BusinessData resolveDawnMsg(ByteBuf body){
+        BusinessData msgBody = new BusinessData();
+        msgBody.setFromId(body.readInt());
+        msgBody.setReply(body.readInt());
+        int num = body.readInt();
+        Map<String, Object> param = new HashMap<>();
+        if (num>0) {
+            Integer[] killed = new Integer[num];
+            for(int i=0;i<num;i++){
+                killed[i]= body.readInt();
+            }
+            param.put("killed",killed);
+            msgBody.setParam(param);
+        }
+        return msgBody;
+
+    }
+
 
 }

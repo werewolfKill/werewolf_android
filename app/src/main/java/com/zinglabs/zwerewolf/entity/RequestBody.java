@@ -33,6 +33,16 @@ public class RequestBody {
 
     private int content;
 
+    private int bout ;
+
+    public int getBout() {
+        return bout;
+    }
+
+    public void setBout(int bout) {
+        this.bout = bout;
+    }
+
     public int getFromId() {
         return fromId;
     }

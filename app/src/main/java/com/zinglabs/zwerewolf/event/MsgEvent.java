@@ -19,6 +19,8 @@ public class MsgEvent {
     public static final int GAME_START=0xc2; //房主开始游戏
     public static final int GAME_NOT_ENOUGH_NUM=0xc3; //没有足够人数
     public static final int GAME_START_FAIL=0xc4; //未知原因导致开始游戏失败
+    public static final int GAME_NOTIFY_WITCH = 0xc5; //通知女巫
+    public static final int GAME_DAWN = 0xc6; //天亮了
 
 
 

@@ -25,6 +25,7 @@ import android.widget.Toast;
 import com.zinglabs.zwerewolf.R;
 import com.zinglabs.zwerewolf.config.Constants;
 import com.zinglabs.zwerewolf.constant.ProtocolConstant;
+import com.zinglabs.zwerewolf.role.Witch;
 import com.zinglabs.zwerewolf.utils.AppUtil;
 import com.zinglabs.zwerewolf.utils.IMClientUtil;
 import com.zinglabs.zwerewolf.utils.MathUtil;
@@ -262,7 +263,7 @@ public class DialogManager {
         builder.show();
     }
 
-    public static void showWitchSaveDialog(Activity activity, int killed, Map<String, Integer> param, int time) {
+    public static void showWitchSaveDialog(Activity activity, int killed, Map<String, Integer> param, int time, Witch witch) {
 
         android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(activity, android.R.style.Theme_Holo_Light_Dialog);
         builder.setTitle(killed + "号玩家死亡，你是否要救？")
@@ -270,6 +271,7 @@ public class DialogManager {
                 .setPositiveButton("是", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
+                        witch.usePanacea();
                         param.put("content", killed);
                         IMClientUtil.sendMsg(ProtocolConstant.SID_GAME, ProtocolConstant.CID_GAME_SAVE_REQ, param);
                     }
@@ -277,14 +279,15 @@ public class DialogManager {
                 .setNegativeButton("否", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        showWitchPoisonDialog(activity, killed, param, time);
-
+                        if(witch.hasPoison()){
+                            showWitchPoisonDialog(activity, param, time,witch);
+                        }
                     }
                 });
         builder.show();
     }
 
-    public static void showWitchPoisonDialog(Activity activity, int killed, Map<String, Integer> param, int time) {
+    public static void showWitchPoisonDialog(Activity activity, Map<String, Integer> param, int time,Witch witch) {
 
         android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(activity, android.R.style.Theme_Holo_Light_Dialog);
         builder.setTitle("您是否要毒人？")
@@ -292,6 +295,7 @@ public class DialogManager {
                 .setPositiveButton("是", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
+                        witch.usePoison();
                         String title = "请选择您要毒的人：";
                         showOperateDialog(activity, title, ProtocolConstant.CID_GAME_POISON_REQ, param, time);
                     }
