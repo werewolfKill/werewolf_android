@@ -217,6 +217,12 @@ public class SimpleController implements Role.OnRoleStateChangeListener {
 
     }
 
+    /**
+     * 女巫操作
+     * @param activity
+     * @param room
+     * @param reply
+     */
     public void witchAction(Activity activity, Room room, int reply) {
         int userId = room.getCurUserId();
         int roomId = room.getRoomId();
@@ -233,6 +239,40 @@ public class SimpleController implements Role.OnRoleStateChangeListener {
         DialogManager.showWitchSaveDialog(activity, reply, witchMap, (int) waitTime,witch);
 
     }
+
+    /**
+     * 天亮流程
+     * @param activity activity
+     * @param room 房间信息
+     */
+    public void doDawn(Activity activity,Room room,Integer[] killeds){
+        room.addDeadList(killeds);
+        if(room.isOver()){
+            DialogManager.showOverDialog(activity,killeds);
+            return;
+        }
+        int userId = room.getCurUserId();
+        int roomId = room.getRoomId();
+        int bout = room.getBout();
+        if(bout==1){  //第1天，警长竞选
+            String title = "您是否要竞选警长？";
+            Map<String, Integer> param = new HashMap<>();
+            param.put("fromId", userId);
+            param.put("roomId", roomId);
+            param.put("bout",bout);
+            DialogManager.showCommonDialog(activity,ProtocolConstant.CID_GAME_ASK_CHIEF,userId,title,param);
+
+        }
+    }
+
+    public void trunSpeaking(){
+
+    }
+
+
+
+
+
 
     /**
      * 展示等待对话框

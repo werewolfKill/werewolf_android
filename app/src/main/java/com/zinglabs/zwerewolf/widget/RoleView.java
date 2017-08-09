@@ -37,6 +37,8 @@ public class RoleView extends RelativeLayout implements View.OnClickListener {
     public static final int STATE_READY = 0xa4;//位置解锁，有人，已准备；显示头像，号码，语音，准备状态
     public static final int STATE_SPEAKING = 0xa5;//位置解锁，有人，正在说话；显示头像，号码，语音
     public static final int STATE_ME = 0xa6;//位置解锁，有人，表示自己；显示头像，号码，语音
+    public static final int STATE_VOTE_CHIEF = 0xa7;//位置解锁，有人，竞选警长；显示头像，号码，语音
+    public static final int STATE_QUIT_CHIEF = 0xa8;//位置解锁，有人，放弃警长；显示头像，号码，语音
 
     private AppCompatActivity activity;
     private View root;
@@ -49,6 +51,8 @@ public class RoleView extends RelativeLayout implements View.OnClickListener {
     private ImageView speaking_iv;
     private ImageView ready_iv;
     private ImageView lock_iv;
+    private ImageView hand_iv;
+    private ImageView quit_chief_iv;
 
     //模拟聊天内容
     private String[] arrChat = Constants.ARR_TEXT_PLAYER_CHAT;
@@ -77,6 +81,8 @@ public class RoleView extends RelativeLayout implements View.OnClickListener {
                     number_iv.setVisibility(View.VISIBLE);
                     number_tv.setVisibility(View.VISIBLE);
                     head_iv.setImageResource(R.mipmap.icon_vacancy);
+                    hand_iv.setVisibility(View.GONE);
+                    quit_chief_iv.setVisibility(View.GONE);
                     break;
                 //游戏中，死亡
                 case STATE_DIE:
@@ -87,6 +93,10 @@ public class RoleView extends RelativeLayout implements View.OnClickListener {
                     number_iv.setVisibility(View.VISIBLE);
                     number_tv.setVisibility(View.VISIBLE);
                     die_iv.setVisibility(View.VISIBLE);
+                    hand_iv.setVisibility(View.GONE);
+                    quit_chief_iv.setVisibility(View.GONE);
+
+
 //                    head_iv.setImageResource(arr_role[number % arr_role.length]);
                     break;
                 //玩家未准备
@@ -98,6 +108,10 @@ public class RoleView extends RelativeLayout implements View.OnClickListener {
                     number_iv.setVisibility(View.VISIBLE);
                     number_tv.setVisibility(View.VISIBLE);
                     head_iv.setImageResource(R.mipmap.app_icon);
+                    hand_iv.setVisibility(View.GONE);
+                    quit_chief_iv.setVisibility(View.GONE);
+
+
 //                    head_iv.setImageResource(arr_role[number % arr_role.length]);
                     if (mRoleData == null) {
                         return;
@@ -120,6 +134,10 @@ public class RoleView extends RelativeLayout implements View.OnClickListener {
                     number_iv.setVisibility(View.VISIBLE);
                     number_tv.setVisibility(View.VISIBLE);
                     ready_iv.setVisibility(View.VISIBLE);
+                    hand_iv.setVisibility(View.GONE);
+                    quit_chief_iv.setVisibility(View.GONE);
+
+
 //                    head_iv.setImageResource(arr_role[number % arr_role.length]);
                     //判断角色是否房主
                     if (mRoleData.isOwner()) {
@@ -137,8 +155,33 @@ public class RoleView extends RelativeLayout implements View.OnClickListener {
                     number_iv.setVisibility(View.VISIBLE);
                     number_tv.setVisibility(View.VISIBLE);
                     speaking_iv.setVisibility(View.VISIBLE);
+                    hand_iv.setVisibility(View.GONE);
+                    quit_chief_iv.setVisibility(View.GONE);
+
                     break;
                 case STATE_ME:
+                    break;  //设置我
+                case STATE_VOTE_CHIEF:  //竞选警长
+                    lock_iv.setVisibility(View.GONE);
+                    die_iv.setVisibility(View.GONE);
+                    ready_iv.setVisibility(View.GONE);
+                    head_iv.setVisibility(View.VISIBLE);
+                    number_iv.setVisibility(View.VISIBLE);
+                    number_tv.setVisibility(View.VISIBLE);
+                    speaking_iv.setVisibility(View.GONE);
+                    hand_iv.setVisibility(View.VISIBLE);
+                    quit_chief_iv.setVisibility(View.GONE);
+                case STATE_QUIT_CHIEF:  //放弃竞选警长
+                    lock_iv.setVisibility(View.GONE);
+                    die_iv.setVisibility(View.GONE);
+                    ready_iv.setVisibility(View.GONE);
+                    head_iv.setVisibility(View.VISIBLE);
+                    number_iv.setVisibility(View.VISIBLE);
+                    number_tv.setVisibility(View.VISIBLE);
+                    speaking_iv.setVisibility(View.GONE);
+                    hand_iv.setVisibility(View.GONE);
+                    quit_chief_iv.setVisibility(View.VISIBLE);
+
 
             }
         }
@@ -161,6 +204,8 @@ public class RoleView extends RelativeLayout implements View.OnClickListener {
         speaking_iv = (ImageView) root.findViewById(R.id.role_speaking_iv);
         ready_iv = (ImageView) root.findViewById(R.id.role_ready_iv);
         lock_iv = (ImageView) root.findViewById(R.id.role_lock_iv);
+        hand_iv = (ImageView) root.findViewById(R.id.role_hand_iv);
+        quit_chief_iv = (ImageView) root.findViewById(R.id.role_quit_chief_iv);
 
     }
 
@@ -247,6 +292,16 @@ public class RoleView extends RelativeLayout implements View.OnClickListener {
 
     public void setMe(){
         mHandler.sendEmptyMessage(STATE_ME);
+
+    }
+
+    public void setChiefVote(){
+        mHandler.sendEmptyMessage(STATE_VOTE_CHIEF);
+
+    }
+
+    public void setQuitChief(){
+        mHandler.sendEmptyMessage(STATE_QUIT_CHIEF);
 
     }
 

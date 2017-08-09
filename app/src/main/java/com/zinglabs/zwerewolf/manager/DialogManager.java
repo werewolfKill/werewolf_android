@@ -30,10 +30,14 @@ import com.zinglabs.zwerewolf.utils.AppUtil;
 import com.zinglabs.zwerewolf.utils.IMClientUtil;
 import com.zinglabs.zwerewolf.utils.MathUtil;
 import com.zinglabs.zwerewolf.utils.RoleUtil;
+import com.zinglabs.zwerewolf.utils.StringUtils;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
+
+import io.netty.util.internal.StringUtil;
 
 
 /**
@@ -309,14 +313,50 @@ public class DialogManager {
         builder.show();
     }
 
+    public static void showOverDialog(Activity activity,Integer [] array){
+        String killStr = StringUtils.join(array,"、")+"号玩家死亡，游戏结束";
+        android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(activity, android.R.style.Theme_Holo_Light_Dialog);
+        builder.setTitle(killStr)
+                .setIcon(android.R.drawable.ic_dialog_dialer)
+                .setPositiveButton("好的", null);
+
+        builder.show();
+
+    }
+
+    public static void showCommonDialog(Activity activity,short cid, int reply,String title, Map<String, Integer> param){
+        android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(activity, android.R.style.Theme_Holo_Light_Dialog);
+        builder.setTitle(title)
+                .setIcon(android.R.drawable.ic_dialog_dialer)
+                .setPositiveButton("是", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        param.put("content",1);
+                        IMClientUtil.sendMsg(ProtocolConstant.SID_GAME, cid, param);
+                    }
+                })
+                .setNegativeButton("不了",  new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        param.put("content",0);
+                        IMClientUtil.sendMsg(ProtocolConstant.SID_GAME, cid, param);
+                    }
+                });
+
+        builder.show();
+
+    }
+
+
     public static void showToast(Activity activity, String str) {
-        if (Looper.myLooper() == null) {
-            Looper.prepare();
-        }
-        Toast.makeText(activity, str, Toast.LENGTH_SHORT).show();
-        if (Looper.myLooper() == null) {
-            Looper.loop();
-        }
+
+
+        android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(activity, android.R.style.Theme_Holo_Light_Dialog);
+        builder.setTitle(str)
+                .setIcon(android.R.drawable.ic_dialog_dialer)
+                .setPositiveButton("好的", null);
+
+        builder.show();
     }
 
     public static void showToast(Activity activity, String str, final int time) {

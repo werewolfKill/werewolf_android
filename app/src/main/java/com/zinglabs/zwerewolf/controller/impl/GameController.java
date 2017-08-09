@@ -66,6 +66,7 @@ public class GameController implements BaseController {
                     msgEvent = new MsgEvent(MsgEvent.GAME_START_FAIL, null, businessData);
                     EventBus.getDefault().post(msgEvent);
                 }
+                break;
             case ProtocolConstant.CID_GAME_KILL_RES_RESP:  //狼人杀人信息
                 break;
             case ProtocolConstant.CID_GAME_NOTIFY_WITCH_KILLED:  //通知女巫狼人杀人信息
@@ -74,11 +75,32 @@ public class GameController implements BaseController {
                 System.out.println("狼人杀的是"+reply);
                 msgEvent = new MsgEvent(MsgEvent.GAME_NOTIFY_WITCH,null,businessData);
                 EventBus.getDefault().post(msgEvent);
+                break;
+            case ProtocolConstant.CID_GAME_VERIFY_RESP:  //验人响应
+                businessData = businessService.receive(body);
+                msgEvent = new MsgEvent(MsgEvent.GAME_NOTIFY_WITCH,null,businessData);
+                EventBus.getDefault().post(msgEvent);
+                break;
             case ProtocolConstant.CID_GAME_DAWN:    //天亮了
                 businessData = businessService.receiveDawnMsg(body);
                 reply = businessData.getReply();  //游戏是否结束
                 msgEvent = new MsgEvent(MsgEvent.GAME_DAWN, null, businessData);
                 EventBus.getDefault().post(msgEvent);
+                break;
+            case ProtocolConstant.CID_GAME_ASK_CHIEF_RESP:  //竞选警长响应
+                businessData = businessService.receive(body);
+                fromId = businessData.getFromId();
+                System.out.println(fromId+"号玩家竞选警长");
+                msgEvent = new MsgEvent(MsgEvent.GAME_ASK_CHIEF, null, businessData);
+                EventBus.getDefault().post(msgEvent);
+
+                break;
+            case ProtocolConstant.CID_GAME_POLICE_SPEAKING : //警上发言
+                businessData = businessService.receive(body);
+
+                msgEvent = new MsgEvent(MsgEvent.GAME_POLICE_SPEAKING, null, businessData);
+                EventBus.getDefault().post(msgEvent);
+
 
 
         }
@@ -93,7 +115,7 @@ public class GameController implements BaseController {
         Integer content = (Integer) map.get("content");
         Integer bout = (Integer) map.get("bout");
 
-        RequestBody reqBody = new RequestBody(ProtocolConstant.SID_GAME, command, fromId, roomId, content);
+        RequestBody reqBody = new RequestBody(ProtocolConstant.SID_GAME, command, fromId, roomId, content,bout);
         businessService.send4Game(channel, reqBody);
 
     }

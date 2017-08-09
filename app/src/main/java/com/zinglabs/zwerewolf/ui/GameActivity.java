@@ -228,10 +228,19 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
         User user = globalData.getUser();
         room.setCurUserId(user.getId());
         globalData.setRoom(room);
+        int roomNum = RoomUtil.getNumByModal(room.getModelId());
+        int userId = room.getCurUserId();
+        int owner = room.getOwnerId();
+        int curUserPos = room.getPlayers().get(userId).getPosition();
+        int ownerPos = room.getPlayers().get(owner).getPosition();
+        this.curUserId = userId;
+        this.curPlayerPos = curUserPos;
+        this.curRole = room.getPlayers().get(userId).getRole();
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+
         setSupportActionBar(toolbar);
-        toolbar.setTitle(room.getRoomId() + "房间，准备中");
-        setTitle(room.getRoomId() + "房间，准备中...");
+        toolbar.setTitle(room.getRoomId()+ "房间,您是"+curUserPos+"号玩家");
+        setTitle(room.getRoomId() + "房间,您是"+curUserPos+"号玩家");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         toolbar.setNavigationIcon(R.mipmap.icon_nav_back);
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
@@ -296,14 +305,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                 return false;
             }
         });
-        int roomNum = RoomUtil.getNumByModal(room.getModelId());
-        int userId = room.getCurUserId();
-        int owner = room.getOwnerId();
-        int curUserPos = room.getPlayers().get(userId).getPosition();
-        int ownerPos = room.getPlayers().get(owner).getPosition();
-        this.curUserId = userId;
-        this.curPlayerPos = curUserPos;
-        this.curRole = room.getPlayers().get(userId).getRole();
+
 
         simulate(roomNum, curUserPos, ownerPos);
 
@@ -391,11 +393,21 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
     public void onEvent(MsgEvent event) {
         String msg = event.getMsgStr();
         Object obj = event.getObj();
-        BusinessData businessData;
+        BusinessData businessData = null;
         int curPos = this.curPlayerPos;
-        RoleView roleView = roleViewMap.get(curPos);
-        int reply;
-        Room room;
+        RoleView roleView;
+        int reply = 0;
+        Room room = null;
+        int fromId = 0;
+        int actionPos = 0;
+        if (event.getMsgType() != MsgEvent.ROOM_CHAT) {
+            room = globalData.getRoom();
+            businessData = (BusinessData) obj;
+            fromId = businessData.getFromId();
+            actionPos = getPosById(fromId, room);
+            reply = businessData.getReply();
+
+        }
 
         switch (event.getMsgType()) {
 
@@ -403,22 +415,25 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                 chatAdapter.update(event.getObj());
                 break;
             case MsgEvent.GAME_LEAVE:  //离开
+                roleView = roleViewMap.get(actionPos);
                 roleView.unReady();
+
                 break;
             case MsgEvent.GAME_READY:  //准备游戏
+                roleView = roleViewMap.get(actionPos);
                 roleView.ready();
+                readyIB.setVisibility(View.GONE);
                 break;
             case MsgEvent.GAME_START:  //游戏开始
+//                readyIB.setVisibility(View.GONE);
                 businessData = (BusinessData) obj;
-                room = globalData.getRoom();
-                int roleId = businessData.getReply();
-                Role role = RoleUtil.getRole(businessData.getReply());
+                Role role = RoleUtil.getRole(reply);
                 curRole = role;
                 room.getPlayers().get(curUserId).setRole(role);
                 room.setBout(1);  //设置为第1天
                 globalData.setRoom(room);
                 String roleMsg = "您的角色是" + role.getName();
-                if (roleId == Constants.ROLE_CODE_OF_WOLF) {
+                if (reply == Constants.ROLE_CODE_OF_WOLF) {
                     Integer[] wolfs = (Integer[]) businessData.getParam().get("wolfs");
                     roleMsg += getOthersStr(wolfs, room.getPlayers(), curPlayerPos);
                 }
@@ -426,6 +441,11 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                 chatAdapter.update(chat);
                 setTitle("您是" + this.curPlayerPos + "号" + role.getName()); //设置标题
                 simpleController.startStage(GameActivity.this, room);
+                break;
+            case MsgEvent.GAME_VERIFY: //预言家验人
+                String str = reply==1?"好人":"狼人";
+                String title = actionPos+"号玩家是"+str;
+                DialogManager.showToast(this, title);
                 break;
             case MsgEvent.GAME_NOT_ENOUGH_NUM:  //游戏人数不足
                 DialogManager.showToast(this, "游戏人数不足，不能开局");
@@ -436,21 +456,29 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                 readyIB.setVisibility(View.VISIBLE);
                 break;
             case MsgEvent.GAME_NOTIFY_WITCH:  //通知女巫某位玩家死亡
-                businessData = (BusinessData) obj;
-                reply = businessData.getReply();
-                room = globalData.getRoom();
-                simpleController.witchAction(GameActivity.this, room,reply);
+                simpleController.witchAction(GameActivity.this, room, reply);
+                break;
+            case MsgEvent.GAME_DAWN: //天亮了
+                Integer[] killeds = (Integer[]) businessData.getParam().get("killed");
+                room.setOver(reply != Constants.GAME_STATUS_PROCESS);
+                simpleController.doDawn(GameActivity.this, room, killeds);
+                break;
+            case MsgEvent.GAME_ASK_CHIEF: //申请警长
+                roleView = roleViewMap.get(actionPos);
+                room.addPoliceList(actionPos);
+                roleView.setChiefVote();
+                globalData.setRoom(room);
+                break;
 
+            case MsgEvent.GAME_POLICE_SPEAKING: //警上发言
+
+                List<Integer> list = RoomUtil.adjustSpeakOrder(room.getPoliceList(), reply);
+                turnSpeaking(roleViewMap, list);
+                //TODO 未竞选玩家投票
                 break;
 
 
-            case MsgEvent.GAME_DAWN: //天亮了
-                businessData = (BusinessData) obj;
-                reply = businessData.getReply();
-
-
-
-            case MsgEvent.ROOM_OVER:
+//            case MsgEvent.ROOM_OVER:
 //                if (!gameController.isGameing()) {
 //                    return;
 //                }
@@ -460,8 +488,8 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
 //                        roleView.ready();
 //                    }
 //                }
-                break;
-            case MsgEvent.ROOM_ROLE:
+//                break;
+//            case MsgEvent.ROOM_ROLE:
 //                if (curPlayerNumber < 0) {
 //                    return;
 //                }
@@ -476,8 +504,8 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
 //                int[] arrRoleDeploy = gameController.getArrRoleDeploy();
 //                String roleName = GameAlloter.getRoleName(arrRoleDeploy[curPlayerNumber - 1]);
 //                myRole_tv.setText("我的身份是：" + roleName);
-                break;
-            case MsgEvent.ROOM_ROLE_STATE_CHANGE:
+//                break;
+//            case MsgEvent.ROOM_ROLE_STATE_CHANGE:
 //                List<Role> roleList = gameController.getRoleList();
 //                for (int i = 0; i < roleList.size(); i++) {
 //                    if (roleList.get(i).isAlive()) {
@@ -486,7 +514,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
 //                        roleViewList.get(i).die();
 //                    }
 //                }
-                break;
+//                break;
 
         }
     }
@@ -531,6 +559,26 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                 roleViewMap.put(i, roleView);
             }
         }
+    }
+
+    private void turnSpeaking(Map<Integer, RoleView> roleViewMap, List<Integer> speakers) {
+        for (Integer pos : speakers) {
+            RoleView rv = roleViewMap.get(pos);
+            rv.speak();
+            try {
+                Thread.sleep(1000 * 2);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+
+    }
+
+    private int getPosById(int userId, Room room) {
+        if(userId>0){
+            return room.getPlayers().get(userId).getPosition();
+        }
+        return 0;
     }
 
     private void clear() {

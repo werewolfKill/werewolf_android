@@ -3,6 +3,9 @@ package com.zinglabs.zwerewolf.utils;
 import com.zinglabs.zwerewolf.config.Constants;
 import com.zinglabs.zwerewolf.role.UserRole;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -34,7 +37,30 @@ public class RoomUtil {
         return number;
     }
 
-
+    /**
+     * 调整发言顺序
+     * @param speaker 所有发言者
+     * @param start 开始发言的人
+     * @return 调整后发言者
+     */
+    public static List<Integer> adjustSpeakOrder(List<Integer> speaker,int start){
+        Collections.sort(speaker);
+        int size = speaker.size();
+        List<Integer> list = new ArrayList<>(size);
+        int index = 0;
+        for (int i = 0; i < size ; i++) {
+            if(start>=speaker.get(i)){
+                if(start==speaker.get(i)){
+                    index = i;
+                }
+                list.add(speaker.get(i));
+            }
+        }
+        if(index>1){
+            list.addAll(speaker.subList(0,index));
+        }
+        return list;
+    }
 }
 
 

@@ -21,6 +21,9 @@ public class MsgEvent {
     public static final int GAME_START_FAIL=0xc4; //未知原因导致开始游戏失败
     public static final int GAME_NOTIFY_WITCH = 0xc5; //通知女巫
     public static final int GAME_DAWN = 0xc6; //天亮了
+    public static final int GAME_ASK_CHIEF = 0xc7; //申请警长
+    public static final int GAME_POLICE_SPEAKING = 0xc8; //警上发言
+    public static final int GAME_VERIFY= 0xc9; //预言家验人
 
 
 

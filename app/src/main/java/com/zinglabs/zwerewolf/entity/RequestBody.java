@@ -16,6 +16,15 @@ public class RequestBody {
         this.content = content;
     }
 
+    public RequestBody(short serviceId, short commandId, int fromId, int roomId, int content, int bout) {
+        this.serviceId = serviceId;
+        this.commandId = commandId;
+        this.fromId = fromId;
+        this.roomId = roomId;
+        this.content = content;
+        this.bout = bout;
+    }
+
     public RequestBody(short serviceId, short commandId, int fromId, int content) {
         this.serviceId = serviceId;
         this.commandId = commandId;

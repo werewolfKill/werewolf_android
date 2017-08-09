@@ -51,5 +51,19 @@
         android:layout_width="60dp"
         android:layout_height="60dp"
         android:src="@mipmap/icon_lock" />
+    <!--举手-->
+    <ImageView
+        android:id="@+id/role_hand_iv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@mipmap/room_put_up_hands"
+        />
+    <!--放弃竞选-->
+    <ImageView
+        android:id="@+id/role_quit_chief_iv"
+        android:layout_width="60dp"
+        android:layout_height="30dp"
+        android:src="@mipmap/room_giveup"
+        />
 
 </RelativeLayout>

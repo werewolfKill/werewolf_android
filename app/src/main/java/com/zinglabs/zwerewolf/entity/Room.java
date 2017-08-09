@@ -3,6 +3,9 @@ package com.zinglabs.zwerewolf.entity;
 import com.zinglabs.zwerewolf.role.UserRole;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -45,6 +48,33 @@ public class Room implements Serializable {
      */
     private Map<Integer,UserRole> players;
 
+    /**
+     * 游戏是否结束
+     */
+    private boolean isOver;
+
+    /**
+     * 死亡名单
+     */
+    private List<Integer> deadList = new ArrayList<>();
+
+    private List<Integer> policeList = new ArrayList<>();
+
+    public boolean isOver() {
+        return isOver;
+    }
+
+    public void setOver(boolean over) {
+        isOver = over;
+    }
+
+    public List<Integer> getDeadList() {
+        return deadList;
+    }
+
+    public void addDeadList(Integer[] arr) {
+        this.deadList.addAll(Arrays.asList(arr));
+    }
 
     /**
      * 表示第几天
@@ -125,7 +155,18 @@ public class Room implements Serializable {
         return players;
     }
 
+    public List<Integer> getPoliceList() {
+        return policeList;
+    }
+
+    public void addPoliceList(int pos) {
+        this.policeList.add(pos);
+    }
+
     public void setPlayers(Map<Integer, UserRole> players) {
         this.players = players;
     }
 }
+
+
+
