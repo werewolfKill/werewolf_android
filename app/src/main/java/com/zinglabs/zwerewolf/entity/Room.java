@@ -1,6 +1,7 @@
 package com.zinglabs.zwerewolf.entity;
 
 import com.zinglabs.zwerewolf.role.UserRole;
+import com.zinglabs.zwerewolf.utils.RoomUtil;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -52,6 +53,15 @@ public class Room implements Serializable {
      * 游戏是否结束
      */
     private boolean isOver;
+
+    /**
+     * 房间人数
+     */
+    private int number;
+
+    public int getNumber() {
+        return number;
+    }
 
     /**
      * 死亡名单
@@ -127,6 +137,7 @@ public class Room implements Serializable {
 
     public void setModelId(int modelId) {
         this.modelId = modelId;
+        this.number = RoomUtil.getNumByModal(modelId);
     }
 
     public int getOwnerId() {
@@ -165,6 +176,13 @@ public class Room implements Serializable {
 
     public void setPlayers(Map<Integer, UserRole> players) {
         this.players = players;
+    }
+
+    public void addPlayer(int userId,int pos){
+        UserRole ur = new UserRole();
+        ur.setUserId(userId);
+        ur.setPosition(pos);
+        this.players.put(userId,ur);
     }
 }
 

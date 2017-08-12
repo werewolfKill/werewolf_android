@@ -245,10 +245,12 @@ public class SimpleController implements Role.OnRoleStateChangeListener {
      * @param activity activity
      * @param room 房间信息
      */
-    public void doDawn(Activity activity,Room room,Integer[] killeds){
-        room.addDeadList(killeds);
+    public void doDawn(Activity activity,Room room,Integer[] kills){
+        if(kills!=null){
+            room.addDeadList(kills);
+        }
         if(room.isOver()){
-            DialogManager.showOverDialog(activity,killeds);
+            DialogManager.showOverDialog(activity,kills);
             return;
         }
         int userId = room.getCurUserId();
@@ -265,7 +267,8 @@ public class SimpleController implements Role.OnRoleStateChangeListener {
         }
     }
 
-    public void trunSpeaking(){
+    public void speakTimer(){
+
 
     }
 

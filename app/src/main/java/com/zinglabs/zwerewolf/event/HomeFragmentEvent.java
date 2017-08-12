@@ -23,6 +23,8 @@ public class HomeFragmentEvent {
 
     public static final int SEARCH_ROOM_FAIL = 6;
 
+    public static final int ENTER_ROOM =7;
+
 
 
 

@@ -57,9 +57,9 @@ public class ByteUtil {
             int curNum = room.getCurNumber();
             for (int i = 0; i < curNum; i++) {
                 UserRole ur = new UserRole();
-                ur.setUsrId(body.readInt());
+                ur.setUserId(body.readInt());
                 ur.setPosition(body.readInt());
-                userRoleMap.put(ur.getUsrId(),ur);
+                userRoleMap.put(ur.getUserId(),ur);
             }
             room.setPlayers(userRoleMap);
             param.put("room",room);
@@ -90,16 +90,18 @@ public class ByteUtil {
         BusinessData msgBody = new BusinessData();
         msgBody.setFromId(body.readInt());
         msgBody.setReply(body.readInt());
-        int num = body.readInt();
         Map<String, Object> param = new HashMap<>();
+        int bout = body.readInt();
+        param.put("bout",bout);
+        int num = body.readInt();
         if (num>0) {
             Integer[] killed = new Integer[num];
             for(int i=0;i<num;i++){
                 killed[i]= body.readInt();
             }
             param.put("killed",killed);
-            msgBody.setParam(param);
         }
+        msgBody.setParam(param);
         return msgBody;
 
     }

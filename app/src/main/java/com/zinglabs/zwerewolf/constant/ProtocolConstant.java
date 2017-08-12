@@ -164,5 +164,8 @@ public interface ProtocolConstant {
     //投票出人响应
     short CID_GAME_VOTE_RESP = 25;
 
+    //他人进入房间
+    short CID_GAME_OTHER_ENTER =26;
+
 
 }

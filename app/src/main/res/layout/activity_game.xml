@@ -62,10 +62,10 @@
             android:id="@+id/room_bar_left"
             android:layout_width="65dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
+            android:layout_marginTop="30dp"
             android:background="@drawable/room_bj"
             android:gravity="center_horizontal"
-            android:minHeight="450dp"
+            android:minHeight="360dp"
             android:orientation="vertical"
             android:padding="2dp" />
 
@@ -74,10 +74,10 @@
             android:layout_width="65dp"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
-            android:layout_marginTop="10dp"
+            android:layout_marginTop="30dp"
             android:background="@drawable/room_bj"
             android:gravity="center_horizontal"
-            android:minHeight="450dp"
+            android:minHeight="360dp"
             android:orientation="vertical"
             android:padding="2dp" />
         <!--顶部显示我的身份-->

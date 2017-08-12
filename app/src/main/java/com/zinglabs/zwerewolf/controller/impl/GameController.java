@@ -5,6 +5,7 @@ import com.zinglabs.zwerewolf.constant.ProtocolConstant;
 import com.zinglabs.zwerewolf.controller.BaseController;
 import com.zinglabs.zwerewolf.data.BusinessData;
 import com.zinglabs.zwerewolf.entity.RequestBody;
+import com.zinglabs.zwerewolf.event.HomeFragmentEvent;
 import com.zinglabs.zwerewolf.event.MsgEvent;
 import com.zinglabs.zwerewolf.role.Role;
 import com.zinglabs.zwerewolf.service.BusinessService;
@@ -83,7 +84,6 @@ public class GameController implements BaseController {
                 break;
             case ProtocolConstant.CID_GAME_DAWN:    //天亮了
                 businessData = businessService.receiveDawnMsg(body);
-                reply = businessData.getReply();  //游戏是否结束
                 msgEvent = new MsgEvent(MsgEvent.GAME_DAWN, null, businessData);
                 EventBus.getDefault().post(msgEvent);
                 break;
@@ -100,9 +100,13 @@ public class GameController implements BaseController {
 
                 msgEvent = new MsgEvent(MsgEvent.GAME_POLICE_SPEAKING, null, businessData);
                 EventBus.getDefault().post(msgEvent);
+                break;
 
-
-
+            case ProtocolConstant.CID_GAME_OTHER_ENTER: //他人进入房间
+                businessData = businessService.receive(body);
+                msgEvent = new MsgEvent(MsgEvent.GAME_OTHER_ENTER, null, businessData);
+                EventBus.getDefault().post(msgEvent);
+                break;
         }
 
     }

@@ -9,7 +9,7 @@ import java.io.Serializable;
  */
 
 public class UserRole implements Serializable{
-    private int usrId;
+    private int userId;
 
     private String userName;
 
@@ -20,12 +20,12 @@ public class UserRole implements Serializable{
      */
     private int position;
 
-    public int getUsrId() {
-        return usrId;
+    public int getUserId() {
+        return userId;
     }
 
-    public void setUsrId(int usrId) {
-        this.usrId = usrId;
+    public void setUserId(int userId) {
+        this.userId = userId;
     }
 
     public String getUserName() {
@@ -59,11 +59,11 @@ public class UserRole implements Serializable{
 
         UserRole userRole = (UserRole) o;
 
-        return usrId == userRole.usrId;
+        return userId == userRole.userId;
     }
 
     @Override
     public int hashCode() {
-        return usrId;
+        return userId;
     }
 }

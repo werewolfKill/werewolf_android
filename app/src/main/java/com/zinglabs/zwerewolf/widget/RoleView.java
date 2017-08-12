@@ -71,6 +71,7 @@ public class RoleView extends RelativeLayout implements View.OnClickListener {
                 //锁定
                 case STATE_LOCK:
                     lock_iv.setVisibility(View.VISIBLE);
+                    quit_chief_iv.setVisibility(View.GONE);
                     break;
                 //无人
                 case STATE_NOBODY:
@@ -81,8 +82,13 @@ public class RoleView extends RelativeLayout implements View.OnClickListener {
                     number_iv.setVisibility(View.VISIBLE);
                     number_tv.setVisibility(View.VISIBLE);
                     head_iv.setImageResource(R.mipmap.icon_vacancy);
+                    die_iv.setVisibility(View.GONE);
                     hand_iv.setVisibility(View.GONE);
                     quit_chief_iv.setVisibility(View.GONE);
+                    if (mRoleData == null) {
+                        return;
+                    }
+                    number_tv.setText("" + mRoleData.getNumber());
                     break;
                 //游戏中，死亡
                 case STATE_DIE:
@@ -110,13 +116,9 @@ public class RoleView extends RelativeLayout implements View.OnClickListener {
                     head_iv.setImageResource(R.mipmap.app_icon);
                     hand_iv.setVisibility(View.GONE);
                     quit_chief_iv.setVisibility(View.GONE);
-
-
-//                    head_iv.setImageResource(arr_role[number % arr_role.length]);
                     if (mRoleData == null) {
                         return;
                     }
-                    //GlideUtil.into(activity, mRoleData.getHeadImgUrl(), head_iv, GlideUtil.ROUND);
                     number_tv.setText("" + mRoleData.getNumber());
                     if (mRoleData.isOwner() && !SimpleController.isGameing()) {
                         ready_iv.setVisibility(View.VISIBLE);
@@ -171,6 +173,7 @@ public class RoleView extends RelativeLayout implements View.OnClickListener {
                     speaking_iv.setVisibility(View.GONE);
                     hand_iv.setVisibility(View.VISIBLE);
                     quit_chief_iv.setVisibility(View.GONE);
+                    break;
                 case STATE_QUIT_CHIEF:  //放弃竞选警长
                     lock_iv.setVisibility(View.GONE);
                     die_iv.setVisibility(View.GONE);
@@ -181,6 +184,7 @@ public class RoleView extends RelativeLayout implements View.OnClickListener {
                     speaking_iv.setVisibility(View.GONE);
                     hand_iv.setVisibility(View.GONE);
                     quit_chief_iv.setVisibility(View.VISIBLE);
+                    break;
 
 
             }
@@ -217,9 +221,21 @@ public class RoleView extends RelativeLayout implements View.OnClickListener {
         if (mRoleData != null) {
             mHandler.sendEmptyMessage(STATE_UNREADY);
             //发送消息玩家进场
-            GameChatData gameChatData = new GameChatData(GameChatData.ENTRY, DateUtil.nowLongStr(),new User(mRoleData.getNickName()) , 111, "");
+            GameChatData gameChatData = new GameChatData(GameChatData.ENTRY, DateUtil.nowLongStr(), new User(mRoleData.getNickName()), 111, "");
             MsgEvent msgEvent = new MsgEvent(MsgEvent.ROOM_CHAT, null, gameChatData);
             EventBus.getDefault().post(msgEvent);
+        } else {
+            clear(false);
+        }
+    }
+
+    /**
+     * 设置玩家信息
+     */
+    public void setNoBody(RoleData roleData) {
+        mRoleData = roleData;
+        if (mRoleData != null) {
+            mHandler.sendEmptyMessage(STATE_NOBODY);
         } else {
             clear(false);
         }
@@ -290,17 +306,17 @@ public class RoleView extends RelativeLayout implements View.OnClickListener {
         mHandler.sendEmptyMessage(STATE_READY);
     }
 
-    public void setMe(){
+    public void setMe() {
         mHandler.sendEmptyMessage(STATE_ME);
 
     }
 
-    public void setChiefVote(){
+    public void setChiefVote() {
         mHandler.sendEmptyMessage(STATE_VOTE_CHIEF);
 
     }
 
-    public void setQuitChief(){
+    public void setQuitChief() {
         mHandler.sendEmptyMessage(STATE_QUIT_CHIEF);
 
     }
