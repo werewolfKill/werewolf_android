@@ -1,5 +1,7 @@
 package com.zinglabs.zwerewolf.utils;
 
+import java.util.List;
+
 /**
  * @user wangtonghe
  * @date 2017/8/7
@@ -44,5 +46,22 @@ public class StringUtils {
             }
         }
         return str;
+    }
+
+    public static String[] trans2StrArr(Integer[] arr,String suffix){
+        String [] strArr = new String[arr.length];
+        for(int i=0;i<arr.length;i++){
+            strArr[i]=arr[i]+suffix;
+        }
+        return strArr;
+    }
+    public static String[] trans2StrArr(List<Integer> list,String suffix){
+        int size = list.size();
+
+        String [] strArr = new String[size];
+        for(int i=0;i<size;i++){
+            strArr[i]=list.get(i)+suffix;
+        }
+        return strArr;
     }
 }

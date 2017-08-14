@@ -59,7 +59,15 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
 import java.util.Random;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import cn.dreamtobe.kpswitch.widget.KPSwitchPanelLinearLayout;
 
@@ -490,8 +498,11 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
             case MsgEvent.GAME_POLICE_SPEAKING: //警上发言
 
                 List<Integer> list = RoomUtil.adjustSpeakOrder(room.getPoliceList(), reply);
-                turnSpeaking(roleViewMap, list);
-                //TODO 未竞选玩家投票
+                simpleController.turnSpeaking(GameActivity.this,roleViewMap, list,room);
+                break;
+            case MsgEvent.GAME_VOTE_CHIEF://警下投票
+                simpleController.voteChief(GameActivity.this,room);
+
                 break;
 
 
@@ -578,36 +589,13 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                 roleViewMap.put(i, roleView);
             }else{
                 roleData = RoleBuild.build(i, new UserData());
-                roleData.setOwner(true);
                 roleView.setNoBody(roleData);
                 roleViewMap.put(i, roleView);
             }
         }
     }
 
-    private void turnSpeaking(Map<Integer, RoleView> roleViewMap, List<Integer> speakers) {
-        int size = roleViewMap.size();
-        new Thread(()->{
-            int prev =0;
-            for (Integer pos : speakers) {
-                if(pos==1){
-                    prev=size;
-                }else{
-                    prev = pos-1;
-                }
-                RoleView curView = roleViewMap.get(pos);
-                RoleView prevView = roleViewMap.get(prev);
-                prevView.unReady();
-                curView.speak();
-                try {
-                    Thread.sleep(1000 * 2);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
 
-        }).start();
-    }
 
 
 

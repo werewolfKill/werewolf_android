@@ -25,6 +25,7 @@ public class MsgEvent {
     public static final int GAME_POLICE_SPEAKING = 0xc8; //警上发言
     public static final int GAME_VERIFY= 0xc9; //预言家验人
     public static final int GAME_OTHER_ENTER= 0xca; //他人进入房间
+    public static final int GAME_VOTE_CHIEF= 0xcb; //他人进入房间
 
 
 

@@ -41,6 +41,8 @@ public class Constants {
     public static final int GAME_STATUS_OVER_GOOD = 1;
     public static final int GAME_STATUS_PROCESS= 0;
 
+    public static final int VOTE_CHIEF_SPEAK_TIME = 1000*5; //警上发言时间
+
 
     //---系统发言
     public static final String TEXT_START_ALLOT = "游戏开始，本轮共有%d个狼人，%d个预言家，%d个女巫，%d个猎人，%d个村民";

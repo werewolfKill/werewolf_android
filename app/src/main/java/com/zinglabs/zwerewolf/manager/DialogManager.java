@@ -259,6 +259,23 @@ public class DialogManager {
                 .show();
     }
 
+    public static void showModalChoice(Activity activity, String title,String[] items, short cid, Map<String, Object> param) {
+        android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(activity, android.R.style.Theme_Holo_Light_Dialog);
+        builder.setTitle(title);
+        //    指定下拉列表的显示数据
+        builder.setItems(items, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                param.put("content", items[which]);
+                IMClientUtil.sendMsg(ProtocolConstant.SID_GAME,cid, param);
+            }
+        });
+        //    设置一个下拉的列表选择项
+        builder.setNegativeButton("取消", null);
+        builder.show();
+    }
+
+
     public static void showWaitOtherDialog(Activity activity, int time) {
 
         android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(activity, android.R.style.Theme_Holo_Light_Dialog);
@@ -346,6 +363,8 @@ public class DialogManager {
         builder.show();
 
     }
+
+
 
 
     public static void showToast(Activity activity, String str) {

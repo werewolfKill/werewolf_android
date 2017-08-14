@@ -17,12 +17,21 @@ import com.zinglabs.zwerewolf.role.Wolf;
 import com.zinglabs.zwerewolf.utils.IMClientUtil;
 import com.zinglabs.zwerewolf.utils.LogUtil;
 import com.zinglabs.zwerewolf.utils.RoleUtil;
+import com.zinglabs.zwerewolf.utils.StringUtils;
+import com.zinglabs.zwerewolf.widget.RoleView;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.IntSummaryStatistics;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Random;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 /**
  * 简单模式游戏流程控制器
@@ -164,7 +173,7 @@ public class SimpleController implements Role.OnRoleStateChangeListener {
                 Map<String, Integer> killMap = new HashMap<>();
                 killMap.put("fromId", userId);
                 killMap.put("roomId", roomId);
-                killMap.put("bout",bout);
+                killMap.put("bout", bout);
                 String title = "您要击杀的人是：";
                 waitTime = RoleUtil.getWaitTime(roleId, modalId);
 
@@ -176,7 +185,7 @@ public class SimpleController implements Role.OnRoleStateChangeListener {
                 testMap.put("fromId", userId);
                 testMap.put("content", userId);
                 testMap.put("roomId", roomId);
-                testMap.put("bout",bout);
+                testMap.put("bout", bout);
                 title = "您要验的人是：";
                 waitTime = RoleUtil.getWaitTime(roleId, modalId);
 
@@ -188,7 +197,7 @@ public class SimpleController implements Role.OnRoleStateChangeListener {
                 guardMap.put("fromId", userId);
                 guardMap.put("content", userId);
                 guardMap.put("roomId", roomId);
-                guardMap.put("bout",bout);
+                guardMap.put("bout", bout);
                 title = "您要守卫的人是：";
                 waitTime = RoleUtil.getWaitTime(roleId, modalId);
 
@@ -202,11 +211,11 @@ public class SimpleController implements Role.OnRoleStateChangeListener {
                 Map<String, Integer> witchMap = new HashMap<>();
                 witchMap.put("fromId", userId);
                 witchMap.put("roomId", roomId);
-                witchMap.put("bout",bout);
+                witchMap.put("bout", bout);
 
                 Witch witch = (Witch) role;
                 if (!witch.hasPanacea() && witch.hasPoison()) { //没有解药但有毒药
-                    DialogManager.showWitchPoisonDialog(activity, witchMap, (int) waitTime,witch);
+                    DialogManager.showWitchPoisonDialog(activity, witchMap, (int) waitTime, witch);
                 }
                 break;
 
@@ -219,6 +228,7 @@ public class SimpleController implements Role.OnRoleStateChangeListener {
 
     /**
      * 女巫操作
+     *
      * @param activity
      * @param room
      * @param reply
@@ -234,45 +244,88 @@ public class SimpleController implements Role.OnRoleStateChangeListener {
         Map<String, Integer> witchMap = new HashMap<>();
         witchMap.put("fromId", userId);
         witchMap.put("roomId", roomId);
-        witchMap.put("bout",bout);
+        witchMap.put("bout", bout);
         waitTime = RoleUtil.getWaitTime(roleId, modalId);
-        DialogManager.showWitchSaveDialog(activity, reply, witchMap, (int) waitTime,witch);
+        DialogManager.showWitchSaveDialog(activity, reply, witchMap, (int) waitTime, witch);
 
     }
 
     /**
      * 天亮流程
+     *
      * @param activity activity
-     * @param room 房间信息
+     * @param room     房间信息
      */
-    public void doDawn(Activity activity,Room room,Integer[] kills){
-        if(kills!=null){
+    public void doDawn(Activity activity, Room room, Integer[] kills) {
+        if (kills != null) {
             room.addDeadList(kills);
         }
-        if(room.isOver()){
-            DialogManager.showOverDialog(activity,kills);
+        if (room.isOver()) {
+            DialogManager.showOverDialog(activity, kills);
             return;
         }
         int userId = room.getCurUserId();
         int roomId = room.getRoomId();
         int bout = room.getBout();
-        if(bout==1){  //第1天，警长竞选
+        if (bout == 1) {  //第1天，警长竞选
             String title = "您是否要竞选警长？";
             Map<String, Integer> param = new HashMap<>();
             param.put("fromId", userId);
             param.put("roomId", roomId);
-            param.put("bout",bout);
-            DialogManager.showCommonDialog(activity,ProtocolConstant.CID_GAME_ASK_CHIEF,userId,title,param);
+            param.put("bout", bout);
+            DialogManager.showCommonDialog(activity, ProtocolConstant.CID_GAME_ASK_CHIEF, userId, title, param);
 
         }
     }
 
-    public void speakTimer(){
+    /**
+     * 轮流发言
+     * @param activity
+     * @param roleViewMap
+     * @param speakers
+     * @param room
+     */
+    public void turnSpeaking(Activity activity, Map<Integer, RoleView> roleViewMap, List<Integer> speakers, Room room) {
+
+        int size = roleViewMap.size();
+        BlockingQueue<Integer> queue = new ArrayBlockingQueue<>(size);
+        queue.addAll(speakers);
+
+        ScheduledExecutorService service = Executors.newSingleThreadScheduledExecutor();
+        service.scheduleAtFixedRate(() -> {
+            Integer turnPos = queue.poll();
+            if (turnPos == null) {
+                Map<String, Object> param = new HashMap<>();
+                param.put("fromId", room.getCurUserId());
+                param.put("roomId", room.getRoomId());
+                param.put("bout", room.getBout());
+                IMClientUtil.sendMsg(ProtocolConstant.SID_GAME, ProtocolConstant.CID_GAME_POLICE_SPEAKING_END, param);
 
 
+                service.shutdown();
+                return;
+            }
+            //TODO 遍历每个角色，待优化
+            for (Map.Entry<Integer, RoleView> entry : roleViewMap.entrySet()) {
+                if (entry.getKey() == turnPos) {
+                    entry.getValue().speak();
+                } else {
+                    entry.getValue().unReady();
+                }
+            }
+        }, 0, Constants.VOTE_CHIEF_SPEAK_TIME, TimeUnit.MILLISECONDS);
     }
 
+    public void voteChief(Activity activity, Room room){
+        List<Integer> speakers = room.getPoliceList();
+        Map<String, Object> param = new HashMap<>();
+        param.put("fromId", room.getCurUserId());
+        param.put("roomId", room.getRoomId());
+        param.put("bout", room.getBout());
+        String title= "竞选警长，请投票";
+        DialogManager.showModalChoice(activity,title,StringUtils.trans2StrArr(speakers,"号"),ProtocolConstant.CID_GAME_CHIEF_VOTE,param);
 
+    }
 
 
 
@@ -586,7 +639,6 @@ public class SimpleController implements Role.OnRoleStateChangeListener {
 //            }
 //        }
 //    }
-
     private boolean witchSave(int number) {
         witch = null;
         for (Map.Entry<Integer, Role> entry : deployMap.entrySet()) {
