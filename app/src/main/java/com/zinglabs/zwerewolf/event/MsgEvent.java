@@ -25,7 +25,13 @@ public class MsgEvent {
     public static final int GAME_POLICE_SPEAKING = 0xc8; //警上发言
     public static final int GAME_VERIFY= 0xc9; //预言家验人
     public static final int GAME_OTHER_ENTER= 0xca; //他人进入房间
-    public static final int GAME_VOTE_CHIEF= 0xcb; //他人进入房间
+    public static final int GAME_VOTE_CHIEF= 0xcb; //投票选出警长
+    public static final int GAME_SET_CHIEF= 0xcc; //设置警长
+    public static final int GAME_SPAKEING= 0xcd; //发言
+    public static final int GAME_CHIEF_SUM_TICKET= 0xce; //警长归票
+    public static final int GAME_VOTE= 0xcf; //投票
+    public static final int GAME_VOTE_RESULT= 0xd0; //投票结果
+    public static final int GAME_DARK= 0xd1; //天黑
 
 
 

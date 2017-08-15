@@ -407,6 +407,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
         int reply = 0;
         Room room = null;
         int fromId = 0;
+        int bout =0;
         int actionPos = 0;
         if (event.getMsgType() != MsgEvent.ROOM_CHAT) {
             room = globalData.getRoom();
@@ -454,10 +455,9 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                     Integer[] wolfs = (Integer[]) businessData.getParam().get("wolfs");
                     roleMsg += getOthersStr(wolfs, room.getPlayers(), curPlayerPos);
                 }
-                GameChatData chat = new GameChatData(GameChatData.CHAT, new Date().getTime() + "", new User(0, "LRSwzc25151"), 111, roleMsg);
-                chatAdapter.update(chat);
+                systemSpeak(roleMsg);  //发布角色信息
                 setTitle("您是" + this.curPlayerPos + "号" + role.getName()); //设置标题
-                simpleController.startStage(GameActivity.this, room);
+                simpleController.doDark(GameActivity.this, room);
                 break;
             case MsgEvent.GAME_VERIFY: //预言家验人
                 actionPos = getPosById(fromId, room);
@@ -478,14 +478,14 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                 break;
             case MsgEvent.GAME_DAWN: //天亮了
                Map<String,Object> param =  businessData.getParam();
-                int bout = (Integer) param.get("bout");
+                 bout = (Integer) param.get("bout");
                 Integer[] kills = null;
                 if(param.get("killed")!=null){
                      kills = (Integer[]) businessData.getParam().get("killed");
                 }
                 room.setOver(reply != Constants.GAME_STATUS_PROCESS);
                 room.setBout(bout);
-                simpleController.doDawn(GameActivity.this, room, kills);
+                simpleController.doDawn(GameActivity.this, room, kills,bout);
                 break;
             case MsgEvent.GAME_ASK_CHIEF: //申请警长
                 actionPos = getPosById(fromId, room);
@@ -498,12 +498,64 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
             case MsgEvent.GAME_POLICE_SPEAKING: //警上发言
 
                 List<Integer> list = RoomUtil.adjustSpeakOrder(room.getPoliceList(), reply);
-                simpleController.turnSpeaking(GameActivity.this,roleViewMap, list,room);
+                simpleController.turnSpeak(GameActivity.this,roleViewMap, list,room,ProtocolConstant.CID_GAME_POLICE_SPEAKING_END);
                 break;
             case MsgEvent.GAME_VOTE_CHIEF://警下投票
                 simpleController.voteChief(GameActivity.this,room);
 
                 break;
+            case MsgEvent.GAME_SET_CHIEF://设置警长
+                actionPos = getPosById(reply,room);
+                roleView = roleViewMap.get(actionPos);
+                bout = room.getBout();
+                 List<Integer> deadArr = room.getDeadList().get(bout);
+                room.setChief(reply);
+                roleView.setChief();
+                for(int deadId:deadArr){
+                    actionPos = getPosById(deadId,room);
+                    roleViewMap.get(actionPos).die();
+                }
+                if(reply==curUserId){
+                    simpleController.turnSpeakByChief(GameActivity.this,room,deadArr);
+                }
+                break;
+            case MsgEvent.GAME_SPAKEING:  //开始发言
+                List<Integer> commonSpeakers = RoomUtil.adjustSpeakOrder(room.getLiveList(), reply);
+                simpleController.turnSpeak(GameActivity.this,roleViewMap, commonSpeakers,room,ProtocolConstant.CID_GAME_REQ_VOTE);
+
+                break;
+            case MsgEvent.GAME_CHIEF_SUM_TICKET ://警长归票
+                simpleController.chiefSumTicket(GameActivity.this,room);
+                break;
+            case  MsgEvent.GAME_VOTE: //请求投票
+                simpleController.vote(GameActivity.this,room);
+                break;
+            case MsgEvent.GAME_VOTE_RESULT://投票结果
+                actionPos = getPosById(reply,room);
+                roleView = roleViewMap.get(actionPos);
+                title = "投票结果为"+actionPos+"号,"+actionPos+"号玩家死亡";
+                systemSpeak(title);
+                List<Integer> oneSpeak = new ArrayList<>();
+                oneSpeak.add(actionPos);
+                if(room.getBout()==1){  //遗言
+                    simpleController.turnSpeak(GameActivity.this,roleViewMap, oneSpeak,room,ProtocolConstant.CID_GAME_REQ_DARK);
+                }else{
+                    simpleController.commonSend(GameActivity.this,room,ProtocolConstant.CID_GAME_REQ_DARK);
+                }
+                List<Integer> dead =  new ArrayList<>();
+                dead.add(reply);
+                room.addDeadList(bout,dead);
+                roleView.die();  //设置死亡
+                break;
+            case MsgEvent.GAME_DARK: //天黑
+                simpleController.doDark(GameActivity.this, room);
+                break;
+
+
+
+
+
+
 
 
 //            case MsgEvent.ROOM_OVER:
@@ -545,6 +597,11 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
 //                break;
 
         }
+    }
+
+    private void systemSpeak(String str){
+        GameChatData chat = new GameChatData(GameChatData.CHAT, new Date().getTime() + "", new User(0, "LRSwzc25151"), 111, str);
+        chatAdapter.update(chat);
     }
 
     private CountDownTimer timer;

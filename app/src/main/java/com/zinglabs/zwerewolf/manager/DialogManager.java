@@ -259,14 +259,14 @@ public class DialogManager {
                 .show();
     }
 
-    public static void showModalChoice(Activity activity, String title,String[] items, short cid, Map<String, Object> param) {
+    public static void showModalChoice(Activity activity, String title,String[] items, short cid, Map<String, Integer> param) {
         android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(activity, android.R.style.Theme_Holo_Light_Dialog);
         builder.setTitle(title);
         //    指定下拉列表的显示数据
         builder.setItems(items, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                param.put("content", items[which]);
+                param.put("content", Integer.parseInt(items[which]));
                 IMClientUtil.sendMsg(ProtocolConstant.SID_GAME,cid, param);
             }
         });
@@ -341,18 +341,18 @@ public class DialogManager {
 
     }
 
-    public static void showCommonDialog(Activity activity,short cid, int reply,String title, Map<String, Integer> param){
+    public static void showCommonDialog(Activity activity,short cid,String title, Map<String, Integer> param,String rightTitle,String noTitle){
         android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(activity, android.R.style.Theme_Holo_Light_Dialog);
         builder.setTitle(title)
                 .setIcon(android.R.drawable.ic_dialog_dialer)
-                .setPositiveButton("是", new DialogInterface.OnClickListener() {
+                .setPositiveButton(rightTitle, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         param.put("content",1);
                         IMClientUtil.sendMsg(ProtocolConstant.SID_GAME, cid, param);
                     }
                 })
-                .setNegativeButton("不了",  new DialogInterface.OnClickListener() {
+                .setNegativeButton(noTitle,  new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         param.put("content",0);

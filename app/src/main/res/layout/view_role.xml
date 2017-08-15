@@ -67,5 +67,11 @@
         android:src="@mipmap/room_giveup"
         android:layout_alignParentBottom="true"
      />
+    <ImageView
+        android:id="@+id/role_chief_iv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@mipmap/room_badge"
+        />
 
 </RelativeLayout>

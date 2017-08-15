@@ -6,6 +6,7 @@ import com.zinglabs.zwerewolf.utils.RoomUtil;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -50,23 +51,51 @@ public class Room implements Serializable {
     private Map<Integer,UserRole> players;
 
     /**
+     * 死亡名单
+     */
+    private Map<Integer,List<Integer>> deadList;
+
+    /**
      * 游戏是否结束
      */
     private boolean isOver;
+    /**
+     * 表示第几天
+     */
+    private int bout ;
 
     /**
      * 房间人数
      */
     private int number;
 
+    /**
+     * 表示警长
+     */
+    private int chief;
+
+    public int getChief() {
+        return chief;
+    }
+
+    /**
+     * 幸存者列表
+     */
+    private List<Integer> liveList = new ArrayList<>();
+
+    public void setChief(int chief) {
+        this.chief = chief;
+    }
+
     public int getNumber() {
         return number;
     }
 
-    /**
-     * 死亡名单
-     */
-    private List<Integer> deadList = new ArrayList<>();
+    public List<Integer> getLiveList() {
+        return liveList;
+    }
+
+
 
     private List<Integer> policeList = new ArrayList<>();
 
@@ -78,18 +107,18 @@ public class Room implements Serializable {
         isOver = over;
     }
 
-    public List<Integer> getDeadList() {
+    public Map<Integer, List<Integer>> getDeadList() {
         return deadList;
     }
 
-    public void addDeadList(Integer[] arr) {
-        this.deadList.addAll(Arrays.asList(arr));
+    public void addDeadList(int bout, List<Integer> list) {
+        this.deadList.put(bout,list);
+        for(Integer id:list){
+            liveList.remove((Integer) players.get(id).getPosition());
+        }
     }
 
-    /**
-     * 表示第几天
-     */
-    private int bout ;
+
 
     public int getBout() {
         return bout;
@@ -183,6 +212,7 @@ public class Room implements Serializable {
         ur.setUserId(userId);
         ur.setPosition(pos);
         this.players.put(userId,ur);
+        liveList.add(pos);
     }
 }
 

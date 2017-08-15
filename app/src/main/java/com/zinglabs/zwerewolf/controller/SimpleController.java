@@ -21,6 +21,7 @@ import com.zinglabs.zwerewolf.utils.StringUtils;
 import com.zinglabs.zwerewolf.widget.RoleView;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.IntSummaryStatistics;
 import java.util.List;
@@ -143,22 +144,8 @@ public class SimpleController implements Role.OnRoleStateChangeListener {
 
     }
 
-    public void startStage(Activity activity, Room room) {
-        doStage(activity, STAGE_DARK, room);
-    }
 
-    private void doStage(Activity activity, String stage, Room room) {
-        switch (stage) {
-            case STAGE_DARK:  //天黑
-                doDark(activity, room);
-                break;
-            case STAGE_DAWN:  //天亮
-
-                break;
-        }
-    }
-
-    private void doDark(Activity activity, Room room) {  //天黑流程
+    public void doDark(Activity activity, Room room) {  //天黑流程
         int userId = room.getCurUserId();
         int roomId = room.getRoomId();
         int curPos = room.getPlayers().get(userId).getPosition();
@@ -256,9 +243,9 @@ public class SimpleController implements Role.OnRoleStateChangeListener {
      * @param activity activity
      * @param room     房间信息
      */
-    public void doDawn(Activity activity, Room room, Integer[] kills) {
+    public void doDawn(Activity activity, Room room, Integer[] kills,int bout) {
         if (kills != null) {
-            room.addDeadList(kills);
+            room.addDeadList(bout, Arrays.asList(kills));
         }
         if (room.isOver()) {
             DialogManager.showOverDialog(activity, kills);
@@ -266,14 +253,13 @@ public class SimpleController implements Role.OnRoleStateChangeListener {
         }
         int userId = room.getCurUserId();
         int roomId = room.getRoomId();
-        int bout = room.getBout();
         if (bout == 1) {  //第1天，警长竞选
             String title = "您是否要竞选警长？";
             Map<String, Integer> param = new HashMap<>();
             param.put("fromId", userId);
             param.put("roomId", roomId);
             param.put("bout", bout);
-            DialogManager.showCommonDialog(activity, ProtocolConstant.CID_GAME_ASK_CHIEF, userId, title, param);
+            DialogManager.showCommonDialog(activity, ProtocolConstant.CID_GAME_ASK_CHIEF, title, param,"是","不了");
 
         }
     }
@@ -285,7 +271,7 @@ public class SimpleController implements Role.OnRoleStateChangeListener {
      * @param speakers
      * @param room
      */
-    public void turnSpeaking(Activity activity, Map<Integer, RoleView> roleViewMap, List<Integer> speakers, Room room) {
+    public void turnSpeak(Activity activity, Map<Integer, RoleView> roleViewMap, List<Integer> speakers, Room room,short cid) {
 
         int size = roleViewMap.size();
         BlockingQueue<Integer> queue = new ArrayBlockingQueue<>(size);
@@ -299,9 +285,7 @@ public class SimpleController implements Role.OnRoleStateChangeListener {
                 param.put("fromId", room.getCurUserId());
                 param.put("roomId", room.getRoomId());
                 param.put("bout", room.getBout());
-                IMClientUtil.sendMsg(ProtocolConstant.SID_GAME, ProtocolConstant.CID_GAME_POLICE_SPEAKING_END, param);
-
-
+                IMClientUtil.sendMsg(ProtocolConstant.SID_GAME,cid, param);
                 service.shutdown();
                 return;
             }
@@ -316,19 +300,60 @@ public class SimpleController implements Role.OnRoleStateChangeListener {
         }, 0, Constants.VOTE_CHIEF_SPEAK_TIME, TimeUnit.MILLISECONDS);
     }
 
+    public void turnSpeakByChief(Activity activity, Room room,List<Integer> deadList){
+
+        String title = "请选择从警左或警右开始发言";
+        if(deadList.size()>0){
+            title = "请选择从死左或死右开始发言";
+        }
+        Map<String, Integer> param = new HashMap<>();
+        param.put("fromId", room.getCurUserId());
+        param.put("roomId", room.getRoomId());
+        param.put("bout", room.getBout());
+        DialogManager.showCommonDialog(activity, ProtocolConstant.CID_GAME_CHIEF_DECIDE_SPEAK,title, param,"左","右");
+    }
+
+
     public void voteChief(Activity activity, Room room){
         List<Integer> speakers = room.getPoliceList();
-        Map<String, Object> param = new HashMap<>();
+        Map<String, Integer> param = new HashMap<>();
         param.put("fromId", room.getCurUserId());
         param.put("roomId", room.getRoomId());
         param.put("bout", room.getBout());
         String title= "竞选警长，请投票";
-        DialogManager.showModalChoice(activity,title,StringUtils.trans2StrArr(speakers,"号"),ProtocolConstant.CID_GAME_CHIEF_VOTE,param);
+        DialogManager.showModalChoice(activity,title,StringUtils.trans2StrArr(speakers,""),ProtocolConstant.CID_GAME_CHIEF_VOTE,param);
 
     }
 
+    public  void chiefSumTicket(Activity activity, Room room){
+        Map<String, Integer> param = new HashMap<>();
+        param.put("fromId", room.getCurUserId());
+        param.put("roomId", room.getRoomId());
+        param.put("bout", room.getBout());
+        String title= "警长请选择归票";
+        DialogManager.showModalChoice(activity,title,StringUtils.trans2StrArr(room.getLiveList(),""), ProtocolConstant.CID_GAME_CHIEF_SUM_TICKET, param);
 
+    }
 
+    public void vote(Activity activity, Room room){
+        List<Integer> speakers = room.getLiveList();
+        Map<String, Integer> param = new HashMap<>();
+        param.put("fromId", room.getCurUserId());
+        param.put("roomId", room.getRoomId());
+        param.put("bout", room.getBout());
+        String title= "请投票";
+        DialogManager.showModalChoice(activity,title,StringUtils.trans2StrArr(speakers,""),ProtocolConstant.CID_GAME_VOTE,param);
+
+    }
+
+    public void commonSend(Activity activity, Room room,short cid){
+        Map<String, Integer> param = new HashMap<>();
+        param.put("fromId", room.getCurUserId());
+        param.put("roomId", room.getRoomId());
+        param.put("bout", room.getBout());
+        IMClientUtil.sendMsg(ProtocolConstant.SID_GAME,cid, param);
+
+    }
 
     /**
      * 展示等待对话框

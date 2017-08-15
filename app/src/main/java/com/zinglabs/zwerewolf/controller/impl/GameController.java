@@ -115,7 +115,34 @@ public class GameController implements BaseController {
             case ProtocolConstant.CID_GAME_ELECT_CHIEF_RESP ://选出警长
                 businessData = businessService.receive(body);
                 System.out.println(businessData.getReply()+"成为警长");
-
+                msgEvent = new MsgEvent(MsgEvent.GAME_SET_CHIEF, null, businessData);
+                EventBus.getDefault().post(msgEvent);
+                break;
+            case ProtocolConstant.CID_GAME_START_SPEAKING:  //开始发言
+                businessData = businessService.receive(body);
+                System.out.println("从"+businessData.getReply()+"开始发言");
+                msgEvent = new MsgEvent(MsgEvent.GAME_SPAKEING, null, businessData);
+                EventBus.getDefault().post(msgEvent);
+                break;
+            case ProtocolConstant.CID_GAME_CHIEF_REQ_SUM_TICKET://要求警长归票
+                businessData = businessService.receive(body);
+                msgEvent = new MsgEvent(MsgEvent.GAME_SPAKEING, null, businessData);
+                EventBus.getDefault().post(msgEvent);
+                break;
+            case ProtocolConstant.CID_GAME_REQ_VOTE_RESP ://请求投票
+                businessData = businessService.receive(body);
+                msgEvent = new MsgEvent(MsgEvent.GAME_VOTE, null, businessData);
+                EventBus.getDefault().post(msgEvent);
+                break;
+            case ProtocolConstant.CID_GAME_VOTE_RESP ://投票结果
+                businessData = businessService.receive(body);
+                msgEvent = new MsgEvent(MsgEvent.GAME_VOTE_RESULT, null, businessData);
+                EventBus.getDefault().post(msgEvent);
+                break;
+            case ProtocolConstant.CID_GAME_DARK://天黑
+                businessData = businessService.receive(body);
+                msgEvent = new MsgEvent(MsgEvent.GAME_DARK, null, businessData);
+                EventBus.getDefault().post(msgEvent);
                 break;
         }
 
