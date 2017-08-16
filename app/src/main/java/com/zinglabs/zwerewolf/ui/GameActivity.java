@@ -496,32 +496,35 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                 break;
 
             case MsgEvent.GAME_POLICE_SPEAKING: //警上发言
-
-                List<Integer> list = RoomUtil.adjustSpeakOrder(room.getPoliceList(), reply);
-                simpleController.turnSpeak(GameActivity.this,roleViewMap, list,room,ProtocolConstant.CID_GAME_POLICE_SPEAKING_END);
+                actionPos = getPosById(reply,room);
+                List<Integer> list = RoomUtil.adjustSpeakOrder(room.getPoliceList(), actionPos);
+                simpleController.turnSpeak(roleViewMap, list,room,ProtocolConstant.CID_GAME_POLICE_SPEAKING_END);
                 break;
             case MsgEvent.GAME_VOTE_CHIEF://警下投票
                 simpleController.voteChief(GameActivity.this,room);
 
                 break;
-            case MsgEvent.GAME_SET_CHIEF://设置警长
-                actionPos = getPosById(reply,room);
-                roleView = roleViewMap.get(actionPos);
+            case MsgEvent.GAME_SET_CHIEF://设置警长  TODO 考虑无警长情况
+                roleView = roleViewMap.get(reply);
                 bout = room.getBout();
                  List<Integer> deadArr = room.getDeadList().get(bout);
                 room.setChief(reply);
-                roleView.setChief();
-                for(int deadId:deadArr){
-                    actionPos = getPosById(deadId,room);
-                    roleViewMap.get(actionPos).die();
+                if(reply>0){
+                    roleView.setChief();
                 }
-                if(reply==curUserId){
+                if(deadArr!=null&&deadArr.size()>0){
+                    for(int deadId:deadArr){
+//                        actionPos = getPosById(deadId,room);
+                        roleViewMap.get(deadId).die();
+                    }
+                }
+                if(reply==curPlayerPos){
                     simpleController.turnSpeakByChief(GameActivity.this,room,deadArr);
                 }
                 break;
             case MsgEvent.GAME_SPAKEING:  //开始发言
                 List<Integer> commonSpeakers = RoomUtil.adjustSpeakOrder(room.getLiveList(), reply);
-                simpleController.turnSpeak(GameActivity.this,roleViewMap, commonSpeakers,room,ProtocolConstant.CID_GAME_REQ_VOTE);
+                simpleController.turnSpeak(roleViewMap, commonSpeakers,room,ProtocolConstant.CID_GAME_REQ_VOTE);
 
                 break;
             case MsgEvent.GAME_CHIEF_SUM_TICKET ://警长归票
@@ -538,7 +541,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                 List<Integer> oneSpeak = new ArrayList<>();
                 oneSpeak.add(actionPos);
                 if(room.getBout()==1){  //遗言
-                    simpleController.turnSpeak(GameActivity.this,roleViewMap, oneSpeak,room,ProtocolConstant.CID_GAME_REQ_DARK);
+                    simpleController.turnSpeak(roleViewMap, oneSpeak,room,ProtocolConstant.CID_GAME_REQ_DARK);
                 }else{
                     simpleController.commonSend(GameActivity.this,room,ProtocolConstant.CID_GAME_REQ_DARK);
                 }

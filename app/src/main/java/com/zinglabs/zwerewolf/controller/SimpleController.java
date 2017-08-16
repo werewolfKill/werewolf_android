@@ -269,12 +269,11 @@ public class SimpleController implements Role.OnRoleStateChangeListener {
 
     /**
      * 轮流发言
-     * @param activity
      * @param roleViewMap
      * @param speakers
      * @param room
      */
-    public void turnSpeak(Activity activity, Map<Integer, RoleView> roleViewMap, List<Integer> speakers, Room room,short cid) {
+    public void turnSpeak(Map<Integer, RoleView> roleViewMap, List<Integer> speakers, Room room,short cid) {
 
         int size = roleViewMap.size();
         BlockingQueue<Integer> queue = new ArrayBlockingQueue<>(size);
@@ -284,17 +283,21 @@ public class SimpleController implements Role.OnRoleStateChangeListener {
         service.scheduleAtFixedRate(() -> {
             Integer turnPos = queue.poll();
             if (turnPos == null) {
+                for (Map.Entry<Integer, RoleView> entry : roleViewMap.entrySet()) {
+                    entry.getValue().unReady();
+                }
                 Map<String, Object> param = new HashMap<>();
                 param.put("fromId", room.getCurUserId());
                 param.put("roomId", room.getRoomId());
                 param.put("bout", room.getBout());
+                param.put("content", 0);
                 IMClientUtil.sendMsg(ProtocolConstant.SID_GAME,cid, param);
                 service.shutdown();
                 return;
             }
             //TODO 遍历每个角色，待优化
             for (Map.Entry<Integer, RoleView> entry : roleViewMap.entrySet()) {
-                if (entry.getKey() == turnPos) {
+                if (entry.getKey().equals(turnPos)) {
                     entry.getValue().speak();
                 } else {
                     entry.getValue().unReady();
@@ -306,7 +309,7 @@ public class SimpleController implements Role.OnRoleStateChangeListener {
     public void turnSpeakByChief(Activity activity, Room room,List<Integer> deadList){
 
         String title = "请选择从警左或警右开始发言";
-        if(deadList.size()>0){
+        if(deadList!=null&&deadList.size()>0){
             title = "请选择从死左或死右开始发言";
         }
         Map<String, Integer> param = new HashMap<>();
@@ -354,6 +357,7 @@ public class SimpleController implements Role.OnRoleStateChangeListener {
         param.put("fromId", room.getCurUserId());
         param.put("roomId", room.getRoomId());
         param.put("bout", room.getBout());
+        param.put("content",0);
         IMClientUtil.sendMsg(ProtocolConstant.SID_GAME,cid, param);
 
     }

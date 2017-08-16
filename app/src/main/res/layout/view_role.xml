@@ -71,6 +71,7 @@
         android:id="@+id/role_chief_iv"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
         android:src="@mipmap/room_badge"
         />
 

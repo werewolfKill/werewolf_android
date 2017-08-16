@@ -8,8 +8,10 @@ import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * 房间信息
@@ -115,11 +117,8 @@ public class Room implements Serializable {
 
     public void addDeadList(int bout, List<Integer> list) {
         this.deadList.put(bout,list);
-        if(liveList==null){
-            liveList = new ArrayList<>();
-        }
         for(Integer id:list){
-            liveList.remove((Integer) players.get(id).getPosition());
+            liveList.remove(id);
         }
     }
 
@@ -205,7 +204,9 @@ public class Room implements Serializable {
     }
 
     public void addPoliceList(int pos) {
-        this.policeList.add(pos);
+        if(!policeList.contains(pos)){
+            this.policeList.add(pos);
+        }
     }
 
     public void setPlayers(Map<Integer, UserRole> players) {
