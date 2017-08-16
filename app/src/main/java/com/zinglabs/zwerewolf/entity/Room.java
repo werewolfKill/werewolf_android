@@ -4,6 +4,7 @@ import com.zinglabs.zwerewolf.role.UserRole;
 import com.zinglabs.zwerewolf.utils.RoomUtil;
 
 import java.io.Serializable;
+import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -53,7 +54,8 @@ public class Room implements Serializable {
     /**
      * 死亡名单
      */
-    private Map<Integer,List<Integer>> deadList;
+    private Map<Integer,List<Integer>> deadList = new HashMap<>();
+
 
     /**
      * 游戏是否结束
@@ -81,7 +83,7 @@ public class Room implements Serializable {
     /**
      * 幸存者列表
      */
-    private List<Integer> liveList = new ArrayList<>();
+    private List<Integer> liveList  = new ArrayList<>();
 
     public void setChief(int chief) {
         this.chief = chief;
@@ -113,6 +115,9 @@ public class Room implements Serializable {
 
     public void addDeadList(int bout, List<Integer> list) {
         this.deadList.put(bout,list);
+        if(liveList==null){
+            liveList = new ArrayList<>();
+        }
         for(Integer id:list){
             liveList.remove((Integer) players.get(id).getPosition());
         }
@@ -204,7 +209,11 @@ public class Room implements Serializable {
     }
 
     public void setPlayers(Map<Integer, UserRole> players) {
+
         this.players = players;
+        for(UserRole ur :players.values()){
+            liveList.add(ur.getPosition());
+        }
     }
 
     public void addPlayer(int userId,int pos){

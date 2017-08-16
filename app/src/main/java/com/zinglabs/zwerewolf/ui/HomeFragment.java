@@ -90,7 +90,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
         switch (v.getId()) {
             case R.id.home_easy_iv:  //简单模式
 //                easy();
-                DialogManager.showToast(getActivity(),"暂未开发。请点击搜索房间或参加房间");
+                DialogManager.showToast(getActivity(),"暂未开发。请点击搜索房间或创建房间");
                 break;
             case R.id.home_standard_iv: //标准模式
                 DialogManager.showToast(getActivity(),"暂未开发,敬请期待...");

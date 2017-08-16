@@ -245,7 +245,10 @@ public class SimpleController implements Role.OnRoleStateChangeListener {
      */
     public void doDawn(Activity activity, Room room, Integer[] kills,int bout) {
         if (kills != null) {
-            room.addDeadList(bout, Arrays.asList(kills));
+            List<Integer> list = Arrays.asList(kills);
+            if(!(list.size()==1&&list.get(0)==0)){
+                room.addDeadList(bout, list);
+            }
         }
         if (room.isOver()) {
             DialogManager.showOverDialog(activity, kills);
