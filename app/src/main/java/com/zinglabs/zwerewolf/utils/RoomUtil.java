@@ -49,7 +49,7 @@ public class RoomUtil {
         List<Integer> list = new ArrayList<>(size);
         int index = 0;
         for (int i = 0; i < size ; i++) {
-            if(start>=speaker.get(i)){
+            if(speaker.get(i)>=start){
                 if(start==speaker.get(i)){
                     index = i;
                 }

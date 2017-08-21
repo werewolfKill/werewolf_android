@@ -144,6 +144,12 @@ public class SimpleController implements Role.OnRoleStateChangeListener {
 
     }
 
+    public void setAtGame(Map<Integer, RoleView> roleViewMap){
+        for(RoleView roleView:roleViewMap.values()){
+            roleView.setAtGame();
+        }
+    }
+
 
     public void doDark(Activity activity, Room room) {  //天黑流程
         int userId = room.getCurUserId();
@@ -275,7 +281,7 @@ public class SimpleController implements Role.OnRoleStateChangeListener {
      */
     public void turnSpeak(Map<Integer, RoleView> roleViewMap, List<Integer> speakers, Room room,short cid) {
 
-        int size = roleViewMap.size();
+        int size = speakers.size();
         BlockingQueue<Integer> queue = new ArrayBlockingQueue<>(size);
         queue.addAll(speakers);
 
@@ -284,7 +290,7 @@ public class SimpleController implements Role.OnRoleStateChangeListener {
             Integer turnPos = queue.poll();
             if (turnPos == null) {
                 for (Map.Entry<Integer, RoleView> entry : roleViewMap.entrySet()) {
-                    entry.getValue().unReady();
+                    entry.getValue().unSpeak();
                 }
                 Map<String, Object> param = new HashMap<>();
                 param.put("fromId", room.getCurUserId());
@@ -300,7 +306,7 @@ public class SimpleController implements Role.OnRoleStateChangeListener {
                 if (entry.getKey().equals(turnPos)) {
                     entry.getValue().speak();
                 } else {
-                    entry.getValue().unReady();
+                    entry.getValue().unSpeak();
                 }
             }
         }, 0, Constants.VOTE_CHIEF_SPEAK_TIME, TimeUnit.MILLISECONDS);

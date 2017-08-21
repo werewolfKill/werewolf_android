@@ -121,12 +121,12 @@ public class GameController implements BaseController {
             case ProtocolConstant.CID_GAME_START_SPEAKING:  //开始发言
                 businessData = businessService.receive(body);
                 System.out.println("从"+businessData.getReply()+"开始发言");
-                msgEvent = new MsgEvent(MsgEvent.GAME_SPAKEING, null, businessData);
+                msgEvent = new MsgEvent(MsgEvent.GAME_SPEAK, null, businessData);
                 EventBus.getDefault().post(msgEvent);
                 break;
             case ProtocolConstant.CID_GAME_CHIEF_REQ_SUM_TICKET://要求警长归票
                 businessData = businessService.receive(body);
-                msgEvent = new MsgEvent(MsgEvent.GAME_SPAKEING, null, businessData);
+                msgEvent = new MsgEvent(MsgEvent.GAME_CHIEF_SUM_TICKET, null, businessData);
                 EventBus.getDefault().post(msgEvent);
                 break;
             case ProtocolConstant.CID_GAME_REQ_VOTE_RESP ://请求投票

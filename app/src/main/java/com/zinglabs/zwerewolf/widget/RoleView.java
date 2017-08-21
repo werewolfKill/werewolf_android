@@ -40,6 +40,9 @@ public class RoleView extends RelativeLayout implements View.OnClickListener {
     public static final int STATE_VOTE_CHIEF = 0xa7;//位置解锁，有人，竞选警长；显示头像，号码，语音
     public static final int STATE_QUIT_CHIEF = 0xa8;//位置解锁，有人，放弃警长；显示头像，号码，语音
     public static final int STATE_SET_CHIEF = 0xa9;//位置解锁，有人，设置警长；显示头像，号码，语音
+    public static final int STATE_WOLF = 0xaa;//位置解锁，有人，狼；显示头像，号码，语音
+    public static final int STATE_SPEAKING_END = 0xab;//位置解锁，有人，语音结束；显示头像，号码，语音
+    public static final int STATE_AT_GAME = 0xac;//位置解锁，有人，游戏中；显示头像，号码，语音
 
     private AppCompatActivity activity;
     private View root;
@@ -55,6 +58,7 @@ public class RoleView extends RelativeLayout implements View.OnClickListener {
     private ImageView hand_iv;
     private ImageView quit_chief_iv;
     private ImageView chief_iv;
+    protected ImageView wolf_iv;
 
     //模拟聊天内容
     private String[] arrChat = Constants.ARR_TEXT_PLAYER_CHAT;
@@ -74,6 +78,7 @@ public class RoleView extends RelativeLayout implements View.OnClickListener {
                 case STATE_LOCK:
                     lock_iv.setVisibility(View.VISIBLE);
                     quit_chief_iv.setVisibility(View.GONE);
+                    wolf_iv.setVisibility(View.GONE);
                     break;
                 //无人
                 case STATE_NOBODY:
@@ -88,6 +93,7 @@ public class RoleView extends RelativeLayout implements View.OnClickListener {
                     hand_iv.setVisibility(View.GONE);
                     chief_iv.setVisibility(View.GONE);
                     quit_chief_iv.setVisibility(View.GONE);
+                    wolf_iv.setVisibility(View.GONE);
                     if (mRoleData == null) {
                         return;
                     }
@@ -95,16 +101,7 @@ public class RoleView extends RelativeLayout implements View.OnClickListener {
                     break;
                 //游戏中，死亡
                 case STATE_DIE:
-                    lock_iv.setVisibility(View.GONE);
-                    ready_iv.setVisibility(View.GONE);
-                    speaking_iv.setVisibility(View.GONE);
-                    head_iv.setVisibility(View.VISIBLE);
-                    number_iv.setVisibility(View.VISIBLE);
-                    number_tv.setVisibility(View.VISIBLE);
-                    die_iv.setVisibility(View.VISIBLE);
-                    hand_iv.setVisibility(View.GONE);
-                    chief_iv.setVisibility(View.GONE);
-                    quit_chief_iv.setVisibility(View.GONE);
+                   die_iv.setVisibility(View.VISIBLE);
                     break;
                 //玩家未准备
                 case STATE_UNREADY:
@@ -118,6 +115,7 @@ public class RoleView extends RelativeLayout implements View.OnClickListener {
                     hand_iv.setVisibility(View.GONE);
                     chief_iv.setVisibility(View.GONE);
                     quit_chief_iv.setVisibility(View.GONE);
+                    wolf_iv.setVisibility(View.GONE);
                     if (mRoleData == null) {
                         return;
                     }
@@ -149,57 +147,30 @@ public class RoleView extends RelativeLayout implements View.OnClickListener {
                         ready_iv.setImageResource(R.mipmap.room_ready);
                     }
                     break;
+                case STATE_AT_GAME://
+                    ready_iv.setVisibility(View.GONE);
+                    break;
                 //游戏中语音
                 case STATE_SPEAKING:
-                    lock_iv.setVisibility(View.GONE);
-                    die_iv.setVisibility(View.GONE);
-                    ready_iv.setVisibility(View.GONE);
-                    head_iv.setVisibility(View.VISIBLE);
-                    number_iv.setVisibility(View.VISIBLE);
-                    number_tv.setVisibility(View.VISIBLE);
                     speaking_iv.setVisibility(View.VISIBLE);
-                    hand_iv.setVisibility(View.GONE);
-                    quit_chief_iv.setVisibility(View.GONE);
-                    chief_iv.setVisibility(View.GONE);
+                    break;
+                case STATE_SPEAKING_END:
+                    speaking_iv.setVisibility(View.GONE);
                     break;
                 case STATE_ME:
                     break;  //设置我
                 case STATE_VOTE_CHIEF:  //竞选警长
-                    lock_iv.setVisibility(View.GONE);
-                    die_iv.setVisibility(View.GONE);
-                    ready_iv.setVisibility(View.GONE);
-                    head_iv.setVisibility(View.VISIBLE);
-                    number_iv.setVisibility(View.VISIBLE);
-                    number_tv.setVisibility(View.VISIBLE);
-                    speaking_iv.setVisibility(View.GONE);
                     hand_iv.setVisibility(View.VISIBLE);
-                    quit_chief_iv.setVisibility(View.GONE);
-                    chief_iv.setVisibility(View.GONE);
                     break;
                 case STATE_QUIT_CHIEF:  //放弃竞选警长
-                    lock_iv.setVisibility(View.GONE);
-                    die_iv.setVisibility(View.GONE);
-                    ready_iv.setVisibility(View.GONE);
-                    head_iv.setVisibility(View.VISIBLE);
-                    number_iv.setVisibility(View.VISIBLE);
-                    number_tv.setVisibility(View.VISIBLE);
-                    speaking_iv.setVisibility(View.GONE);
-                    hand_iv.setVisibility(View.GONE);
                     quit_chief_iv.setVisibility(View.VISIBLE);
-                    chief_iv.setVisibility(View.GONE);
                     break;
                 case STATE_SET_CHIEF:  //设置警长
-                    lock_iv.setVisibility(View.GONE);
-                    die_iv.setVisibility(View.GONE);
-                    ready_iv.setVisibility(View.GONE);
-                    head_iv.setVisibility(View.VISIBLE);
-                    number_iv.setVisibility(View.VISIBLE);
-                    number_tv.setVisibility(View.VISIBLE);
-                    speaking_iv.setVisibility(View.GONE);
-                    hand_iv.setVisibility(View.GONE);
-                    quit_chief_iv.setVisibility(View.GONE);
                     chief_iv.setVisibility(View.VISIBLE);
                     break;
+                case STATE_WOLF:// 设置狼
+                    wolf_iv.setVisibility(View.VISIBLE);
+
 
 
 
@@ -227,6 +198,7 @@ public class RoleView extends RelativeLayout implements View.OnClickListener {
         hand_iv = (ImageView) root.findViewById(R.id.role_hand_iv);
         quit_chief_iv = (ImageView) root.findViewById(R.id.role_quit_chief_iv);
         chief_iv = (ImageView) root.findViewById(R.id.role_chief_iv);
+        wolf_iv = (ImageView) root.findViewById(R.id.role_wolf);
 
     }
 
@@ -256,6 +228,11 @@ public class RoleView extends RelativeLayout implements View.OnClickListener {
         } else {
             clear(false);
         }
+    }
+
+    public void setAtGame(){
+        mHandler.sendEmptyMessage(STATE_AT_GAME);
+
     }
 
     public RoleData getmRoleData() {
@@ -340,10 +317,15 @@ public class RoleView extends RelativeLayout implements View.OnClickListener {
 
     }
 
+    public void setWolf(){
+        mHandler.sendEmptyMessage(STATE_WOLF);
+    }
+
     public void setQuitChief() {
         mHandler.sendEmptyMessage(STATE_QUIT_CHIEF);
 
     }
+
 
     /**
      * 未准备状态
@@ -371,6 +353,11 @@ public class RoleView extends RelativeLayout implements View.OnClickListener {
      */
     public void speak() {
         mHandler.sendEmptyMessage(STATE_SPEAKING);
+    }
+
+    public void unSpeak(){
+        mHandler.sendEmptyMessage(STATE_SPEAKING_END);
+
     }
 
     /**

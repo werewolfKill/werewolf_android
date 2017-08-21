@@ -48,6 +48,7 @@ import com.zinglabs.zwerewolf.utils.AppUtil;
 import com.zinglabs.zwerewolf.utils.DateUtil;
 import com.zinglabs.zwerewolf.utils.RoleUtil;
 import com.zinglabs.zwerewolf.utils.RoomUtil;
+import com.zinglabs.zwerewolf.utils.StringUtils;
 import com.zinglabs.zwerewolf.widget.RoleView;
 
 import org.greenrobot.eventbus.EventBus;
@@ -59,19 +60,10 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Queue;
 import java.util.Random;
-import java.util.Timer;
-import java.util.TimerTask;
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 import cn.dreamtobe.kpswitch.widget.KPSwitchPanelLinearLayout;
 
-import static com.zinglabs.zwerewolf.R.id.cancel_action;
 import static com.zinglabs.zwerewolf.R.id.room_ready_ib;
 
 
@@ -443,7 +435,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                 roleView.unReady();
                 break;
             case MsgEvent.GAME_START:  //游戏开始
-//                readyIB.setVisibility(View.GONE);
+                simpleController.setAtGame(roleViewMap);
                 businessData = (BusinessData) obj;
                 Role role = RoleUtil.getRole(reply);
                 curRole = role;
@@ -453,7 +445,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                 String roleMsg = "您的角色是" + role.getName();
                 if (reply == Constants.ROLE_CODE_OF_WOLF) {
                     Integer[] wolfs = (Integer[]) businessData.getParam().get("wolfs");
-                    roleMsg += getOthersStr(wolfs, room.getPlayers(), curPlayerPos);
+                    roleMsg += getOthersStr(wolfs, room.getPlayers(), curPlayerPos,roleViewMap);
                 }
                 systemSpeak(roleMsg);  //发布角色信息
                 setTitle("您是" + this.curPlayerPos + "号" + role.getName()); //设置标题
@@ -463,6 +455,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                 actionPos = getPosById(fromId, room);
                 String str = reply==1?"好人":"狼人";
                 String title = actionPos+"号玩家是"+str;
+                systemSpeak(title);  //发布角色信息
                 DialogManager.showToast(this, title);
                 break;
             case MsgEvent.GAME_NOT_ENOUGH_NUM:  //游戏人数不足
@@ -479,12 +472,19 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
             case MsgEvent.GAME_DAWN: //天亮了
                Map<String,Object> param =  businessData.getParam();
                  bout = (Integer) param.get("bout");
-                Integer[] kills = null;
+                Integer[] kills = new Integer[0];
                 if(param.get("killed")!=null){
                      kills = (Integer[]) businessData.getParam().get("killed");
                 }
                 room.setOver(reply != Constants.GAME_STATUS_PROCESS);
                 room.setBout(bout);
+                title = "天亮了";
+                if(bout!=1&&kills.length>0){
+                    title+=",昨晚死亡的是"+ StringUtils.join(kills,"、")+"玩家";
+                }else if(bout!=1&&kills.length==0){
+                    title+="昨晚是平安夜";
+                }
+                systemSpeak(title);
                 simpleController.doDawn(GameActivity.this, room, kills,bout);
                 break;
             case MsgEvent.GAME_ASK_CHIEF: //申请警长
@@ -492,6 +492,8 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                 roleView = roleViewMap.get(actionPos);
                 room.addPoliceList(actionPos);
                 roleView.setChiefVote();
+                title = actionPos+"号玩家竞选警长";
+                systemSpeak(title);
                 globalData.setRoom(room);
                 break;
 
@@ -511,18 +513,22 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                 room.setChief(reply);
                 if(reply>0){
                     roleView.setChief();
+                    title=reply+"号玩家当选警长";
+                    systemSpeak(title);
                 }
                 if(deadArr!=null&&deadArr.size()>0){
                     for(int deadId:deadArr){
 //                        actionPos = getPosById(deadId,room);
                         roleViewMap.get(deadId).die();
                     }
+                    title = StringUtils.join(deadArr.toArray(new Integer[0]),"、")+"号玩家死亡";
+                    systemSpeak(title);
                 }
                 if(reply==curPlayerPos){
                     simpleController.turnSpeakByChief(GameActivity.this,room,deadArr);
                 }
                 break;
-            case MsgEvent.GAME_SPAKEING:  //开始发言
+            case MsgEvent.GAME_SPEAK:  //开始发言
                 List<Integer> commonSpeakers = RoomUtil.adjustSpeakOrder(room.getLiveList(), reply);
                 simpleController.turnSpeak(roleViewMap, commonSpeakers,room,ProtocolConstant.CID_GAME_REQ_VOTE);
 
@@ -553,52 +559,6 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
             case MsgEvent.GAME_DARK: //天黑
                 simpleController.doDark(GameActivity.this, room);
                 break;
-
-
-
-
-
-
-
-
-//            case MsgEvent.ROOM_OVER:
-//                if (!gameController.isGameing()) {
-//                    return;
-//                }
-//                gameController.gameOver();
-//                for (RoleView roleView : roleViewList) {
-//                    if (roleView.hasRole()) {
-//                        roleView.ready();
-//                    }
-//                }
-//                break;
-//            case MsgEvent.ROOM_ROLE:
-//                if (curPlayerNumber < 0) {
-//                    return;
-//                }
-//                //法官发布开局角色组成
-//                String msgStr = event.getMsgStr();
-//                if (msgStr != null && msgStr.length() > 0) {
-//                    GameChatData gameChatData = new GameChatData(GameChatData.CHAT, new Date().getTime() + "", GameChatData.SYSTEM_CHAT, "", msgStr);
-//                    chatAdapter.update(gameChatData);
-//                    return;
-//                }
-//                //显示我的身份
-//                int[] arrRoleDeploy = gameController.getArrRoleDeploy();
-//                String roleName = GameAlloter.getRoleName(arrRoleDeploy[curPlayerNumber - 1]);
-//                myRole_tv.setText("我的身份是：" + roleName);
-//                break;
-//            case MsgEvent.ROOM_ROLE_STATE_CHANGE:
-//                List<Role> roleList = gameController.getRoleList();
-//                for (int i = 0; i < roleList.size(); i++) {
-//                    if (roleList.get(i).isAlive()) {
-//                        roleViewList.get(i).unReady();
-//                    } else {
-//                        roleViewList.get(i).die();
-//                    }
-//                }
-//                break;
-
         }
     }
 
@@ -681,7 +641,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-    private String getOthersStr(Integer[] wolfs, Map<Integer, UserRole> players, int curPos) {
+    private String getOthersStr(Integer[] wolfs, Map<Integer, UserRole> players, int curPos,Map<Integer, RoleView> roleViewMap) {
         String str = " ";
         if (wolfs.length > 0) {
             str += ",你的狼同伴是:";
@@ -692,6 +652,8 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
             if (pos != curPos) {
                 str += pos + "号 ";
             }
+            RoleView roleView = roleViewMap.get(pos);
+            roleView.setWolf();
             userRole.setRole(new Wolf());
         }
         return str;

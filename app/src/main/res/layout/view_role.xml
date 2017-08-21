@@ -58,6 +58,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"
         android:src="@mipmap/room_put_up_hands"
+
         />
     <!--放弃竞选-->
     <ImageView
@@ -74,5 +75,14 @@
         android:layout_alignParentEnd="true"
         android:src="@mipmap/room_badge"
         />
+    <ImageView
+        android:id="@+id/role_wolf"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@mipmap/room_wolf"
+        android:layout_alignParentBottom="true"
+        />
+
+
 
 </RelativeLayout>
