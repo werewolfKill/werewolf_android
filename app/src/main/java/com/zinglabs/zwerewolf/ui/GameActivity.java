@@ -462,6 +462,10 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                 DialogManager.showToast(this, "游戏人数不足，不能开局");
                 readyIB.setVisibility(View.VISIBLE);
                 break;
+            case MsgEvent.GAME_NOT_ALL_READY://有人没准备好
+                DialogManager.showToast(this, "有人没准备好，请稍待");
+                readyIB.setVisibility(View.VISIBLE);
+                break;
             case MsgEvent.GAME_START_FAIL:
                 DialogManager.showToast(this, "开局失败！");
                 readyIB.setVisibility(View.VISIBLE);
@@ -499,6 +503,8 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
 
             case MsgEvent.GAME_POLICE_SPEAKING: //警上发言
                 actionPos = getPosById(reply,room);
+                title = "开始警上发言,从"+actionPos+"号开始发言";
+                systemSpeak(title);
                 List<Integer> list = RoomUtil.adjustSpeakOrder(room.getPoliceList(), actionPos);
                 simpleController.turnSpeak(roleViewMap, list,room,ProtocolConstant.CID_GAME_POLICE_SPEAKING_END);
                 break;
@@ -529,6 +535,9 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                 }
                 break;
             case MsgEvent.GAME_SPEAK:  //开始发言
+                actionPos = getPosById(reply,room);
+                title = "开始发言,从"+actionPos+"号开始发言";
+                systemSpeak(title);
                 List<Integer> commonSpeakers = RoomUtil.adjustSpeakOrder(room.getLiveList(), reply);
                 simpleController.turnSpeak(roleViewMap, commonSpeakers,room,ProtocolConstant.CID_GAME_REQ_VOTE);
 
@@ -537,20 +546,23 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                 simpleController.chiefSumTicket(GameActivity.this,room);
                 break;
             case  MsgEvent.GAME_VOTE: //请求投票
+                title = "警长归票"+reply+"号";
+                systemSpeak(title);
                 simpleController.vote(GameActivity.this,room);
                 break;
             case MsgEvent.GAME_VOTE_RESULT://投票结果
                 actionPos = getPosById(reply,room);
                 roleView = roleViewMap.get(actionPos);
-                title = "投票结果为"+actionPos+"号,"+actionPos+"号玩家死亡";
-                systemSpeak(title);
                 List<Integer> oneSpeak = new ArrayList<>();
                 oneSpeak.add(actionPos);
                 if(room.getBout()==1){  //遗言
+                    title = "投票结果为"+actionPos+"号,"+actionPos+"号玩家死亡,请留遗言";
                     simpleController.turnSpeak(roleViewMap, oneSpeak,room,ProtocolConstant.CID_GAME_REQ_DARK);
                 }else{
+                    title = "投票结果为"+actionPos+"号,"+actionPos+"号玩家死亡";
                     simpleController.commonSend(GameActivity.this,room,ProtocolConstant.CID_GAME_REQ_DARK);
                 }
+                systemSpeak(title);
                 List<Integer> dead =  new ArrayList<>();
                 dead.add(reply);
                 room.addDeadList(bout,dead);

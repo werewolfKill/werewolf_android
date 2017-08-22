@@ -34,16 +34,16 @@ public class GameController implements BaseController {
         BusinessData businessData;
 
         MsgEvent msgEvent = null;
-        int fromId, reply,code;
+        int fromId, reply, code;
 
         switch (command) {
             case ProtocolConstant.CID_GAME_READY_RESP: //准备游戏
                 businessData = businessService.receive(body);
                 reply = businessData.getReply();
-                if(reply==0){
-                    code= MsgEvent.GAME_LEAVE;
-                }else{
-                    code= MsgEvent.GAME_READY;
+                if (reply == 0) {
+                    code = MsgEvent.GAME_LEAVE;
+                } else {
+                    code = MsgEvent.GAME_READY;
                 }
                 msgEvent = new MsgEvent(code, null, businessData);
                 EventBus.getDefault().post(msgEvent);
@@ -60,12 +60,17 @@ public class GameController implements BaseController {
             case ProtocolConstant.CID_GAME_START_FAIL:  //开始游戏失败
                 businessData = businessService.receiveStartMsg(body);
                 reply = businessData.getReply();
-                if(reply== Constants.ROOM_NOT_ENOUGH_NUM){
+                if (reply == Constants.ROOM_NOT_ENOUGH_NUM) {
                     msgEvent = new MsgEvent(MsgEvent.GAME_NOT_ENOUGH_NUM, null, businessData);
                     EventBus.getDefault().post(msgEvent);
-                }else{
+                } else if (reply == Constants.ROOM_NOT_ALL_READY) {
+                    msgEvent = new MsgEvent(MsgEvent.GAME_NOT_ALL_READY, null, businessData);
+                    EventBus.getDefault().post(msgEvent);
+
+                } else {
                     msgEvent = new MsgEvent(MsgEvent.GAME_START_FAIL, null, businessData);
                     EventBus.getDefault().post(msgEvent);
+
                 }
                 break;
             case ProtocolConstant.CID_GAME_KILL_RES_RESP:  //狼人杀人信息
@@ -73,13 +78,13 @@ public class GameController implements BaseController {
             case ProtocolConstant.CID_GAME_NOTIFY_WITCH_KILLED:  //通知女巫狼人杀人信息
                 businessData = businessService.receive(body);
                 reply = businessData.getReply();
-                System.out.println("狼人杀的是"+reply);
-                msgEvent = new MsgEvent(MsgEvent.GAME_NOTIFY_WITCH,null,businessData);
+                System.out.println("狼人杀的是" + reply);
+                msgEvent = new MsgEvent(MsgEvent.GAME_NOTIFY_WITCH, null, businessData);
                 EventBus.getDefault().post(msgEvent);
                 break;
             case ProtocolConstant.CID_GAME_VERIFY_RESP:  //验人响应
                 businessData = businessService.receive(body);
-                msgEvent = new MsgEvent(MsgEvent.GAME_NOTIFY_WITCH,null,businessData);
+                msgEvent = new MsgEvent(MsgEvent.GAME_VERIFY, null, businessData);
                 EventBus.getDefault().post(msgEvent);
                 break;
             case ProtocolConstant.CID_GAME_DAWN:    //天亮了
@@ -90,12 +95,12 @@ public class GameController implements BaseController {
             case ProtocolConstant.CID_GAME_ASK_CHIEF_RESP:  //竞选警长响应
                 businessData = businessService.receive(body);
                 fromId = businessData.getFromId();
-                System.out.println(fromId+"号玩家竞选警长");
+                System.out.println(fromId + "号玩家竞选警长");
                 msgEvent = new MsgEvent(MsgEvent.GAME_ASK_CHIEF, null, businessData);
                 EventBus.getDefault().post(msgEvent);
 
                 break;
-            case ProtocolConstant.CID_GAME_POLICE_START_SPEAKING : //警上发言
+            case ProtocolConstant.CID_GAME_POLICE_START_SPEAKING: //警上发言
                 businessData = businessService.receive(body);
 
                 msgEvent = new MsgEvent(MsgEvent.GAME_POLICE_SPEAKING, null, businessData);
@@ -112,15 +117,15 @@ public class GameController implements BaseController {
                 msgEvent = new MsgEvent(MsgEvent.GAME_VOTE_CHIEF, null, businessData);
                 EventBus.getDefault().post(msgEvent);
                 break;
-            case ProtocolConstant.CID_GAME_ELECT_CHIEF_RESP ://选出警长
+            case ProtocolConstant.CID_GAME_ELECT_CHIEF_RESP://选出警长
                 businessData = businessService.receive(body);
-                System.out.println(businessData.getReply()+"成为警长");
+                System.out.println(businessData.getReply() + "成为警长");
                 msgEvent = new MsgEvent(MsgEvent.GAME_SET_CHIEF, null, businessData);
                 EventBus.getDefault().post(msgEvent);
                 break;
             case ProtocolConstant.CID_GAME_START_SPEAKING:  //开始发言
                 businessData = businessService.receive(body);
-                System.out.println("从"+businessData.getReply()+"开始发言");
+                System.out.println("从" + businessData.getReply() + "开始发言");
                 msgEvent = new MsgEvent(MsgEvent.GAME_SPEAK, null, businessData);
                 EventBus.getDefault().post(msgEvent);
                 break;
@@ -129,12 +134,12 @@ public class GameController implements BaseController {
                 msgEvent = new MsgEvent(MsgEvent.GAME_CHIEF_SUM_TICKET, null, businessData);
                 EventBus.getDefault().post(msgEvent);
                 break;
-            case ProtocolConstant.CID_GAME_REQ_VOTE_RESP ://请求投票
+            case ProtocolConstant.CID_GAME_REQ_VOTE_RESP://请求投票
                 businessData = businessService.receive(body);
                 msgEvent = new MsgEvent(MsgEvent.GAME_VOTE, null, businessData);
                 EventBus.getDefault().post(msgEvent);
                 break;
-            case ProtocolConstant.CID_GAME_VOTE_RESP ://投票结果
+            case ProtocolConstant.CID_GAME_VOTE_RESP://投票结果
                 businessData = businessService.receive(body);
                 msgEvent = new MsgEvent(MsgEvent.GAME_VOTE_RESULT, null, businessData);
                 EventBus.getDefault().post(msgEvent);
@@ -156,7 +161,7 @@ public class GameController implements BaseController {
         Integer content = (Integer) map.get("content");
         Integer bout = (Integer) map.get("bout");
 
-        RequestBody reqBody = new RequestBody(ProtocolConstant.SID_GAME, command, fromId, roomId, content,bout);
+        RequestBody reqBody = new RequestBody(ProtocolConstant.SID_GAME, command, fromId, roomId, content, bout);
         businessService.send4Game(channel, reqBody);
 
     }

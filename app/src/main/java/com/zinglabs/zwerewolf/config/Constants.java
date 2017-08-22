@@ -35,6 +35,8 @@ public class Constants {
     public static final int ROOM_NOT_EXIST = -1;  //搜索房间不存在
     public static final int ROOM_ALREADY_FULL = -2; //搜索房间已满
     public static final int ROOM_NOT_ENOUGH_NUM = -3; //房间人数不够
+    public static final int ROOM_NOT_ALL_READY = -4; //房间人数不够
+
 
     //    游戏过程状态码
     public static final int GAME_STATUS_OVER_WOLF = -1;

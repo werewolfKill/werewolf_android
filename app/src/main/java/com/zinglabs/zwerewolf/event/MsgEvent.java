@@ -32,6 +32,7 @@ public class MsgEvent {
     public static final int GAME_VOTE= 0xcf; //投票
     public static final int GAME_VOTE_RESULT= 0xd0; //投票结果
     public static final int GAME_DARK= 0xd1; //天黑
+    public static final int GAME_NOT_ALL_READY= 0xd2; //有人没准备好
 
 
 
