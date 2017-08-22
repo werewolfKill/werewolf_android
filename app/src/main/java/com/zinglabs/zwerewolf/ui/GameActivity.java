@@ -401,6 +401,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
         int fromId = 0;
         int bout =0;
         int actionPos = 0;
+        String title ="";
         if (event.getMsgType() != MsgEvent.ROOM_CHAT) {
             room = globalData.getRoom();
             businessData = (BusinessData) obj;
@@ -449,12 +450,13 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                 }
                 systemSpeak(roleMsg);  //发布角色信息
                 setTitle("您是" + this.curPlayerPos + "号" + role.getName()); //设置标题
+                title = "天黑了";
+                systemSpeak(title);
                 simpleController.doDark(GameActivity.this, room);
                 break;
             case MsgEvent.GAME_VERIFY: //预言家验人
-                actionPos = getPosById(fromId, room);
                 String str = reply==1?"好人":"狼人";
-                String title = actionPos+"号玩家是"+str;
+                title = reply+"号玩家是"+str;
                 systemSpeak(title);  //发布角色信息
                 DialogManager.showToast(this, title);
                 break;
@@ -484,11 +486,19 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                 room.setBout(bout);
                 title = "天亮了";
                 if(bout!=1&&kills.length>0){
-                    title+=",昨晚死亡的是"+ StringUtils.join(kills,"、")+"玩家";
+                    title+=",昨晚死亡的是"+ StringUtils.join(kills,"、")+"号玩家";
+
                 }else if(bout!=1&&kills.length==0){
                     title+="昨晚是平安夜";
                 }
                 systemSpeak(title);
+                if(kills!=null&&kills.length>0){
+                    for(int deadId:kills){
+                        roleViewMap.get(deadId).die();
+                    }
+                    title = StringUtils.join(kills,"、")+"号玩家死亡";
+                    systemSpeak(title);
+                }
                 simpleController.doDawn(GameActivity.this, room, kills,bout);
                 break;
             case MsgEvent.GAME_ASK_CHIEF: //申请警长
@@ -535,8 +545,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                 }
                 break;
             case MsgEvent.GAME_SPEAK:  //开始发言
-                actionPos = getPosById(reply,room);
-                title = "开始发言,从"+actionPos+"号开始发言";
+                title = "开始发言,从"+reply+"号开始发言";
                 systemSpeak(title);
                 List<Integer> commonSpeakers = RoomUtil.adjustSpeakOrder(room.getLiveList(), reply);
                 simpleController.turnSpeak(roleViewMap, commonSpeakers,room,ProtocolConstant.CID_GAME_REQ_VOTE);
@@ -551,15 +560,14 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                 simpleController.vote(GameActivity.this,room);
                 break;
             case MsgEvent.GAME_VOTE_RESULT://投票结果
-                actionPos = getPosById(reply,room);
-                roleView = roleViewMap.get(actionPos);
+                roleView = roleViewMap.get(reply);
                 List<Integer> oneSpeak = new ArrayList<>();
-                oneSpeak.add(actionPos);
+                oneSpeak.add(reply);
                 if(room.getBout()==1){  //遗言
-                    title = "投票结果为"+actionPos+"号,"+actionPos+"号玩家死亡,请留遗言";
+                    title = "投票结果为"+reply+"号,"+reply+"号玩家死亡,请留遗言";
                     simpleController.turnSpeak(roleViewMap, oneSpeak,room,ProtocolConstant.CID_GAME_REQ_DARK);
                 }else{
-                    title = "投票结果为"+actionPos+"号,"+actionPos+"号玩家死亡";
+                    title = "投票结果为"+actionPos+"号,"+reply+"号玩家死亡";
                     simpleController.commonSend(GameActivity.this,room,ProtocolConstant.CID_GAME_REQ_DARK);
                 }
                 systemSpeak(title);
@@ -569,6 +577,8 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                 roleView.die();  //设置死亡
                 break;
             case MsgEvent.GAME_DARK: //天黑
+                title = "天黑了";
+                systemSpeak(title);
                 simpleController.doDark(GameActivity.this, room);
                 break;
         }

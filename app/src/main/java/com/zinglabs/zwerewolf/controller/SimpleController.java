@@ -269,6 +269,7 @@ public class SimpleController implements Role.OnRoleStateChangeListener {
             param.put("roomId", roomId);
             param.put("bout", bout);
             DialogManager.showCommonDialog(activity, ProtocolConstant.CID_GAME_ASK_CHIEF, title, param,"是","不了");
+        }else{  //
 
         }
     }
