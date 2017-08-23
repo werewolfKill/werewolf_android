@@ -43,7 +43,7 @@ public class Constants {
     public static final int GAME_STATUS_OVER_GOOD = 1;
     public static final int GAME_STATUS_PROCESS= 0;
 
-    public static final int VOTE_CHIEF_SPEAK_TIME = 1000*5; //警上发言时间
+    public static final int VOTE_CHIEF_SPEAK_TIME = 1000*2; //警上发言时间
 
 
     //---系统发言

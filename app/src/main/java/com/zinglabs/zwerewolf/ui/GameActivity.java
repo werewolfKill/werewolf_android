@@ -532,14 +532,14 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                     title=reply+"号玩家当选警长";
                     systemSpeak(title);
                 }
-                if(deadArr!=null&&deadArr.size()>0&&bout!=1){
+                if(deadArr!=null&&deadArr.size()>0){
                     for(int deadId:deadArr){
 //                        actionPos = getPosById(deadId,room);
                         roleViewMap.get(deadId).die();
                     }
                     title = StringUtils.join(deadArr.toArray(new Integer[0]),"、")+"号玩家死亡";
                     systemSpeak(title);
-                }else if(bout!=1){
+                }else {
                     title ="昨晚是平安夜";
                     systemSpeak(title);
                 }
