@@ -227,7 +227,6 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
         Room room = (Room) getIntent().getSerializableExtra("room");
         User user = globalData.getUser();
         room.setCurUserId(user.getId());
-        globalData.setRoom(room);
         int roomNum = RoomUtil.getNumByModal(room.getModelId());
         int userId = room.getCurUserId();
         int owner = room.getOwnerId();
@@ -236,6 +235,9 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
         this.curUserId = userId;
         this.curPlayerPos = curUserPos;
         this.curRole = room.getPlayers().get(userId).getRole();
+        room.setCurUserPos(curPlayerPos);
+        globalData.setRoom(room);
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
 
         setSupportActionBar(toolbar);
@@ -492,14 +494,12 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                     title+="昨晚是平安夜";
                 }
                 systemSpeak(title);
-                if(kills!=null&&kills.length>0){
+                if(kills!=null&&kills.length>0&&kills[0]!=0&&bout!=1){
                     for(int deadId:kills){
                         roleViewMap.get(deadId).die();
                     }
-                    title = StringUtils.join(kills,"、")+"号玩家死亡";
-                    systemSpeak(title);
                 }
-                simpleController.doDawn(GameActivity.this, room, kills,bout);
+                simpleController.doDawn(GameActivity.this, room, kills,roleViewMap,ProtocolConstant.CID_GAME_REQ_VOTE);
                 break;
             case MsgEvent.GAME_ASK_CHIEF: //申请警长
                 actionPos = getPosById(fromId, room);
@@ -532,12 +532,15 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                     title=reply+"号玩家当选警长";
                     systemSpeak(title);
                 }
-                if(deadArr!=null&&deadArr.size()>0){
+                if(deadArr!=null&&deadArr.size()>0&&bout!=1){
                     for(int deadId:deadArr){
 //                        actionPos = getPosById(deadId,room);
                         roleViewMap.get(deadId).die();
                     }
                     title = StringUtils.join(deadArr.toArray(new Integer[0]),"、")+"号玩家死亡";
+                    systemSpeak(title);
+                }else if(bout!=1){
+                    title ="昨晚是平安夜";
                     systemSpeak(title);
                 }
                 if(reply==curPlayerPos){
@@ -560,14 +563,20 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                 simpleController.vote(GameActivity.this,room);
                 break;
             case MsgEvent.GAME_VOTE_RESULT://投票结果
+                if(reply==0){
+                    title = "投票无人死亡";
+                    systemSpeak(title);
+                    simpleController.commonSend(GameActivity.this,room,ProtocolConstant.CID_GAME_REQ_DARK);
+                    break;
+                }
                 roleView = roleViewMap.get(reply);
                 List<Integer> oneSpeak = new ArrayList<>();
                 oneSpeak.add(reply);
-                if(room.getBout()==1){  //遗言
+                if(room.getBout()==1&&reply!=0){  //遗言
                     title = "投票结果为"+reply+"号,"+reply+"号玩家死亡,请留遗言";
                     simpleController.turnSpeak(roleViewMap, oneSpeak,room,ProtocolConstant.CID_GAME_REQ_DARK);
                 }else{
-                    title = "投票结果为"+actionPos+"号,"+reply+"号玩家死亡";
+                    title = "投票结果为"+reply+"号,"+reply+"号玩家死亡";
                     simpleController.commonSend(GameActivity.this,room,ProtocolConstant.CID_GAME_REQ_DARK);
                 }
                 systemSpeak(title);

@@ -44,6 +44,11 @@ public class Room implements Serializable {
     private int curUserId;
 
     /**
+     * 当前用户位置
+     */
+    private int curUserPos;
+
+    /**
      * 当前用户人数
      */
     private int curNumber;
@@ -122,7 +127,13 @@ public class Room implements Serializable {
         }
     }
 
+    public int getCurUserPos() {
+        return curUserPos;
+    }
 
+    public void setCurUserPos(int curUserPos) {
+        this.curUserPos = curUserPos;
+    }
 
     public int getBout() {
         return bout;

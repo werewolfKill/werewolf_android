@@ -249,11 +249,14 @@ public class SimpleController implements Role.OnRoleStateChangeListener {
      * @param activity activity
      * @param room     房间信息
      */
-    public void doDawn(Activity activity, Room room, Integer[] kills,int bout) {
+    public void doDawn(Activity activity, Room room, Integer[] kills,Map<Integer, RoleView> roleViewMap,short cid) {
+        int bout = room.getBout();
+        List<Integer> deads = new ArrayList<>();
         if (kills != null) {
             List<Integer> list = Arrays.asList(kills);
             if(!(list.size()==1&&list.get(0)==0)){
                 room.addDeadList(bout, list);
+               deads=Arrays.asList(kills);
             }
         }
         if (room.isOver()) {
@@ -270,7 +273,14 @@ public class SimpleController implements Role.OnRoleStateChangeListener {
             param.put("bout", bout);
             DialogManager.showCommonDialog(activity, ProtocolConstant.CID_GAME_ASK_CHIEF, title, param,"是","不了");
         }else{  //
-
+            int chief = room.getChief();
+            if(chief>0){  //有警长
+                if(room.getCurUserPos()==chief){
+                    this.turnSpeakByChief(activity,room,deads);
+                }
+            }else{
+                this.turnSpeak(roleViewMap,room.getLiveList(),room,cid);
+            }
         }
     }
 
