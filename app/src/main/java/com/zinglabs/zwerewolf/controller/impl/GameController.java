@@ -149,6 +149,11 @@ public class GameController implements BaseController {
                 msgEvent = new MsgEvent(MsgEvent.GAME_DARK, null, businessData);
                 EventBus.getDefault().post(msgEvent);
                 break;
+            case ProtocolConstant.CID_GAME_CHANGE_CHIEF_RESP://移交警徽
+                businessData = businessService.receive(body);
+                msgEvent = new MsgEvent(MsgEvent.GAME_CHANGE_CHIEF, null, businessData);
+                EventBus.getDefault().post(msgEvent);
+                break;
         }
 
     }

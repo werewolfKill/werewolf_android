@@ -43,6 +43,7 @@ public class RoleView extends RelativeLayout implements View.OnClickListener {
     public static final int STATE_WOLF = 0xaa;//位置解锁，有人，狼；显示头像，号码，语音
     public static final int STATE_SPEAKING_END = 0xab;//位置解锁，有人，语音结束；显示头像，号码，语音
     public static final int STATE_AT_GAME = 0xac;//位置解锁，有人，游戏中；显示头像，号码，语音
+    public static final int STATE_CANCEL_CHIEF = 0xad;//位置解锁，有人，取消警长身份；显示头像，号码，语音
 
     private AppCompatActivity activity;
     private View root;
@@ -168,6 +169,9 @@ public class RoleView extends RelativeLayout implements View.OnClickListener {
                 case STATE_SET_CHIEF:  //设置警长
                     chief_iv.setVisibility(View.VISIBLE);
                     break;
+                case STATE_CANCEL_CHIEF:  //设置警长
+                    chief_iv.setVisibility(View.GONE);
+                    break;
                 case STATE_WOLF:// 设置狼
                     wolf_iv.setVisibility(View.VISIBLE);
 
@@ -232,6 +236,11 @@ public class RoleView extends RelativeLayout implements View.OnClickListener {
 
     public void setAtGame(){
         mHandler.sendEmptyMessage(STATE_AT_GAME);
+
+    }
+
+    public void unChief(){
+        mHandler.sendEmptyMessage(STATE_CANCEL_CHIEF);
 
     }
 

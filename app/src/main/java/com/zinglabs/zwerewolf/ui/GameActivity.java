@@ -95,6 +95,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
     private int curPlayerPos;
     private int curUserId;
     private Role curRole;
+    private int curChiefPos;
 
     private Context context;
 
@@ -529,6 +530,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                 room.setChief(reply);
                 if(reply>0){
                     roleView.setChief();
+                    curChiefPos = reply;
                     cancelChiefStatus(roleViewMap,reply);
                     title=reply+"号玩家当选警长";
                     systemSpeak(title);
@@ -580,6 +582,9 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                     simpleController.turnSpeak(roleViewMap, oneSpeak,room,ProtocolConstant.CID_GAME_REQ_DARK);
                 }else{
                     title = "投票结果为"+reply+"号,"+reply+"号玩家死亡";
+                    if(room.getChief()==reply){ //流警徽
+                        simpleController.changeChief(GameActivity.this,room);
+                    }
                     simpleController.commonSend(GameActivity.this,room,ProtocolConstant.CID_GAME_REQ_DARK);
                 }
                 systemSpeak(title);
@@ -593,6 +598,19 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                 systemSpeak(title);
                 simpleController.doDark(GameActivity.this, room);
                 break;
+            case MsgEvent.GAME_CHANGE_CHIEF://移交警徽
+                roleView = roleViewMap.get(reply);
+                if(reply>0){
+                    roleView.setChief();
+                    curChiefPos = reply;
+                    title=reply+"号玩家当选警长";
+                    systemSpeak(title);
+                }else{
+                    int preChief = getPosById(fromId,room);
+                    roleViewMap.get(preChief).unChief();
+                }
+                break;
+
         }
     }
 

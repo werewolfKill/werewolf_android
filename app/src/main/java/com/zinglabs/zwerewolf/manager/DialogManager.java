@@ -274,6 +274,28 @@ public class DialogManager {
         builder.setNegativeButton("取消", null);
         builder.show();
     }
+    public static void showModalChoice2(Activity activity, String title,String negTitle,String[] items, short cid, Map<String, Integer> param) {
+        android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(activity, android.R.style.Theme_Holo_Light_Dialog);
+        builder.setTitle(title);
+        //    指定下拉列表的显示数据
+        builder.setItems(items, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                param.put("content", Integer.parseInt(items[which]));
+                IMClientUtil.sendMsg(ProtocolConstant.SID_GAME,cid, param);
+            }
+        });
+        //    设置一个下拉的列表选择项
+        builder.setNegativeButton(negTitle, new DialogInterface.OnClickListener(){
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                param.put("content", 0);
+                IMClientUtil.sendMsg(ProtocolConstant.SID_GAME,cid, param);
+
+            }
+        } );
+        builder.show();
+    }
 
 
     public static void showWaitOtherDialog(Activity activity, int time) {
