@@ -7,6 +7,7 @@ import java.io.Serializable;
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -101,7 +102,8 @@ public class Room implements Serializable {
     }
 
     public List<Integer> getLiveList() {
-        return liveList;
+        Collections.sort(liveList);
+        return  liveList;
     }
 
 

@@ -12,7 +12,7 @@ public class Constants {
     public static int ENCODING = AudioFormat.ENCODING_PCM_16BIT;
 
 //    public  static final String app_host = "192.168.0.102";
-    public static final String app_host="10.0.0.101";
+    public static final String app_host="10.0.0.100";
     public static final int app_port = 8080;
 
     //游戏模式
@@ -43,7 +43,7 @@ public class Constants {
     public static final int GAME_STATUS_OVER_GOOD = 1;
     public static final int GAME_STATUS_PROCESS= 0;
 
-    public static final int VOTE_CHIEF_SPEAK_TIME = 1000*2; //警上发言时间
+    public static final int VOTE_CHIEF_SPEAK_TIME = 1000*5; //警上发言时间
 
 
     //---系统发言

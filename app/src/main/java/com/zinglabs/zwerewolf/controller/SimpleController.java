@@ -144,8 +144,8 @@ public class SimpleController implements Role.OnRoleStateChangeListener {
 
     }
 
-    public void setAtGame(Map<Integer, RoleView> roleViewMap){
-        for(RoleView roleView:roleViewMap.values()){
+    public void setAtGame(Map<Integer, RoleView> roleViewMap) {
+        for (RoleView roleView : roleViewMap.values()) {
             roleView.setAtGame();
         }
     }
@@ -169,8 +169,7 @@ public class SimpleController implements Role.OnRoleStateChangeListener {
                 killMap.put("bout", bout);
                 String title = "您要击杀的人是：";
                 waitTime = RoleUtil.getWaitTime(roleId, modalId);
-
-                DialogManager.showOperateDialog(activity, title, ProtocolConstant.CID_GAME_KILL_REQ, killMap, (int) waitTime);
+                DialogManager.showModalChoice(activity, title, StringUtils.trans2StrArr(room.getLiveList(),""), ProtocolConstant.CID_GAME_KILL_REQ, killMap);
 
                 break;
             case STAGE_PROPHET:  //预言家
@@ -181,9 +180,7 @@ public class SimpleController implements Role.OnRoleStateChangeListener {
                 testMap.put("bout", bout);
                 title = "您要验的人是：";
                 waitTime = RoleUtil.getWaitTime(roleId, modalId);
-
-                DialogManager.showOperateDialog(activity, title, ProtocolConstant.CID_GAME_VERIFY_REQ, testMap, (int) waitTime);
-
+                DialogManager.showModalChoice(activity, title, StringUtils.trans2StrArr(room.getLiveList(),""), ProtocolConstant.CID_GAME_KILL_REQ, testMap);
                 break;
             case STAGE_GUARD:    //守卫
                 Map<String, Integer> guardMap = new HashMap<>();
@@ -193,9 +190,7 @@ public class SimpleController implements Role.OnRoleStateChangeListener {
                 guardMap.put("bout", bout);
                 title = "您要守卫的人是：";
                 waitTime = RoleUtil.getWaitTime(roleId, modalId);
-
-                DialogManager.showOperateDialog(activity, title, ProtocolConstant.CID_GAME_GUARD_REQ, guardMap, (int) waitTime);
-
+                DialogManager.showModalChoice(activity, title, StringUtils.trans2StrArr(room.getLiveList(),""), ProtocolConstant.CID_GAME_KILL_REQ, guardMap);
                 break;
             case STAGE_WITCH:   //女巫
                 waitTime = RoleUtil.getWaitTime(roleId, modalId);
@@ -208,7 +203,7 @@ public class SimpleController implements Role.OnRoleStateChangeListener {
 
                 Witch witch = (Witch) role;
                 if (!witch.hasPanacea() && witch.hasPoison()) { //没有解药但有毒药
-                    DialogManager.showWitchPoisonDialog(activity, witchMap, (int) waitTime, witch);
+                    DialogManager.showWitchPoisonDialog(activity, witchMap, (int) waitTime, witch,room.getLiveList());
                 }
                 break;
 
@@ -239,7 +234,7 @@ public class SimpleController implements Role.OnRoleStateChangeListener {
         witchMap.put("roomId", roomId);
         witchMap.put("bout", bout);
         waitTime = RoleUtil.getWaitTime(roleId, modalId);
-        DialogManager.showWitchSaveDialog(activity, reply, witchMap, (int) waitTime, witch);
+        DialogManager.showWitchSaveDialog(activity, reply, witchMap, (int) waitTime, witch,room.getLiveList());
 
     }
 
@@ -249,14 +244,14 @@ public class SimpleController implements Role.OnRoleStateChangeListener {
      * @param activity activity
      * @param room     房间信息
      */
-    public void doDawn(Activity activity, Room room, Integer[] kills,Map<Integer, RoleView> roleViewMap,short cid) {
+    public void doDawn(Activity activity, Room room, Integer[] kills, Map<Integer, RoleView> roleViewMap, short cid) {
         int bout = room.getBout();
         List<Integer> deads = new ArrayList<>();
         if (kills != null) {
             List<Integer> list = Arrays.asList(kills);
-            if(!(list.size()==1&&list.get(0)==0)){
+            if (!(list.size() == 1 && list.get(0) == 0)) {
                 room.addDeadList(bout, list);
-               deads=Arrays.asList(kills);
+                deads = Arrays.asList(kills);
             }
         }
         if (room.isOver()) {
@@ -271,26 +266,27 @@ public class SimpleController implements Role.OnRoleStateChangeListener {
             param.put("fromId", userId);
             param.put("roomId", roomId);
             param.put("bout", bout);
-            DialogManager.showCommonDialog(activity, ProtocolConstant.CID_GAME_ASK_CHIEF, title, param,"是","不了");
-        }else{  //
+            DialogManager.showCommonDialog(activity, ProtocolConstant.CID_GAME_ASK_CHIEF, title, param, "是", "不了");
+        } else {  //
             int chief = room.getChief();
-            if(chief>0){  //有警长
-                if(room.getCurUserPos()==chief){
-                    this.turnSpeakByChief(activity,room,deads);
+            if (chief > 0) {  //有警长
+                if (room.getCurUserPos() == chief) {
+                    this.turnSpeakByChief(activity, room, deads);
                 }
-            }else{
-                this.turnSpeak(roleViewMap,room.getLiveList(),room,cid);
+            } else {
+                this.turnSpeak(roleViewMap, room.getLiveList(), room, cid);
             }
         }
     }
 
     /**
      * 轮流发言
+     *
      * @param roleViewMap
      * @param speakers
      * @param room
      */
-    public void turnSpeak(Map<Integer, RoleView> roleViewMap, List<Integer> speakers, Room room,short cid) {
+    public void turnSpeak(Map<Integer, RoleView> roleViewMap, List<Integer> speakers, Room room, short cid) {
 
         int size = speakers.size();
         BlockingQueue<Integer> queue = new ArrayBlockingQueue<>(size);
@@ -308,7 +304,7 @@ public class SimpleController implements Role.OnRoleStateChangeListener {
                 param.put("roomId", room.getRoomId());
                 param.put("bout", room.getBout());
                 param.put("content", 0);
-                IMClientUtil.sendMsg(ProtocolConstant.SID_GAME,cid, param);
+                IMClientUtil.sendMsg(ProtocolConstant.SID_GAME, cid, param);
                 service.shutdown();
                 return;
             }
@@ -323,59 +319,59 @@ public class SimpleController implements Role.OnRoleStateChangeListener {
         }, 0, Constants.VOTE_CHIEF_SPEAK_TIME, TimeUnit.MILLISECONDS);
     }
 
-    public void turnSpeakByChief(Activity activity, Room room,List<Integer> deadList){
+    public void turnSpeakByChief(Activity activity, Room room, List<Integer> deadList) {
 
         String title = "请选择从警左或警右开始发言";
-        if(deadList!=null&&deadList.size()>0){
+        if (deadList != null && deadList.size() > 0) {
             title = "请选择从死左或死右开始发言";
         }
         Map<String, Integer> param = new HashMap<>();
         param.put("fromId", room.getCurUserId());
         param.put("roomId", room.getRoomId());
         param.put("bout", room.getBout());
-        DialogManager.showCommonDialog(activity, ProtocolConstant.CID_GAME_CHIEF_DECIDE_SPEAK,title, param,"左","右");
+        DialogManager.showCommonDialog(activity, ProtocolConstant.CID_GAME_CHIEF_DECIDE_SPEAK, title, param, "左", "右");
     }
 
 
-    public void voteChief(Activity activity, Room room){
+    public void voteChief(Activity activity, Room room) {
         List<Integer> speakers = room.getPoliceList();
         Map<String, Integer> param = new HashMap<>();
         param.put("fromId", room.getCurUserId());
         param.put("roomId", room.getRoomId());
         param.put("bout", room.getBout());
-        String title= "竞选警长，请投票";
-        DialogManager.showModalChoice(activity,title,StringUtils.trans2StrArr(speakers,""),ProtocolConstant.CID_GAME_CHIEF_VOTE,param);
+        String title = "竞选警长，请投票";
+        DialogManager.showModalChoice(activity, title, StringUtils.trans2StrArr(speakers, ""), ProtocolConstant.CID_GAME_CHIEF_VOTE, param);
 
     }
 
-    public  void chiefSumTicket(Activity activity, Room room){
+    public void chiefSumTicket(Activity activity, Room room) {
         Map<String, Integer> param = new HashMap<>();
         param.put("fromId", room.getCurUserId());
         param.put("roomId", room.getRoomId());
         param.put("bout", room.getBout());
-        String title= "警长请选择归票";
-        DialogManager.showModalChoice(activity,title,StringUtils.trans2StrArr(room.getLiveList(),""), ProtocolConstant.CID_GAME_CHIEF_SUM_TICKET, param);
+        String title = "警长请选择归票";
+        DialogManager.showModalChoice(activity, title, StringUtils.trans2StrArr(room.getLiveList(), ""), ProtocolConstant.CID_GAME_CHIEF_SUM_TICKET, param);
 
     }
 
-    public void vote(Activity activity, Room room){
+    public void vote(Activity activity, Room room) {
         List<Integer> speakers = room.getLiveList();
         Map<String, Integer> param = new HashMap<>();
         param.put("fromId", room.getCurUserId());
         param.put("roomId", room.getRoomId());
         param.put("bout", room.getBout());
-        String title= "请投票";
-        DialogManager.showModalChoice(activity,title,StringUtils.trans2StrArr(speakers,""),ProtocolConstant.CID_GAME_VOTE,param);
+        String title = "请投票";
+        DialogManager.showModalChoice(activity, title, StringUtils.trans2StrArr(speakers, ""), ProtocolConstant.CID_GAME_VOTE, param);
 
     }
 
-    public void commonSend(Activity activity, Room room,short cid){
+    public void commonSend(Activity activity, Room room, short cid) {
         Map<String, Integer> param = new HashMap<>();
         param.put("fromId", room.getCurUserId());
         param.put("roomId", room.getRoomId());
         param.put("bout", room.getBout());
-        param.put("content",0);
-        IMClientUtil.sendMsg(ProtocolConstant.SID_GAME,cid, param);
+        param.put("content", 0);
+        IMClientUtil.sendMsg(ProtocolConstant.SID_GAME, cid, param);
 
     }
 
@@ -413,281 +409,7 @@ public class SimpleController implements Role.OnRoleStateChangeListener {
      * 进入流程中的某阶段
      */
 
-//    private void doStage(String stage) {
-//        who = -1;
-//        prophet = null;
-//        wolf = null;
-//        witch = null;
-//        isGameing = true;
-//        Runnable runnable = null;
-//        if (isGameing) {
-//            curStage = stage;
-//            switch (stage) {
-//                case STAGE_DARK:
-//                    //第一回合天黑时法官发言，游戏角色组成情况
-//                    if (bout == 1) {
-//                        String str_element = String.format(Constants.TEXT_START_ALLOT, elementMap.get(Wolf.NAME), elementMap.get(Prophet.NAME), elementMap.get(Witch.NAME), elementMap.get(Huntsman.NAME), elementMap.get(Villager.NAME));
-//                        Message msg_system_chat = new Message();
-//                        msg_system_chat.what = GameStateMessage.GAME_START;
-//                        msg_system_chat.obj = new GameStateMessage(null, str_element);
-//                        handler.sendMessage(msg_system_chat);
-//                    }
-//                    //修改房间标题
-//                    Message msg_room_title = new Message();
-//                    msg_room_title.what = GameStateMessage.ZHOUYE;
-//                    msg_room_title.obj = new GameStateMessage(null, "(第" + bout + "夜)");
-//                    handler.sendMessage(msg_room_title);
-//
-//                    //法官发言
-//                    Message msg_system_chat = new Message();
-//                    msg_system_chat.what = GameStateMessage.CHAT;
-//                    msg_system_chat.obj = new GameStateMessage(null, String.format(Constants.TEXT_DAY_DARK, bout));
-//                    handler.sendMessage(msg_system_chat);
-//                    doStage(STAGE_PROPHET);
-//                    break;
-//
-//                case STAGE_PROPHET:
-//                    for (Map.Entry<Integer, Role> entry : deployMap.entrySet()) {
-//                        if (entry.getValue().getName().equals(Prophet.NAME) && entry.getValue().isAlive()) {
-//                            prophet = (Prophet) entry.getValue();
-//                            who = doRoleActionToWho(entry.getValue());
-//                        }
-//                    }
-//                    if (prophet != null) {
-//                        //修改倒计时内容
-//                        Message msg_system_timer = new Message();
-//                        msg_system_timer.what = GameStateMessage.COUNTDOWNTIMER;
-//                        msg_system_timer.obj = new GameStateMessage(prophet, String.format(Constants.TEXT_WAIT_ACTION, prophet.getName()), Prophet.ACTION_TIME);
-//                        handler.sendMessage(msg_system_timer);
-//                        runnable = new Runnable() {
-//                            @Override
-//                            public void run() {
-//                                if (who >= 1) {
-//                                    Message msg_system_chat = new Message();
-//                                    msg_system_chat.what = GameStateMessage.CHAT;
-//                                    msg_system_chat.obj = new GameStateMessage(null, "预言家调查了[" + who + "]号的身份,他的身份是" + deployMap.get(who).getName());
-//                                    handler.sendMessage(msg_system_chat);
-//                                }
-//                                doStage(STAGE_WOLF);
-//                            }
-//                        };
-//                        new GameTask(Role.getRoleActionTime(), runnable).start();
-//                    } else {
-//                        doStage(STAGE_WOLF);
-//                    }
-//                    break;
-//
-//                case STAGE_WOLF:
-//                    for (Map.Entry<Integer, Role> entry : deployMap.entrySet()) {
-//                        if (entry.getValue().getName().equals(Wolf.NAME) && entry.getValue().isAlive()) {
-//                            wolf = (Wolf) entry.getValue();
-//                            who = doRoleActionToWho(entry.getValue());
-//                        }
-//                    }
-//                    if (wolf != null) {
-//                        //修改倒计时内容
-//                        Message msg_system_timer = new Message();
-//                        msg_system_timer.what = GameStateMessage.COUNTDOWNTIMER;
-//                        msg_system_timer.obj = new GameStateMessage(wolf, String.format(Constants.TEXT_WAIT_ACTION, wolf.getName()), Wolf.ACTION_TIME);
-//                        handler.sendMessage(msg_system_timer);
-//                        runnable = new Runnable() {
-//                            @Override
-//                            public void run() {
-//                                if (who >= 1) {
-//                                    //女巫救人行动
-//                                    if (!witchSave(who)) {
-//                                        Role role = deployMap.get(who);
-//                                        Message msg_system_die = new Message();
-//                                        msg_system_die.what = GameStateMessage.CHAT;
-//                                        msg_system_die.obj = new GameStateMessage(role, String.format("[%d]号被狼杀", who));
-//                                        handler.sendMessage(msg_system_die);
-//                                        role.setState(Role.STATE_DIE_WOLF_KILL);
-//
-//                                        nightDieList.add(who);
-//                                    }
-//                                }
-//                                doStage(STAGE_WITCH);
-//                            }
-//                        };
-//                        new GameTask(Role.getRoleActionTime(), runnable).start();
-//                    } else {
-//                        doStage(STAGE_WITCH);
-//                    }
-//                    break;
-//
-//                case STAGE_WITCH:
-//                    for (Map.Entry<Integer, Role> entry : deployMap.entrySet()) {
-//                        if (entry.getValue().getName().equals(Witch.NAME) && entry.getValue().isAlive()) {
-//                            witch = (Witch) entry.getValue();
-//                            who = doRoleActionToWho(entry.getValue());
-//                            break;
-//                        }
-//                    }
-//                    if (witch != null && witch.hasPanacea()) {
-//                        //修改倒计时内容
-//                        Message msg_system_timer = new Message();
-//                        msg_system_timer.what = GameStateMessage.COUNTDOWNTIMER;
-//                        msg_system_timer.obj = new GameStateMessage(witch, String.format(Constants.TEXT_WAIT_ACTION, witch.getName()), Witch.ACTION_TIME);
-//                        handler.sendMessage(msg_system_timer);
-//                        runnable = new Runnable() {
-//                            @Override
-//                            public void run() {
-//                                if (who >= 1 && witch.hasPoison()) {
-//                                    witch.usePoison();
-//                                    Role role = deployMap.get(who);
-//                                    Message msg_system_chat = new Message();
-//                                    msg_system_chat.what = GameStateMessage.CHAT;
-//                                    msg_system_chat.obj = new GameStateMessage(role, String.format("[%d]号被毒杀", who));
-//                                    handler.sendMessage(msg_system_chat);
-//                                    role.setState(Role.STATE_DIE_POISON);
-//                                    nightDieList.add(who);
-//                                    LogUtil.e(who + "被毒杀");
-//                                } else {
-//                                }
-//                                doStage(STAGE_HUNTSMAN);
-//                            }
-//                        };
-//                        new GameTask(Role.getRoleActionTime(), runnable).start();
-//                    } else {
-//                        doStage(STAGE_HUNTSMAN);
-//                    }
-//                    break;
-//
-//                case STAGE_HUNTSMAN:
-//                    Huntsman huntsman = null;
-//                    for (Map.Entry<Integer, Role> entry : deployMap.entrySet()) {
-//                        if (entry.getValue().getName().equals(Huntsman.NAME) && entry.getValue().isAlive()) {
-//                            huntsman = (Huntsman) entry.getValue();
-//                            who = doRoleActionToWho(entry.getValue());
-//                            break;
-//                        }
-//                    }
-//                    doStage(STAGE_DAWN);
-//                    break;
-//
-//                case STAGE_DAWN:
-//                    bout++;
-//                    //修改房间标题
-//                    Message msg_room_title_1 = new Message();
-//                    msg_room_title_1.what = GameStateMessage.ZHOUYE;
-//                    msg_room_title_1.obj = new GameStateMessage(null, "(第" + bout + "天)");
-//                    handler.sendMessage(msg_room_title_1);
-//
-//                    //法官发言
-//                    Message msg_system_chat_1 = new Message();
-//                    msg_system_chat_1.what = GameStateMessage.CHAT;
-//                    //判断是否夜晚死过人
-//                    if (nightDieList.size() > 0) {
-//                        msg_system_chat_1.obj = new GameStateMessage(null, String.format(Constants.TEXT_DAY_DAWN, GameAlloter.textNumerFormat(nightDieList)));
-//                    } else {
-//                        msg_system_chat_1.obj = new GameStateMessage(null, Constants.TEXT_DAY_SAFE);
-//                    }
-//                    handler.sendMessage(msg_system_chat_1);
-//                    doStage(STAGE_TALK);
-//                    break;
-//
-//                case STAGE_TALK:
-//                    int curSpeaker = 0;
-//                    for (Map.Entry<Integer, Role> entry : deployMap.entrySet()) {
-//                        if (entry.getValue().getState().equals(Role.STATE_TALK)) {
-//                            curSpeaker = entry.getKey();
-//                            entry.getValue().setState(Role.STATE_HOLD_ON);
-//                            break;
-//                        }
-//                    }
-//                    int firstSpeaker = GameAlloter.pickSpeak(aliveList, nightDieList);
-//                    //curSpeaker=0时表示第一次轮询
-//                    if (curSpeaker == 0) {
-//                        curSpeaker = GameAlloter.pickSpeak(aliveList, curSpeaker);
-//                    } else {
-//                        curSpeaker = GameAlloter.pickSpeak(aliveList, curSpeaker);
-//                        //轮询结束
-//                        if (firstSpeaker == curSpeaker) {
-//                            runnable = new Runnable() {
-//                                @Override
-//                                public void run() {
-//                                    doStage(STAGE_VOTE);
-//                                }
-//                            };
-//                            new GameTask(1000, runnable).start();
-//                            break;
-//                        }
-//                    }
-//
-//                    //修改倒计时内容
-//                    Message msg_system_timer = new Message();
-//                    msg_system_timer.what = GameStateMessage.COUNTDOWNTIMER;
-//                    //是否有人语音中
-//                    if (curSpeaker > 0) {
-//                        if (nightDieList.size() > 0) {
-//                            msg_system_timer.obj = new GameStateMessage(witch, String.format(Constants.TEXT_DAY_DAWN_TIMER, GameAlloter.textNumerFormat(nightDieList), curSpeaker), Role.getCommonActionTime());
-//                        } else {
-//                            msg_system_timer.obj = new GameStateMessage(witch, String.format(Constants.TEXT_DAY_SAFE_TIMER, curSpeaker), Role.getCommonActionTime());
-//                        }
-//                    } else {
-//                        if (nightDieList.size() > 0) {
-//                            msg_system_timer.obj = new GameStateMessage(witch, String.format(Constants.TEXT_DAY_DAWN_TIMER, GameAlloter.textNumerFormat(nightDieList), firstSpeaker), Role.getCommonActionTime());
-//                        } else {
-//                            msg_system_timer.obj = new GameStateMessage(witch, String.format(Constants.TEXT_DAY_SAFE_TIMER, firstSpeaker), Role.getCommonActionTime());
-//                        }
-//                    }
-//
-//
-//                    handler.sendMessage(msg_system_timer);
-//
-//                    Role role = deployMap.get(curSpeaker);
-//                    role.setState(Role.STATE_TALK);
-//
-//                    Message msg_player_speak = new Message();
-//                    msg_player_speak.what = GameStateMessage.GAME_SPEAK;
-//                    msg_player_speak.obj = new GameStateMessage(role, null);
-//                    handler.sendMessage(msg_player_speak);
-//
-//                    runnable = new Runnable() {
-//                        @Override
-//                        public void run() {
-//                            doStage(STAGE_TALK);
-//                        }
-//                    };
-//                    new GameTask(Role.getCommonActionTime(), runnable).start();
-//                    break;
-//
-//                case STAGE_VOTE:
-//                    nightDieList.clear();
-//                    //修改倒计时内容
-//                    Message msg_system_timer_vote = new Message();
-//                    msg_system_timer_vote.what = GameStateMessage.COUNTDOWNTIMER;
-//                    msg_system_timer_vote.obj = new GameStateMessage(null, "等待其他玩家投票", Role.getRoleActionTime());
-//                    handler.sendMessage(msg_system_timer_vote);
-//
-//                    runnable = new Runnable() {
-//                        @Override
-//                        public void run() {
-//                            if (Role.doCommonAction() == Role.ACTION_KILL) {
-//                                who = aliveList.get(new Random().nextInt(aliveList.size()));
-//                            }
-//
-//                            if (who >= 1) {
-//                                Role role = deployMap.get(who);
-//                                Message msg_system_chat_vote = new Message();
-//                                msg_system_chat_vote.what = GameStateMessage.CHAT;
-////                                msg_system_chat_vote.obj = new GameStateMessage(role, String.format("[%d]号被票杀", who));
-//                                msg_system_chat_vote.obj = new GameStateMessage(role, String.format(Constants.TEXT_VOTE_KILL, who));
-//                                handler.sendMessage(msg_system_chat_vote);
-//                                role.setState(Role.STATE_DIE_VOTE);
-//                            }
-//                            doStage(STAGE_TOUPIAOJIEGUO);
-//                        }
-//                    };
-//                    new GameTask(Role.getRoleActionTime(), runnable, false).start();
-//                    break;
-//
-//                case STAGE_TOUPIAOJIEGUO:
-//                    doStage(STAGE_DARK);
-//                    break;
-//            }
-//        }
-//    }
+
     private boolean witchSave(int number) {
         witch = null;
         for (Map.Entry<Integer, Role> entry : deployMap.entrySet()) {
@@ -706,25 +428,6 @@ public class SimpleController implements Role.OnRoleStateChangeListener {
         return false;
     }
 
-
-    /**
-     * 角色对谁做出独有行动
-     */
-    private int doRoleActionToWho(Role role) {
-        int who = -1;
-        int outlier = -1;
-        if (role.doRoleAction() == Role.ACTION_GIVE_UP) {
-            return who;
-        }
-
-        for (Map.Entry<Integer, Role> entry : deployMap.entrySet()) {
-            if (role.equals(entry.getValue())) {
-                outlier = entry.getKey();
-            }
-        }
-
-        return GameAlloter.chooseAliver(aliveList, outlier);
-    }
 
     public List<Integer> getAliveList() {
         return aliveList;
@@ -780,34 +483,6 @@ public class SimpleController implements Role.OnRoleStateChangeListener {
             this.isCanRandom = isCanRandom;
         }
 
-        public boolean skip() {
-            return false;
-        }
 
-        public void start() {
-            if (skip()) {
-                return;
-            }
-            //判断该类角色是否有幸存者
-            long time = new Random().nextInt((int) millisInFuture);
-            if (isCanRandom) {
-                if (time < 3000) {
-                    time = 3000;
-                }
-            } else {
-                time = millisInFuture;
-            }
-
-            new CountDownTimer(time, COUNT_DOWN_INTERVAL) {
-                @Override
-                public void onTick(long millisUntilFinished) {
-                }
-
-                @Override
-                public void onFinish() {
-                    runnable.run();
-                }
-            }.start();
-        }
     }
 }

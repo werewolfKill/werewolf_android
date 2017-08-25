@@ -284,7 +284,7 @@ public class DialogManager {
         builder.show();
     }
 
-    public static void showWitchSaveDialog(Activity activity, int killed, Map<String, Integer> param, int time, Witch witch) {
+    public static void showWitchSaveDialog(Activity activity, int killed, Map<String, Integer> param, int time, Witch witch,List<Integer> lives) {
 
         android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(activity, android.R.style.Theme_Holo_Light_Dialog);
         builder.setTitle(killed + "号玩家死亡，你是否要救？")
@@ -301,14 +301,14 @@ public class DialogManager {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         if(witch.hasPoison()){
-                            showWitchPoisonDialog(activity, param, time,witch);
+                            showWitchPoisonDialog(activity, param, time,witch,lives);
                         }
                     }
                 });
         builder.show();
     }
 
-    public static void showWitchPoisonDialog(Activity activity, Map<String, Integer> param, int time,Witch witch) {
+    public static void showWitchPoisonDialog(Activity activity, Map<String, Integer> param, int time,Witch witch,List<Integer> lives) {
 
         android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(activity, android.R.style.Theme_Holo_Light_Dialog);
         builder.setTitle("您是否要毒人？")
@@ -318,7 +318,7 @@ public class DialogManager {
                     public void onClick(DialogInterface dialog, int which) {
                         witch.usePoison();
                         String title = "请选择您要毒的人：";
-                        showOperateDialog(activity, title, ProtocolConstant.CID_GAME_POISON_REQ, param, time);
+                        showModalChoice(activity,title,StringUtils.trans2StrArr(lives,""),ProtocolConstant.CID_GAME_POISON_REQ,param);
                     }
                 })
                 .setNegativeButton("否",new DialogInterface.OnClickListener() {

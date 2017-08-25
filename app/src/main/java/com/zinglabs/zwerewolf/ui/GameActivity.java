@@ -529,13 +529,16 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                 room.setChief(reply);
                 if(reply>0){
                     roleView.setChief();
+                    cancelChiefStatus(roleViewMap,reply);
                     title=reply+"号玩家当选警长";
                     systemSpeak(title);
                 }
                 if(deadArr!=null&&deadArr.size()>0){
-                    for(int deadId:deadArr){
-//                        actionPos = getPosById(deadId,room);
-                        roleViewMap.get(deadId).die();
+                    for(int deadPos:deadArr){
+                        roleViewMap.get(deadPos).die();
+                        if(deadPos==curPlayerPos){
+                            systemSpeak("您已死亡！");
+                        }
                     }
                     title = StringUtils.join(deadArr.toArray(new Integer[0]),"、")+"号玩家死亡";
                     systemSpeak(title);
@@ -616,6 +619,15 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                 DialogManager.dismissDialog(GameActivity.this);
             }
         }.start();
+    }
+
+    private void cancelChiefStatus(Map<Integer, RoleView> roleViewMap,int except){
+        for(Map.Entry<Integer,RoleView> roleEntry: roleViewMap.entrySet()){
+            if(roleEntry.getKey()!=except){
+                roleEntry.getValue().setQuitChief();
+            }
+        }
+
     }
 
     private void simulate(Room room, int curUserId, int owner) {

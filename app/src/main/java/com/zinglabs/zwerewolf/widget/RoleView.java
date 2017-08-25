@@ -162,8 +162,8 @@ public class RoleView extends RelativeLayout implements View.OnClickListener {
                 case STATE_VOTE_CHIEF:  //竞选警长
                     hand_iv.setVisibility(View.VISIBLE);
                     break;
-                case STATE_QUIT_CHIEF:  //放弃竞选警长
-                    quit_chief_iv.setVisibility(View.VISIBLE);
+                case STATE_QUIT_CHIEF:  //取消竞选警长
+                    hand_iv.setVisibility(View.GONE);
                     break;
                 case STATE_SET_CHIEF:  //设置警长
                     chief_iv.setVisibility(View.VISIBLE);
