@@ -383,13 +383,18 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                 break;
             //准备
             case room_ready_ib:
+                if(room.isAtChiefVote()){   //放弃竞选
+                    simpleController.cancelVoteChief(GameActivity.this,room);
+                    roleViewMap.get(curPlayerPos).setQuitChief();
+                    break;
+                }
                 if (room.isOwner()) {
                     readyIB.setVisibility(View.GONE);
                     simpleController.startGame(room);
                 } else {
-//                    readyIB.setVisibility(View.GONE);
                     simpleController.readyGame(room);
                 }
+
                 break;
         }
     }
@@ -487,7 +492,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                 if(param.get("killed")!=null){
                      kills = (Integer[]) businessData.getParam().get("killed");
                 }
-                room.setOver(reply != Constants.GAME_STATUS_PROCESS);
+                room.setOver(reply);
                 room.setBout(bout);
                 title = "天亮了";
                 if(bout!=1&&kills.length>0){
@@ -509,6 +514,11 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                 roleView = roleViewMap.get(actionPos);
                 room.addPoliceList(actionPos);
                 roleView.setChiefVote();
+                if(actionPos==curPlayerPos){
+                    readyIB.setImageResource(R.mipmap.room_giveup);
+                    readyIB.setVisibility(View.VISIBLE);
+                    room.setAtChiefVote(true);
+                }
                 title = actionPos+"号玩家竞选警长";
                 systemSpeak(title);
                 globalData.setRoom(room);
@@ -527,6 +537,10 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                 break;
             case MsgEvent.GAME_SET_CHIEF://设置警长  TODO 考虑无警长情况
                 roleView = roleViewMap.get(reply);
+                if(room.isAtChiefVote()){
+                    room.setAtChiefVote(false);
+                    readyIB.setVisibility(View.GONE);
+                }
                 bout = room.getBout();
                  List<Integer> deadArr = room.getDeadList().get(bout);
                 room.setChief(reply);

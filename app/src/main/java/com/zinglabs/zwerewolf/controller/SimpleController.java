@@ -215,6 +215,23 @@ public class SimpleController implements Role.OnRoleStateChangeListener {
     }
 
     /**
+     * 放弃竞选（退水）
+     * @param activity
+     * @param room
+     */
+    public void cancelVoteChief(Activity activity, Room room){
+        int userId = room.getCurUserId();
+        int roomId = room.getRoomId();
+        int bout = room.getBout();
+        Map<String, Integer> param = new HashMap<>();
+        param.put("fromId", userId);
+        param.put("roomId", roomId);
+        param.put("bout", bout);
+        String title = "确定放弃竞选吗？";
+        DialogManager.showCommonDialog(activity,ProtocolConstant.CID_GAME_QUIT_POLICE,title,param,"是","否");
+    }
+
+    /**
      * 天亮流程
      *
      * @param activity activity
@@ -231,7 +248,7 @@ public class SimpleController implements Role.OnRoleStateChangeListener {
             }
         }
         if (room.isOver()) {
-            DialogManager.showOverDialog(activity, kills);
+            DialogManager.showOverDialog(activity, kills,room.getOver());
             return;
         }
         int userId = room.getCurUserId();
@@ -323,7 +340,7 @@ public class SimpleController implements Role.OnRoleStateChangeListener {
         param.put("fromId", room.getCurUserId());
         param.put("roomId", room.getRoomId());
         param.put("bout", room.getBout());
-        DialogManager.showCommonDialog(activity, ProtocolConstant.CID_GAME_CHIEF_DECIDE_SPEAK, title, param, "左", "右");
+        DialogManager.showCommonDialog(activity, ProtocolConstant.CID_GAME_CHIEF_DECIDE_SPEAK, title, param, "右", "左");
     }
 
 

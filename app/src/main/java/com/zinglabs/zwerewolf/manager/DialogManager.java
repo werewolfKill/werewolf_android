@@ -259,7 +259,7 @@ public class DialogManager {
                 .show();
     }
 
-    public static void showModalChoice(Activity activity, String title,String[] items, short cid, Map<String, Integer> param) {
+    public static void showModalChoice(Activity activity, String title, String[] items, short cid, Map<String, Integer> param) {
         android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(activity, android.R.style.Theme_Holo_Light_Dialog);
         builder.setTitle(title);
         //    指定下拉列表的显示数据
@@ -267,14 +267,15 @@ public class DialogManager {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 param.put("content", Integer.parseInt(items[which]));
-                IMClientUtil.sendMsg(ProtocolConstant.SID_GAME,cid, param);
+                IMClientUtil.sendMsg(ProtocolConstant.SID_GAME, cid, param);
             }
         });
         //    设置一个下拉的列表选择项
         builder.setNegativeButton("取消", null);
         builder.show();
     }
-    public static void showModalChoice2(Activity activity, String title,String negTitle,String[] items, short cid, Map<String, Integer> param) {
+
+    public static void showModalChoice2(Activity activity, String title, String negTitle, String[] items, short cid, Map<String, Integer> param) {
         android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(activity, android.R.style.Theme_Holo_Light_Dialog);
         builder.setTitle(title);
         //    指定下拉列表的显示数据
@@ -282,18 +283,18 @@ public class DialogManager {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 param.put("content", Integer.parseInt(items[which]));
-                IMClientUtil.sendMsg(ProtocolConstant.SID_GAME,cid, param);
+                IMClientUtil.sendMsg(ProtocolConstant.SID_GAME, cid, param);
             }
         });
         //    设置一个下拉的列表选择项
-        builder.setNegativeButton(negTitle, new DialogInterface.OnClickListener(){
+        builder.setNegativeButton(negTitle, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 param.put("content", 0);
-                IMClientUtil.sendMsg(ProtocolConstant.SID_GAME,cid, param);
+                IMClientUtil.sendMsg(ProtocolConstant.SID_GAME, cid, param);
 
             }
-        } );
+        });
         builder.show();
     }
 
@@ -306,7 +307,7 @@ public class DialogManager {
         builder.show();
     }
 
-    public static void showWitchSaveDialog(Activity activity, int killed, Map<String, Integer> param, int time, Witch witch,List<Integer> lives) {
+    public static void showWitchSaveDialog(Activity activity, int killed, Map<String, Integer> param, int time, Witch witch, List<Integer> lives) {
 
         android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(activity, android.R.style.Theme_Holo_Light_Dialog);
         builder.setTitle(killed + "号玩家死亡，你是否要救？")
@@ -322,15 +323,15 @@ public class DialogManager {
                 .setNegativeButton("否", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        if(witch.hasPoison()){
-                            showWitchPoisonDialog(activity, param, time,witch,lives);
+                        if (witch.hasPoison()) {
+                            showWitchPoisonDialog(activity, param, time, witch, lives);
                         }
                     }
                 });
         builder.show();
     }
 
-    public static void showWitchPoisonDialog(Activity activity, Map<String, Integer> param, int time,Witch witch,List<Integer> lives) {
+    public static void showWitchPoisonDialog(Activity activity, Map<String, Integer> param, int time, Witch witch, List<Integer> lives) {
 
         android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(activity, android.R.style.Theme_Holo_Light_Dialog);
         builder.setTitle("您是否要毒人？")
@@ -340,20 +341,26 @@ public class DialogManager {
                     public void onClick(DialogInterface dialog, int which) {
                         witch.usePoison();
                         String title = "请选择您要毒的人：";
-                        showModalChoice(activity,title,StringUtils.trans2StrArr(lives,""),ProtocolConstant.CID_GAME_POISON_REQ,param);
+                        showModalChoice(activity, title, StringUtils.trans2StrArr(lives, ""), ProtocolConstant.CID_GAME_POISON_REQ, param);
                     }
                 })
-                .setNegativeButton("否",new DialogInterface.OnClickListener() {
+                .setNegativeButton("否", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         showWaitOtherDialog(activity, time);
                     }
-                } );
+                });
         builder.show();
     }
 
-    public static void showOverDialog(Activity activity,Integer [] array){
-        String killStr = StringUtils.join(array,"、")+"号玩家死亡，游戏结束";
+    public static void showOverDialog(Activity activity, Integer[] array, int flag) {
+
+        String killStr = StringUtils.join(array, "、") + "号玩家死亡，游戏结束";
+        if (flag == Constants.GAME_STATUS_OVER_GOOD) {
+            killStr+="，好人获胜。";
+        }else {
+            killStr+="，狼人获胜。";
+        }
         android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(activity, android.R.style.Theme_Holo_Light_Dialog);
         builder.setTitle(killStr)
                 .setIcon(android.R.drawable.ic_dialog_dialer)
@@ -363,21 +370,21 @@ public class DialogManager {
 
     }
 
-    public static void showCommonDialog(Activity activity,short cid,String title, Map<String, Integer> param,String rightTitle,String noTitle){
+    public static void showCommonDialog(Activity activity, short cid, String title, Map<String, Integer> param, String rightTitle, String noTitle) {
         android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(activity, android.R.style.Theme_Holo_Light_Dialog);
         builder.setTitle(title)
                 .setIcon(android.R.drawable.ic_dialog_dialer)
                 .setPositiveButton(rightTitle, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        param.put("content",1);
+                        param.put("content", 1);
                         IMClientUtil.sendMsg(ProtocolConstant.SID_GAME, cid, param);
                     }
                 })
-                .setNegativeButton(noTitle,  new DialogInterface.OnClickListener() {
+                .setNegativeButton(noTitle, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        param.put("content",0);
+                        param.put("content", 0);
                         IMClientUtil.sendMsg(ProtocolConstant.SID_GAME, cid, param);
                     }
                 });
@@ -385,8 +392,6 @@ public class DialogManager {
         builder.show();
 
     }
-
-
 
 
     public static void showToast(Activity activity, String str) {

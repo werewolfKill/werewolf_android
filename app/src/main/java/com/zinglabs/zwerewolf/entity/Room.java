@@ -1,5 +1,6 @@
 package com.zinglabs.zwerewolf.entity;
 
+import com.zinglabs.zwerewolf.config.Constants;
 import com.zinglabs.zwerewolf.role.UserRole;
 import com.zinglabs.zwerewolf.utils.RoomUtil;
 
@@ -66,9 +67,9 @@ public class Room implements Serializable {
 
 
     /**
-     * 游戏是否结束
+     * 游戏是否结束标识
      */
-    private boolean isOver;
+    private int over;
     /**
      * 表示第几天
      */
@@ -83,6 +84,16 @@ public class Room implements Serializable {
      * 表示警长
      */
     private int chief;
+
+    private boolean atChiefVote;
+
+    public boolean isAtChiefVote() {
+        return atChiefVote;
+    }
+
+    public void setAtChiefVote(boolean atChiefVote) {
+        this.atChiefVote = atChiefVote;
+    }
 
     public int getChief() {
         return chief;
@@ -110,12 +121,16 @@ public class Room implements Serializable {
 
     private List<Integer> policeList = new ArrayList<>();
 
-    public boolean isOver() {
-        return isOver;
+    public int getOver() {
+        return over;
     }
 
-    public void setOver(boolean over) {
-        isOver = over;
+    public void setOver(int over) {
+        this.over = over;
+    }
+
+    public boolean isOver(){
+        return over!= Constants.GAME_STATUS_PROCESS;
     }
 
     public Map<Integer, List<Integer>> getDeadList() {
