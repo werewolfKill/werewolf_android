@@ -191,7 +191,7 @@
             </LinearLayout>
         </LinearLayout>
         <!--开始准备按钮-->
-        <ImageButton
+        <ImageView
             android:id="@+id/room_ready_ib"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

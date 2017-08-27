@@ -88,7 +88,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
     private View key_v;
     private EditText et;
     private ImageButton startIB;
-    private ImageButton readyIB;
+    private ImageView readyIB;
     private GlobalData globalData;
     private ImageView ready_iv;
 
@@ -279,9 +279,11 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
         ready_iv = (ImageView) findViewById(R.id.role_ready_iv);
 
         findViewById(R.id.room_send_tv).setOnClickListener(this);
-        readyIB = (ImageButton) findViewById(R.id.room_ready_ib);
+        readyIB = (ImageView) findViewById(R.id.room_ready_ib);
         readyIB.setOnClickListener(this);
-
+        if(room.isOwner()){
+            readyIB.setImageResource(R.mipmap.button_start);
+        }
         voice_v.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {

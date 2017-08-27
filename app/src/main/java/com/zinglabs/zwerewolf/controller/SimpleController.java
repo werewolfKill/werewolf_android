@@ -156,7 +156,7 @@ public class SimpleController implements Role.OnRoleStateChangeListener {
                 testMap.put("bout", bout);
                 title = "您要验的人是：";
                 waitTime = RoleUtil.getWaitTime(roleId, modalId);
-                DialogManager.showModalChoice(activity, title, StringUtils.trans2StrArr(room.getLiveList(),""), ProtocolConstant.CID_GAME_KILL_REQ, testMap);
+                DialogManager.showModalChoice(activity, title, StringUtils.trans2StrArr(room.getLiveList(),""), ProtocolConstant.CID_GAME_VERIFY_REQ, testMap);
                 break;
             case STAGE_GUARD:    //守卫
                 Map<String, Integer> guardMap = new HashMap<>();
@@ -166,7 +166,7 @@ public class SimpleController implements Role.OnRoleStateChangeListener {
                 guardMap.put("bout", bout);
                 title = "您要守卫的人是：";
                 waitTime = RoleUtil.getWaitTime(roleId, modalId);
-                DialogManager.showModalChoice(activity, title, StringUtils.trans2StrArr(room.getLiveList(),""), ProtocolConstant.CID_GAME_KILL_REQ, guardMap);
+                DialogManager.showModalChoice(activity, title, StringUtils.trans2StrArr(room.getLiveList(),""), ProtocolConstant.CID_GAME_GUARD_REQ, guardMap);
                 break;
             case STAGE_WITCH:   //女巫
                 waitTime = RoleUtil.getWaitTime(roleId, modalId);
