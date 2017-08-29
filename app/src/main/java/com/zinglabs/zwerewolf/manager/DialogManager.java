@@ -282,7 +282,8 @@ public class DialogManager {
         builder.setItems(items, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                param.put("content", Integer.parseInt(items[which]));
+                int pos = Integer.parseInt(items[which]);
+                param.put("content", pos);
                 IMClientUtil.sendMsg(ProtocolConstant.SID_GAME, cid, param);
             }
         });

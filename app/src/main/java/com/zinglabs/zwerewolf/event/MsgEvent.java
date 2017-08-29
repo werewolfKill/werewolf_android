@@ -34,6 +34,8 @@ public class MsgEvent {
     public static final int GAME_DARK= 0xd1; //天黑
     public static final int GAME_NOT_ALL_READY= 0xd2; //有人没准备好
     public static final int GAME_CHANGE_CHIEF= 0xd3; //移交警长
+    public static final int GAME_QUIT_VOTE_CHIEF = 0xd4; //取消警长竞选
+    public static final int GAME_KILL_INFO = 0xd5; //狼同伴杀人信息
 
 
 

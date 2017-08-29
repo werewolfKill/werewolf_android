@@ -5,6 +5,7 @@ import com.zinglabs.zwerewolf.role.UserRole;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
@@ -16,7 +17,7 @@ import java.util.Map;
 
 public class RoomUtil {
     public static int getNumByModal(int modalId) {
-        int number ;
+        int number;
         switch (modalId) {
             case Constants.MODEL_9:
                 number = 9;
@@ -39,25 +40,31 @@ public class RoomUtil {
 
     /**
      * 调整发言顺序
+     *
      * @param speaker 所有发言者
-     * @param start 开始发言的人
+     * @param start   开始发言的人
      * @return 调整后发言者
      */
-    public static List<Integer> adjustSpeakOrder(List<Integer> speaker,int start){
+    public static List<Integer> adjustSpeakOrder(List<Integer> speaker, int start, boolean isLeft) {
         Collections.sort(speaker);
         int size = speaker.size();
         List<Integer> list = new ArrayList<>(size);
         int index = 0;
-        for (int i = 0; i < size ; i++) {
-            if(speaker.get(i)>=start){
-                if(start==speaker.get(i)){
+        for (int i = 0; i < size; i++) {
+            if (speaker.get(i) >= start) {
+                if (start == speaker.get(i)) {
                     index = i;
                 }
                 list.add(speaker.get(i));
             }
         }
-        if(index>1){
-            list.addAll(speaker.subList(0,index));
+        if (index > 1) {
+            list.addAll(speaker.subList(0, index));
+        }
+        if(isLeft){
+            Collections.reverse(list);
+            list.set(0,list.get(size-1));
+            list.remove(size-1);
         }
         return list;
     }

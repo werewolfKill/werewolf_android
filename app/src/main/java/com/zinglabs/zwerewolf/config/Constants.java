@@ -12,7 +12,7 @@ public class Constants {
     public static int ENCODING = AudioFormat.ENCODING_PCM_16BIT;
 
 //    public  static final String app_host = "192.168.0.102";
-    public static final String app_host="10.0.0.104";
+    public static final String app_host="10.0.0.101";
     public static final int app_port = 8080;
 
     //游戏模式

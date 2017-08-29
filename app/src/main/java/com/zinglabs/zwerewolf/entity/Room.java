@@ -237,6 +237,12 @@ public class Room implements Serializable {
         }
     }
 
+    public void quitPoliceList(int pos){
+        if(policeList.contains(pos)){
+            policeList.remove((Integer) pos);
+        }
+    }
+
     public void setPlayers(Map<Integer, UserRole> players) {
 
         this.players = players;

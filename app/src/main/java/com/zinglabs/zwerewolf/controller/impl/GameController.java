@@ -73,7 +73,13 @@ public class GameController implements BaseController {
 
                 }
                 break;
-            case ProtocolConstant.CID_GAME_KILL_RES_RESP:  //狼人杀人信息
+            case ProtocolConstant.CID_GAME_KILL_RESP:  //狼人同伴杀人信息
+                businessData = businessService.receive(body);
+                reply = businessData.getReply();
+                System.out.println("同伴杀的是" + reply);
+                msgEvent = new MsgEvent(MsgEvent.GAME_KILL_INFO, null, businessData);
+                EventBus.getDefault().post(msgEvent);
+
                 break;
             case ProtocolConstant.CID_GAME_NOTIFY_WITCH_KILLED:  //通知女巫狼人杀人信息
                 businessData = businessService.receive(body);
@@ -152,6 +158,11 @@ public class GameController implements BaseController {
             case ProtocolConstant.CID_GAME_CHANGE_CHIEF_RESP://移交警徽
                 businessData = businessService.receive(body);
                 msgEvent = new MsgEvent(MsgEvent.GAME_CHANGE_CHIEF, null, businessData);
+                EventBus.getDefault().post(msgEvent);
+                break;
+            case  ProtocolConstant.CID_GAME_QUIT_POLICE_RESP://取消警长竞选
+                businessData = businessService.receive(body);
+                msgEvent = new MsgEvent(MsgEvent.GAME_QUIT_VOTE_CHIEF, null, businessData);
                 EventBus.getDefault().post(msgEvent);
                 break;
         }

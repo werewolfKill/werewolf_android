@@ -385,7 +385,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
             case room_ready_ib:
                 if(room.isAtChiefVote()){   //放弃竞选
                     simpleController.cancelVoteChief(GameActivity.this,room);
-                    roleViewMap.get(curPlayerPos).setQuitChief();
+                    readyIB.setVisibility(View.GONE);
                     break;
                 }
                 if (room.isOwner()) {
@@ -459,7 +459,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                     roleMsg += getOthersStr(wolfs, room.getPlayers(), curPlayerPos,roleViewMap);
                 }
                 systemSpeak(roleMsg);  //发布角色信息
-                setTitle("您是" + this.curPlayerPos + "号" + role.getName()); //设置标题
+                setTitle(room.getRoomId()+"号房间，您是" + this.curPlayerPos + "号" + role.getName()); //设置标题
                 title = "天黑了";
                 systemSpeak(title);
                 simpleController.doDark(GameActivity.this, room);
@@ -505,6 +505,9 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                 if(kills!=null&&kills.length>0&&kills[0]!=0&&bout!=1){
                     for(int deadId:kills){
                         roleViewMap.get(deadId).die();
+                        if(deadId==room.getChief()&&deadId==curPlayerPos){
+                            simpleController.changeChief(GameActivity.this,room);  //留警徽
+                        }
                     }
                 }
                 simpleController.doDawn(GameActivity.this, room, kills,roleViewMap,ProtocolConstant.CID_GAME_REQ_VOTE);
@@ -528,7 +531,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                 actionPos = getPosById(reply,room);
                 title = "开始警上发言,从"+actionPos+"号开始发言";
                 systemSpeak(title);
-                List<Integer> list = RoomUtil.adjustSpeakOrder(room.getPoliceList(), actionPos);
+                List<Integer> list = RoomUtil.adjustSpeakOrder(room.getPoliceList(), actionPos,false);
                 simpleController.turnSpeak(roleViewMap, list,room,ProtocolConstant.CID_GAME_POLICE_SPEAKING_END);
                 break;
             case MsgEvent.GAME_VOTE_CHIEF://警下投票
@@ -556,6 +559,9 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                         roleViewMap.get(deadPos).die();
                         if(deadPos==curPlayerPos){
                             systemSpeak("您已死亡！");
+                            if(deadPos==room.getChief()){
+                                simpleController.changeChief(GameActivity.this,room);  //留警徽
+                            }
                         }
                     }
                     title = StringUtils.join(deadArr.toArray(new Integer[0]),"、")+"号玩家死亡";
@@ -569,9 +575,10 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                 }
                 break;
             case MsgEvent.GAME_SPEAK:  //开始发言
+                int leftFlag = businessData.getFromId();  //这里fromId表示正序或倒序发言
                 title = "开始发言,从"+reply+"号开始发言";
                 systemSpeak(title);
-                List<Integer> commonSpeakers = RoomUtil.adjustSpeakOrder(room.getLiveList(), reply);
+                List<Integer> commonSpeakers = RoomUtil.adjustSpeakOrder(room.getLiveList(), reply,leftFlag==0);
                 simpleController.turnSpeak(roleViewMap, commonSpeakers,room,ProtocolConstant.CID_GAME_REQ_VOTE);
 
                 break;
@@ -593,14 +600,14 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                 roleView = roleViewMap.get(reply);
                 List<Integer> oneSpeak = new ArrayList<>();
                 oneSpeak.add(reply);
-                if(room.getBout()==1&&reply!=0){  //遗言
+                if(room.getChief()==reply&&reply==curPlayerPos){ //留警徽
+                    simpleController.changeChief(GameActivity.this,room);
+                }
+                if(room.getBout()==1){  //遗言
                     title = "投票结果为"+reply+"号,"+reply+"号玩家死亡,请留遗言";
                     simpleController.turnSpeak(roleViewMap, oneSpeak,room,ProtocolConstant.CID_GAME_REQ_DARK);
                 }else{
                     title = "投票结果为"+reply+"号,"+reply+"号玩家死亡";
-                    if(room.getChief()==reply){ //流警徽
-                        simpleController.changeChief(GameActivity.this,room);
-                    }
                     simpleController.commonSend(GameActivity.this,room,ProtocolConstant.CID_GAME_REQ_DARK);
                 }
                 systemSpeak(title);
@@ -615,16 +622,25 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                 simpleController.doDark(GameActivity.this, room);
                 break;
             case MsgEvent.GAME_CHANGE_CHIEF://移交警徽
+                int preChief = getPosById(fromId,room);
+                roleViewMap.get(preChief).unChief();
                 roleView = roleViewMap.get(reply);
                 if(reply>0){
                     roleView.setChief();
                     curChiefPos = reply;
-                    title=reply+"号玩家当选警长";
+                    title="警徽移交到"+reply+",号，"+reply+"号玩家成为警长";
                     systemSpeak(title);
-                }else{
-                    int preChief = getPosById(fromId,room);
-                    roleViewMap.get(preChief).unChief();
+                    room.setChief(reply);
                 }
+                break;
+            case MsgEvent.GAME_QUIT_VOTE_CHIEF: //取消竞选警长
+                roleView = roleViewMap.get(reply);
+                roleView.setQuitChief();
+                room.quitPoliceList(reply);
+                break;
+            case MsgEvent.GAME_KILL_INFO://同伴杀人信息
+                title = "狼同伴杀的是"+reply+"号";
+                systemSpeak(title);
                 break;
 
         }

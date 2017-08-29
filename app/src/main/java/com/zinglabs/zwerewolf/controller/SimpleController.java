@@ -283,7 +283,7 @@ public class SimpleController implements Role.OnRoleStateChangeListener {
         int bout = room.getBout();
         param.put("fromId", userId);
         param.put("roomId", roomId);
-        param.put("bout", bout);  //设为0
+        param.put("bout", bout);
         String title = "请选择将警徽交给...";
 
         DialogManager.showModalChoice2(activity, title, "撕掉警徽",StringUtils.trans2StrArr(room.getLiveList(), ""), ProtocolConstant.CID_GAME_CHANGE_CHIEF, param);
@@ -332,15 +332,15 @@ public class SimpleController implements Role.OnRoleStateChangeListener {
 
     public void turnSpeakByChief(Activity activity, Room room, List<Integer> deadList) {
 
-        String title = "请选择从警左或警右开始发言";
+        String title = "请选择以警长正序或倒序开始发言";
         if (deadList != null && deadList.size() > 0) {
-            title = "请选择从死左或死右开始发言";
+            title = "请选择以死者正序或倒序开始发言";
         }
         Map<String, Integer> param = new HashMap<>();
         param.put("fromId", room.getCurUserId());
         param.put("roomId", room.getRoomId());
         param.put("bout", room.getBout());
-        DialogManager.showCommonDialog(activity, ProtocolConstant.CID_GAME_CHIEF_DECIDE_SPEAK, title, param, "右", "左");
+        DialogManager.showCommonDialog(activity, ProtocolConstant.CID_GAME_CHIEF_DECIDE_SPEAK, title, param, "正序", "倒序");
     }
 
 
