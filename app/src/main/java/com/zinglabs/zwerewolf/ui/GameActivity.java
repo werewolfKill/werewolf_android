@@ -61,6 +61,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.Timer;
 
 import cn.dreamtobe.kpswitch.widget.KPSwitchPanelLinearLayout;
 
@@ -91,6 +92,8 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
     private ImageView readyIB;
     private GlobalData globalData;
     private ImageView ready_iv;
+
+    private Timer speakTimer;
 
     private int curPlayerPos;
     private int curUserId;
@@ -387,8 +390,11 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                     simpleController.cancelVoteChief(GameActivity.this,room);
                     readyIB.setVisibility(View.GONE);
                     break;
-                }
-                if (room.isOwner()) {
+                }else if(room.isSpeaking()) {  //正在发言,结束发言
+                    speakTimer.cancel();
+                    roleViewMap.get(curPlayerPos).unSpeak();
+                    simpleController.cancelSpeak(room);
+                }else if (room.isOwner()) {
                     readyIB.setVisibility(View.GONE);
                     simpleController.startGame(room);
                 } else {
@@ -524,6 +530,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                 }
                 title = actionPos+"号玩家竞选警长";
                 systemSpeak(title);
+                room.setStage(1);
                 globalData.setRoom(room);
                 break;
 
@@ -535,11 +542,13 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                 simpleController.turnSpeak(roleViewMap, list,room,ProtocolConstant.CID_GAME_POLICE_SPEAKING_END);
                 break;
             case MsgEvent.GAME_VOTE_CHIEF://警下投票
+                simpleController.setUnSpeak(roleViewMap,0);
                 simpleController.voteChief(GameActivity.this,room);
 
                 break;
             case MsgEvent.GAME_SET_CHIEF://设置警长  TODO 考虑无警长情况
                 roleView = roleViewMap.get(reply);
+                room.setStage(2);
                 if(room.isAtChiefVote()){
                     room.setAtChiefVote(false);
                     readyIB.setVisibility(View.GONE);
@@ -583,9 +592,11 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
 
                 break;
             case MsgEvent.GAME_CHIEF_SUM_TICKET ://警长归票
+                simpleController.setUnSpeak(roleViewMap,0);
                 simpleController.chiefSumTicket(GameActivity.this,room);
                 break;
             case  MsgEvent.GAME_VOTE: //请求投票
+                simpleController.setUnSpeak(roleViewMap,0);
                 title = "警长归票"+reply+"号";
                 systemSpeak(title);
                 simpleController.vote(GameActivity.this,room);
@@ -594,7 +605,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                 if(reply==0){
                     title = "投票无人死亡";
                     systemSpeak(title);
-                    simpleController.commonSend(GameActivity.this,room,ProtocolConstant.CID_GAME_REQ_DARK);
+                    simpleController.commonSend(room,ProtocolConstant.CID_GAME_REQ_DARK,0);
                     break;
                 }
                 roleView = roleViewMap.get(reply);
@@ -608,7 +619,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                     simpleController.turnSpeak(roleViewMap, oneSpeak,room,ProtocolConstant.CID_GAME_REQ_DARK);
                 }else{
                     title = "投票结果为"+reply+"号,"+reply+"号玩家死亡";
-                    simpleController.commonSend(GameActivity.this,room,ProtocolConstant.CID_GAME_REQ_DARK);
+                    simpleController.commonSend(room,ProtocolConstant.CID_GAME_REQ_DARK,0);
                 }
                 systemSpeak(title);
                 List<Integer> dead =  new ArrayList<>();
@@ -641,6 +652,18 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
             case MsgEvent.GAME_KILL_INFO://同伴杀人信息
                 title = "狼同伴杀的是"+reply+"号";
                 systemSpeak(title);
+                break;
+            case MsgEvent.GAME_TURN_SPEAK://轮到某人发言
+                roleView = roleViewMap.get(reply);
+                if(curPlayerPos==reply){
+                    readyIB.setImageResource(R.mipmap.room_speak_end);
+//                    readyIB.setVisibility(View.VISIBLE);
+                    room.setSpeaking(true);  //自己正在发言
+                }else{
+                    room.setSpeaking(false);
+                }
+                speakTimer = new Timer();
+                simpleController.speak(roleViewMap,reply,room,speakTimer);
                 break;
 
         }

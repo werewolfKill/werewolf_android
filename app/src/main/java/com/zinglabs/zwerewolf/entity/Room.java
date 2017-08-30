@@ -56,6 +56,19 @@ public class Room implements Serializable {
     private int curNumber;
 
     /**
+     * 游戏阶段，目前为区分竞选阶段和其他阶段
+     */
+    private int stage;
+
+    public int getStage() {
+        return stage;
+    }
+
+    public void setStage(int stage) {
+        this.stage = stage;
+    }
+
+    /**
      * 房间玩家集合
      */
     private Map<Integer,UserRole> players;
@@ -65,6 +78,18 @@ public class Room implements Serializable {
      */
     private Map<Integer,List<Integer>> deadList = new HashMap<>();
 
+    /**
+     * 正在发言
+     */
+    private boolean isSpeaking;
+
+    public boolean isSpeaking() {
+        return isSpeaking;
+    }
+
+    public void setSpeaking(boolean speaking) {
+        isSpeaking = speaking;
+    }
 
     /**
      * 游戏是否结束标识

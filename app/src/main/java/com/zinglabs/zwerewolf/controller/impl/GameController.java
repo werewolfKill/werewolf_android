@@ -165,6 +165,11 @@ public class GameController implements BaseController {
                 msgEvent = new MsgEvent(MsgEvent.GAME_QUIT_VOTE_CHIEF, null, businessData);
                 EventBus.getDefault().post(msgEvent);
                 break;
+            case ProtocolConstant.CID_GAME_TURN_SPEAK: //轮到某人发言
+                businessData = businessService.receive(body);
+                msgEvent = new MsgEvent(MsgEvent.GAME_TURN_SPEAK, null, businessData);
+                EventBus.getDefault().post(msgEvent);
+                break;
         }
 
     }
