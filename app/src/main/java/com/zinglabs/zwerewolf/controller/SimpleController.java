@@ -331,7 +331,7 @@ public class SimpleController implements Role.OnRoleStateChangeListener {
                     entry.getValue().unSpeak();
                 }
             }
-        }, 0, Constants.SPEAK_TIME, TimeUnit.MILLISECONDS);
+        }, 0, Constants.TIME_GAME_SPEAK, TimeUnit.MILLISECONDS);
     }
 
     public void setUnSpeak(Map<Integer, RoleView> roleViewMap, int reply) {
@@ -353,7 +353,13 @@ public class SimpleController implements Role.OnRoleStateChangeListener {
      */
     public void speak(Map<Integer, RoleView> roleViewMap, int reply, Room room, Timer timer) {
         setUnSpeak(roleViewMap, reply);
-        showWaitDialog(10*1000);
+        showSpeakDialog(reply,Constants.TIME_GAME_SPEAK);
+
+    }
+
+
+    public void nightTimer(long time){
+        showWaitDialog(Constants.TEXT_DAY_DARK,time);
 
     }
 
@@ -427,13 +433,23 @@ public class SimpleController implements Role.OnRoleStateChangeListener {
     /**
      * 展示等待对话框
      *
-     * @param time 角色
+     * @param time 时间
+     * @param text 对话框文字
      */
-    private void showWaitDialog(long time) {
+    private void showWaitDialog(String text,long time) {
         Message msg_system_timer = new Message();
         msg_system_timer.what = GameStateMessage.COUNTDOWNTIMER;  //倒计时
-        msg_system_timer.obj = new GameStateMessage(wolf, String.format(Constants.TEXT_WAIT_ACTION, ""), time);
+        msg_system_timer.obj = new GameStateMessage(text, time);
         handler.sendMessage(msg_system_timer);
+
+    }
+
+    private void showSpeakDialog(int pos,long time){
+        Message msg_system_timer = new Message();
+        msg_system_timer.what = GameStateMessage.COUNTDOWNTIMER;  //倒计时
+        msg_system_timer.obj = new GameStateMessage(String.format(Constants.TEXT_WAIT_SPEAK, pos+""), time,Constants.TYPE_DIALOG_SPEAK,pos);
+        handler.sendMessage(msg_system_timer);
+
 
     }
 

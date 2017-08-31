@@ -97,7 +97,9 @@
                 android:layout_alignParentLeft="true"
                 android:layout_marginLeft="5dp"
                 android:text="我的身份："
-                android:textColor="@android:color/white" />
+                android:textColor="@android:color/white"
+                android:layout_alignEnd="@+id/room_myrole_details_tv"
+                android:layout_alignParentTop="true" />
 
             <TextView
                 android:id="@+id/room_myrole_details_tv"

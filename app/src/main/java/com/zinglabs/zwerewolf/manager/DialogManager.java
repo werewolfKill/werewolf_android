@@ -25,6 +25,7 @@ import android.widget.Toast;
 import com.zinglabs.zwerewolf.R;
 import com.zinglabs.zwerewolf.config.Constants;
 import com.zinglabs.zwerewolf.constant.ProtocolConstant;
+import com.zinglabs.zwerewolf.event.GameStateMessage;
 import com.zinglabs.zwerewolf.role.Witch;
 import com.zinglabs.zwerewolf.utils.AppUtil;
 import com.zinglabs.zwerewolf.utils.IMClientUtil;
@@ -89,10 +90,12 @@ public class DialogManager {
     }
 
 
-    public static void showWaitDialog(Activity activity, View view, long time) {
+    public static void showWaitDialog(Activity activity, View view, GameStateMessage message) {
         if (!AppUtil.isSafe(activity)) {
             return;
         }
+        long time = message.getTime();
+        String text = message.getText();
         if (room_day_pw == null) {
             room_day_v = LayoutInflater.from(activity).inflate(R.layout.pw_room_day, null);
             room_day_pw = new PopupWindow(room_day_v, view.getWidth(), WindowManager.LayoutParams.WRAP_CONTENT, true);
@@ -100,9 +103,12 @@ public class DialogManager {
             room_day_pw.setBackgroundDrawable(null);
         }
         TextView day_timer_tv = (TextView) room_day_v.findViewById(R.id.room_day_timer_tv);
+        TextView info_text = (TextView) room_day_v.findViewById(R.id.room_day_info_tv);
 
         if (time > 0) {
-            day_timer_tv.setText(time + "s");
+            String timeStr = time/1000+"S";
+            day_timer_tv.setText(timeStr);
+            info_text.setText(text);
         }
         room_day_pw.setOutsideTouchable(false);
         room_day_pw.setFocusable(false);

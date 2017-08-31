@@ -43,18 +43,42 @@ public class Constants {
     public static final int GAME_STATUS_OVER_GOOD = 1;
     public static final int GAME_STATUS_PROCESS= 0;
 
-    public static final int SPEAK_TIME = 1000*5; //警上发言时间
+    //发言时间
+    public static final int TIME_GAME_SPEAK = 1000*5;
+
+    //投票时间
+    public static final int TIME_GAME_VOTE = 1000*10;
+
+    //天黑时间
+    public static final int TIME_GAME_DARK = 1000*30;
+
+    //狼人行动时间
+    public static final  int TIME_GAME_WOLF = 1000*10;
+
+    //女巫行动时间
+    public static final int TIME_GAME_WITCH = 1000*20;
+
+    public static final int TIME_GAME_VOTE_CHIEF = 1000*10;
 
     public static final int STAGE_VOTE_CHIEF = 1; //竞选警长阶段
     public static final int STAGE_OTHER= 2; //警上发言时间
+
+    /**
+     * 对话框类型
+     */
+    public static final int TYPE_DIALOG_SPEAK = 1; //发言
+    public static final int TYPE_DIALOG_DAWN = 2;  //白天
+    public static final int TYPE_DIALOG_DARK = 3;  //夜晚
+
 
 
 
 
     //---系统发言
     public static final String TEXT_START_ALLOT = "游戏开始，本轮共有%d个狼人，%d个预言家，%d个女巫，%d个猎人，%d个村民";
-    public static final String TEXT_DAY_DARK = "天黑请闭眼，第%d夜开始，大家出来活动吧";
+    public static final String TEXT_DAY_DARK = "天黑了，请等待其他玩家操作";
     public static final String TEXT_WAIT_ACTION = "请等待%s操作";
+    public static final String TEXT_WAIT_SPEAK = "%s号玩家正在发言";
     public static final String TEXT_DAY_SAFE = "天亮了，昨晚是平安夜";
     public static final String TEXT_DAY_DAWN = "天亮了，昨晚%s号死亡";
     public static final String TEXT_DAY_SAFE_TIMER = "昨晚是平安夜，[%d]号开始发言";

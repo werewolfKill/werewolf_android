@@ -33,7 +33,7 @@
         android:layout_marginBottom="5dp"
         android:layout_marginTop="5dp"
         android:gravity="center"
-        android:text="昨晚号死亡，号开始发言"
+        android:text="号发言"
         android:textColor="@android:color/white" />
 
     <TextView

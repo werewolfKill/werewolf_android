@@ -1,6 +1,7 @@
 package com.zinglabs.zwerewolf.event;
 
 import com.zinglabs.zwerewolf.role.Role;
+import com.zinglabs.zwerewolf.ui.GameActivity;
 
 /**
  * Created by Administrator on 2017/3/15.
@@ -23,15 +24,48 @@ public class GameStateMessage {
     private String text;
     private long time = 15 * 1000;
 
+    private int dialogType;
+
+    private int destPos;  //针对发言类型，表示正在发言的pos
+
+
+    public GameStateMessage(String text, long time) {
+        this.text = text;
+        this.time = time;
+    }
+
     public GameStateMessage(Role role, String text) {
         this.role = role;
         this.text = text;
+
     }
 
     public GameStateMessage(Role role, String text, long time) {
         this.role = role;
         this.text = text;
         this.time = time;
+    }
+    public GameStateMessage(String text,long time,int dialogType,int destPos ){
+        this.dialogType = dialogType;
+        this.text = text;
+        this.time = time;
+        this.destPos = destPos;
+    }
+
+    public int getDialogType() {
+        return dialogType;
+    }
+
+    public void setDialogType(int dialogType) {
+        this.dialogType = dialogType;
+    }
+
+    public int getDestPos() {
+        return destPos;
+    }
+
+    public void setDestPos(int destPos) {
+        this.destPos = destPos;
     }
 
     public Role getRole() {
