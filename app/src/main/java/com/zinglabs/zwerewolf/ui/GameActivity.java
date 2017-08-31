@@ -494,6 +494,8 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
             case MsgEvent.GAME_DAWN: //天亮了
                Map<String,Object> param =  businessData.getParam();
                  bout = (Integer) param.get("bout");
+                 String roomTitle = getTitle().toString();
+                setTitle(roomTitle+" 第"+bout+"天"); //设置标题
                 Integer[] kills = new Integer[0];
                 if(param.get("killed")!=null){
                      kills = (Integer[]) businessData.getParam().get("killed");
@@ -657,10 +659,11 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                 roleView = roleViewMap.get(reply);
                 if(curPlayerPos==reply){
                     readyIB.setImageResource(R.mipmap.room_speak_end);
-//                    readyIB.setVisibility(View.VISIBLE);
+                    readyIB.setVisibility(View.VISIBLE);
                     room.setSpeaking(true);  //自己正在发言
                 }else{
                     room.setSpeaking(false);
+                    readyIB.setVisibility(View.GONE);
                 }
                 speakTimer = new Timer();
                 simpleController.speak(roleViewMap,reply,room,speakTimer);

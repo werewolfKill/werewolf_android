@@ -14,6 +14,7 @@ import com.zinglabs.zwerewolf.role.Prophet;
 import com.zinglabs.zwerewolf.role.Role;
 import com.zinglabs.zwerewolf.role.Witch;
 import com.zinglabs.zwerewolf.role.Wolf;
+import com.zinglabs.zwerewolf.ui.GameActivity;
 import com.zinglabs.zwerewolf.utils.IMClientUtil;
 import com.zinglabs.zwerewolf.utils.LogUtil;
 import com.zinglabs.zwerewolf.utils.RoleUtil;
@@ -352,19 +353,18 @@ public class SimpleController implements Role.OnRoleStateChangeListener {
      */
     public void speak(Map<Integer, RoleView> roleViewMap, int reply, Room room, Timer timer) {
         setUnSpeak(roleViewMap, reply);
+        showWaitDialog(10*1000);
+
+    }
+
+    public void cancelSpeak(Room room) {
+        room.setSpeaking(false);
         int stage = room.getStage();
         int bout = room.getBout();
         if (stage == 1) {
             bout = 0;
         }
         commonSend(room, ProtocolConstant.CID_GAME_TURN_SPEAK_END, bout);
-
-
-    }
-
-    public void cancelSpeak(Room room) {
-        room.setSpeaking(false);
-        commonSend(room, ProtocolConstant.CID_GAME_TURN_SPEAK_END, 0);
     }
 
     public void turnSpeakByChief(Activity activity, Room room, List<Integer> deadList) {
@@ -427,12 +427,12 @@ public class SimpleController implements Role.OnRoleStateChangeListener {
     /**
      * 展示等待对话框
      *
-     * @param role 角色
+     * @param time 角色
      */
-    private void showWaitDialog(Role role, long time) {
+    private void showWaitDialog(long time) {
         Message msg_system_timer = new Message();
         msg_system_timer.what = GameStateMessage.COUNTDOWNTIMER;  //倒计时
-        msg_system_timer.obj = new GameStateMessage(wolf, String.format(Constants.TEXT_WAIT_ACTION, role.getName()), time);
+        msg_system_timer.obj = new GameStateMessage(wolf, String.format(Constants.TEXT_WAIT_ACTION, ""), time);
         handler.sendMessage(msg_system_timer);
 
     }
