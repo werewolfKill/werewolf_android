@@ -50,6 +50,10 @@ public class BusinessService {
         return ByteUtil.resolveBusiness(byteBuf);
 
     }
+    public BusinessData receiveVoteMsg(ByteBuf byteBuf){
+        return ByteUtil.resolveVoteMsg(byteBuf);
+
+    }
     public BusinessData receiveRoomMsg(ByteBuf byteBuf){
         return ByteUtil.resolveRoomMsg(byteBuf);
     }

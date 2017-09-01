@@ -47,7 +47,7 @@ public class ByteUtil {
         msgBody.setReply(body.readInt());
         int flag = body.readInt();
         Map<String, Object> param = new HashMap<>();
-        if (flag>0) {
+        if (flag > 0) {
             Room room = new Room();
             room.setRoomId(body.readInt()); //房间id
             room.setOwnerId(body.readInt()); //房主id
@@ -59,47 +59,68 @@ public class ByteUtil {
                 UserRole ur = new UserRole();
                 ur.setUserId(body.readInt());
                 ur.setPosition(body.readInt());
-                userRoleMap.put(ur.getUserId(),ur);
+                userRoleMap.put(ur.getUserId(), ur);
             }
             room.setPlayers(userRoleMap);
-            param.put("room",room);
+            param.put("room", room);
             msgBody.setParam(param);
         }
         return msgBody;
     }
 
-    public static BusinessData resolveStartMsg(ByteBuf body){
+    /**
+     * 解析投票信息
+     *
+     * @param body 传送的消息
+     * @return 消息体
+     */
+    public static BusinessData resolveVoteMsg(ByteBuf body) {
+        BusinessData msgBody = new BusinessData();
+        msgBody.setFromId(body.readInt());
+        msgBody.setReply(body.readInt());
+        Map<String, Object> param = new HashMap<>();
+        int size = body.readInt();
+
+        for (int i = 0; i < size; i++) {
+            param.put(String.valueOf(body.readInt()),body.readInt());
+        }
+        msgBody.setParam(param);
+
+        return msgBody;
+    }
+
+    public static BusinessData resolveStartMsg(ByteBuf body) {
         BusinessData msgBody = new BusinessData();
         msgBody.setFromId(body.readInt());
         msgBody.setReply(body.readInt());
         int num = body.readInt();
         Map<String, Object> param = new HashMap<>();
-        if (num>0) {
+        if (num > 0) {
             Integer[] wolfs = new Integer[num];
-            for(int i=0;i<num;i++){
-               wolfs[i]= body.readInt();
+            for (int i = 0; i < num; i++) {
+                wolfs[i] = body.readInt();
             }
-            param.put("wolfs",wolfs);
+            param.put("wolfs", wolfs);
             msgBody.setParam(param);
         }
         return msgBody;
 
     }
 
-    public static BusinessData resolveDawnMsg(ByteBuf body){
+    public static BusinessData resolveDawnMsg(ByteBuf body) {
         BusinessData msgBody = new BusinessData();
         msgBody.setFromId(body.readInt());
         msgBody.setReply(body.readInt());
         Map<String, Object> param = new HashMap<>();
         int bout = body.readInt();
-        param.put("bout",bout);
+        param.put("bout", bout);
         int num = body.readInt();
-        if (num>0) {
+        if (num > 0) {
             Integer[] killed = new Integer[num];
-            for(int i=0;i<num;i++){
-                killed[i]= body.readInt();
+            for (int i = 0; i < num; i++) {
+                killed[i] = body.readInt();
             }
-            param.put("killed",killed);
+            param.put("killed", killed);
         }
         msgBody.setParam(param);
         return msgBody;

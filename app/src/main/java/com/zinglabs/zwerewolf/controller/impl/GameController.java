@@ -124,14 +124,12 @@ public class GameController implements BaseController {
                 EventBus.getDefault().post(msgEvent);
                 break;
             case ProtocolConstant.CID_GAME_ELECT_CHIEF_RESP://选出警长
-                businessData = businessService.receive(body);
-                System.out.println(businessData.getReply() + "成为警长");
+                businessData = businessService.receiveVoteMsg(body);
                 msgEvent = new MsgEvent(MsgEvent.GAME_SET_CHIEF, null, businessData);
                 EventBus.getDefault().post(msgEvent);
                 break;
             case ProtocolConstant.CID_GAME_START_SPEAKING:  //开始发言
                 businessData = businessService.receive(body);
-                System.out.println("从" + businessData.getReply() + "开始发言");
                 msgEvent = new MsgEvent(MsgEvent.GAME_SPEAK, null, businessData);
                 EventBus.getDefault().post(msgEvent);
                 break;
@@ -146,7 +144,7 @@ public class GameController implements BaseController {
                 EventBus.getDefault().post(msgEvent);
                 break;
             case ProtocolConstant.CID_GAME_VOTE_RESP://投票结果
-                businessData = businessService.receive(body);
+                businessData = businessService.receiveVoteMsg(body);
                 msgEvent = new MsgEvent(MsgEvent.GAME_VOTE_RESULT, null, businessData);
                 EventBus.getDefault().post(msgEvent);
                 break;

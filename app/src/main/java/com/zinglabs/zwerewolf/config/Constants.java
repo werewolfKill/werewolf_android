@@ -44,7 +44,7 @@ public class Constants {
     public static final int GAME_STATUS_PROCESS= 0;
 
     //发言时间
-    public static final int TIME_GAME_SPEAK = 1000*5;
+    public static final int TIME_GAME_SPEAK = 1000*20;
 
     //投票时间
     public static final int TIME_GAME_VOTE = 1000*10;
@@ -77,6 +77,7 @@ public class Constants {
     //---系统发言
     public static final String TEXT_START_ALLOT = "游戏开始，本轮共有%d个狼人，%d个预言家，%d个女巫，%d个猎人，%d个村民";
     public static final String TEXT_DAY_DARK = "天黑了，请等待其他玩家操作";
+    public static final String TEXT_DAY_CHIEF_VOTE = "请选择是否竞选警长";
     public static final String TEXT_WAIT_ACTION = "请等待%s操作";
     public static final String TEXT_WAIT_SPEAK = "%s号玩家正在发言";
     public static final String TEXT_DAY_SAFE = "天亮了，昨晚是平安夜";

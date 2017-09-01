@@ -258,6 +258,7 @@ public class SimpleController implements Role.OnRoleStateChangeListener {
         int userId = room.getCurUserId();
         int roomId = room.getRoomId();
         if (bout == 1) {  //第1天，警长竞选
+            chiefVoteTimer(Constants.TIME_GAME_VOTE_CHIEF);
             String title = "您是否要竞选警长？";
             Map<String, Integer> param = new HashMap<>();
             param.put("fromId", userId);
@@ -348,10 +349,9 @@ public class SimpleController implements Role.OnRoleStateChangeListener {
      * 发言
      *
      * @param roleViewMap
-     * @param room
-     * @param timer
+     * @param reply
      */
-    public void speak(Map<Integer, RoleView> roleViewMap, int reply, Room room, Timer timer) {
+    public void speak(Map<Integer, RoleView> roleViewMap, int reply) {
         setUnSpeak(roleViewMap, reply);
         showSpeakDialog(reply,Constants.TIME_GAME_SPEAK);
 
@@ -361,6 +361,10 @@ public class SimpleController implements Role.OnRoleStateChangeListener {
     public void nightTimer(long time){
         showWaitDialog(Constants.TEXT_DAY_DARK,time);
 
+    }
+
+    public void chiefVoteTimer(long time){
+        showWaitDialog(Constants.TEXT_DAY_CHIEF_VOTE,time);
     }
 
     public void cancelSpeak(Room room) {
@@ -389,6 +393,7 @@ public class SimpleController implements Role.OnRoleStateChangeListener {
 
     public void voteChief(Activity activity, Room room) {
 
+        chiefVoteTimer(Constants.TIME_GAME_VOTE);
         List<Integer> speakers = room.getPoliceList();
         Map<String, Integer> param = new HashMap<>();
         param.put("fromId", room.getCurUserId());
