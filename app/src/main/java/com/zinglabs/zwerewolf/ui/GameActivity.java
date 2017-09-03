@@ -471,7 +471,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                 break;
             case MsgEvent.GAME_VERIFY: //预言家验人
                 String str = reply == 1 ? "好人" : "狼人";
-                title = reply + "号玩家是" + str;
+                title = fromId + "号玩家是" + str;
                 systemSpeak(title);  //发布角色信息
                 DialogManager.showToast(this, title);
                 break;

@@ -258,7 +258,7 @@ public class SimpleController implements Role.OnRoleStateChangeListener {
         int userId = room.getCurUserId();
         int roomId = room.getRoomId();
         if (bout == 1) {  //第1天，警长竞选
-            chiefVoteTimer(Constants.TIME_GAME_VOTE_CHIEF);
+            chiefVoteTimer(Constants.TIME_GAME_VOTE_CHIEF,Constants.TEXT_DAY_CHIEF_VOTE);
             String title = "您是否要竞选警长？";
             Map<String, Integer> param = new HashMap<>();
             param.put("fromId", userId);
@@ -363,8 +363,8 @@ public class SimpleController implements Role.OnRoleStateChangeListener {
 
     }
 
-    public void chiefVoteTimer(long time){
-        showWaitDialog(Constants.TEXT_DAY_CHIEF_VOTE,time);
+    public void chiefVoteTimer(long time,String text){
+        showWaitDialog(text,time);
     }
 
     public void cancelSpeak(Room room) {
@@ -393,13 +393,13 @@ public class SimpleController implements Role.OnRoleStateChangeListener {
 
     public void voteChief(Activity activity, Room room) {
 
-        chiefVoteTimer(Constants.TIME_GAME_VOTE);
+        String title = "竞选警长，请投票";
+        chiefVoteTimer(Constants.TIME_GAME_VOTE,title);
         List<Integer> speakers = room.getPoliceList();
         Map<String, Integer> param = new HashMap<>();
         param.put("fromId", room.getCurUserId());
         param.put("roomId", room.getRoomId());
         param.put("bout", room.getBout());
-        String title = "竞选警长，请投票";
         DialogManager.showModalChoice(activity, title, StringUtils.trans2StrArr(speakers, ""), ProtocolConstant.CID_GAME_CHIEF_VOTE, param);
 
     }
