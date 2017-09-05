@@ -44,7 +44,7 @@ public class Constants {
     public static final int GAME_STATUS_PROCESS= 0;
 
     //发言时间
-    public static final int TIME_GAME_SPEAK = 1000*5;
+    public static final int TIME_GAME_SPEAK = 1000*20;
 
     //投票时间
     public static final int TIME_GAME_VOTE = 1000*10;
