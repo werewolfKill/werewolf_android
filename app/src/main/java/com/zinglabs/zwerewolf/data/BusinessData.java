@@ -14,6 +14,15 @@ public class BusinessData {
 
     private int fromId; //发送者的ID，为0表示服务器
     private int  reply; //回复码
+    private int over;  //游戏是否结束，用于投票时的参数
+
+    public int getOver() {
+        return over;
+    }
+
+    public void setOver(int over) {
+        this.over = over;
+    }
 
     private Map<String,Object> param;  //其他参数
 

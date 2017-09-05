@@ -46,6 +46,7 @@ import com.zinglabs.zwerewolf.role.UserRole;
 import com.zinglabs.zwerewolf.role.Wolf;
 import com.zinglabs.zwerewolf.utils.AppUtil;
 import com.zinglabs.zwerewolf.utils.DateUtil;
+import com.zinglabs.zwerewolf.utils.IMClientUtil;
 import com.zinglabs.zwerewolf.utils.RoleUtil;
 import com.zinglabs.zwerewolf.utils.RoomUtil;
 import com.zinglabs.zwerewolf.utils.StringUtils;
@@ -60,6 +61,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Random;
 import java.util.Timer;
 
@@ -99,6 +101,8 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
     private int curUserId;
     private Role curRole;
     private int curChiefPos;
+
+    private int curRoomId;
 
     private Context context;
 
@@ -237,6 +241,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
         int ownerPos = room.getPlayers().get(owner).getPosition();
         this.curUserId = userId;
         this.curPlayerPos = curUserPos;
+        this.curRoomId = room.getRoomId();
         this.curRole = room.getPlayers().get(userId).getRole();
         room.setCurUserPos(curPlayerPos);
         globalData.setRoom(room);
@@ -464,7 +469,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                     roleMsg += getOthersStr(wolfs, room.getPlayers(), curPlayerPos, roleViewMap);
                 }
                 systemSpeak(roleMsg);  //发布角色信息
-                setTitle(room.getRoomId() + "号房间"+curPlayerPos+"号"+curRole.getName()); //设置标题
+                setTitle(room.getRoomId() + "号房间" + curPlayerPos + "号" + curRole.getName()); //设置标题
                 title = "天黑了";
                 systemSpeak(title);
                 simpleController.doDark(GameActivity.this, room);
@@ -612,6 +617,14 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                 }
                 String voteInfo = getVoteInfo(businessData.getParam());
                 systemSpeak(voteInfo);
+                int over = businessData.getOver();
+                if (over != 0) {
+                    room.setOver(over);
+                    Integer[] deads = new Integer[1];
+                    deads[0] = reply;
+                    DialogManager.showOverDialog(GameActivity.this, deads, over);
+                    return;
+                }
                 roleView = roleViewMap.get(reply);
                 List<Integer> oneSpeak = new ArrayList<>();
                 oneSpeak.add(reply);
@@ -620,7 +633,12 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                 }
                 if (room.getBout() == 1) {  //遗言
                     title = "投票结果为" + reply + "号," + reply + "号玩家死亡,请留遗言";
-                    simpleController.speak(roleViewMap,reply);
+                    Map<String, Object> deadParam = new HashMap<>();
+                    deadParam.put("fromId", room.getCurUserId());
+                    deadParam.put("roomId", room.getRoomId());
+                    deadParam.put("bout", 1);
+                    deadParam.put("content", 0);
+                    simpleController.speakDead(roleViewMap, reply, deadParam);
 //                    simpleController.turnSpeak(roleViewMap, oneSpeak, room, ProtocolConstant.CID_GAME_REQ_DARK);
                 } else {
                     title = "投票结果为" + reply + "号," + reply + "号玩家死亡";
@@ -661,7 +679,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                 break;
             case MsgEvent.GAME_TURN_SPEAK://轮到某人发言
                 roleView = roleViewMap.get(reply);
-                if (curPlayerPos == reply) {
+                if (curPlayerPos == reply && fromId != 0) {  //此时fromId为区分是否为警长竞选
                     readyIB.setImageResource(R.mipmap.room_speak_end);
                     readyIB.setVisibility(View.VISIBLE);
                     room.setSpeaking(true);  //自己正在发言
@@ -697,8 +715,13 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
 
             @Override
             public void onFinish() {
-                if (message.getDialogType() == Constants.TYPE_DIALOG_SPEAK) {
+                if (message.getDialogType() == Constants.TYPE_DIALOG_SPEAK) {  //发言
                     roleViewMap.get(message.getDestPos()).unSpeak();
+                } else if (message.getDialogType() == Constants.TYPE_DIALOG_WROTE) {  //遗言
+                    Map<String, Object> param = message.getParam();
+                    roleViewMap.get(message.getDestPos()).unSpeak();
+                    IMClientUtil.sendMsg(ProtocolConstant.SID_GAME, ProtocolConstant.CID_GAME_REQ_DARK, param);
+
                 }
                 DialogManager.dismissDialog(GameActivity.this);
             }
@@ -742,10 +765,10 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-    private String getVoteInfo(Map<String,Object> param){
+    private String getVoteInfo(Map<String, Object> param) {
         StringBuilder sb = new StringBuilder();
-        for(Map.Entry<String,Object> entry:param.entrySet()){
-            sb.append(entry.getKey()+"号投给"+entry.getValue().toString()+"号\n");
+        for (Map.Entry<String, Object> entry : param.entrySet()) {
+            sb.append(entry.getKey() + "号投给" + entry.getValue().toString() + "号\n");
         }
         return sb.toString();
     }

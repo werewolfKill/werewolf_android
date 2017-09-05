@@ -3,6 +3,9 @@ package com.zinglabs.zwerewolf.event;
 import com.zinglabs.zwerewolf.role.Role;
 import com.zinglabs.zwerewolf.ui.GameActivity;
 
+import java.util.Map;
+import java.util.Objects;
+
 /**
  * Created by Administrator on 2017/3/15.
  */
@@ -28,6 +31,16 @@ public class GameStateMessage {
 
     private int destPos;  //针对发言类型，表示正在发言的pos
 
+
+    private Map<String,Object> param;
+
+    public Map<String, Object> getParam() {
+        return param;
+    }
+
+    public void setParam(Map<String, Object> param) {
+        this.param = param;
+    }
 
     public GameStateMessage(String text, long time) {
         this.text = text;

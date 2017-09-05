@@ -78,6 +78,7 @@ public class ByteUtil {
         BusinessData msgBody = new BusinessData();
         msgBody.setFromId(body.readInt());
         msgBody.setReply(body.readInt());
+        msgBody.setOver(body.readInt());
         Map<String, Object> param = new HashMap<>();
         int size = body.readInt();
 

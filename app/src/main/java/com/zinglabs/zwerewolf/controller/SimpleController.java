@@ -353,7 +353,14 @@ public class SimpleController implements Role.OnRoleStateChangeListener {
      */
     public void speak(Map<Integer, RoleView> roleViewMap, int reply) {
         setUnSpeak(roleViewMap, reply);
-        showSpeakDialog(reply,Constants.TIME_GAME_SPEAK);
+        showSpeakDialog(reply,Constants.TIME_GAME_SPEAK,Constants.TYPE_DIALOG_SPEAK,null);
+
+    }
+
+    public void speakDead(Map<Integer, RoleView> roleViewMap, int reply,Map<String,Object> param){
+
+        setUnSpeak(roleViewMap, reply);
+        showSpeakDialog(reply,Constants.TIME_GAME_SPEAK,Constants.TYPE_DIALOG_WROTE,param);
 
     }
 
@@ -449,19 +456,15 @@ public class SimpleController implements Role.OnRoleStateChangeListener {
 
     }
 
-    private void showSpeakDialog(int pos,long time){
+    private void showSpeakDialog(int pos,long time,int type,Map<String, Object> param){
         Message msg_system_timer = new Message();
         msg_system_timer.what = GameStateMessage.COUNTDOWNTIMER;  //倒计时
-        msg_system_timer.obj = new GameStateMessage(String.format(Constants.TEXT_WAIT_SPEAK, pos+""), time,Constants.TYPE_DIALOG_SPEAK,pos);
+        GameStateMessage message =  new GameStateMessage(String.format(Constants.TEXT_WAIT_SPEAK, pos+""), time,type,pos);
+        if(type==Constants.TYPE_DIALOG_WROTE&&param!=null){
+           message.setParam(param);
+        }
+        msg_system_timer.obj = message;
         handler.sendMessage(msg_system_timer);
-
-
-    }
-
-    public void doDawn(String role, int bout) {  //天亮流程
-//        switch ()
-
-
     }
 
     public void stopGame() {

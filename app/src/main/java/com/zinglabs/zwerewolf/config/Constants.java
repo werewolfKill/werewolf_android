@@ -44,7 +44,7 @@ public class Constants {
     public static final int GAME_STATUS_PROCESS= 0;
 
     //发言时间
-    public static final int TIME_GAME_SPEAK = 1000*20;
+    public static final int TIME_GAME_SPEAK = 1000*5;
 
     //投票时间
     public static final int TIME_GAME_VOTE = 1000*10;
@@ -60,6 +60,9 @@ public class Constants {
 
     public static final int TIME_GAME_VOTE_CHIEF = 1000*10;
 
+
+
+
     public static final int STAGE_VOTE_CHIEF = 1; //竞选警长阶段
     public static final int STAGE_OTHER= 2; //警上发言时间
 
@@ -67,7 +70,7 @@ public class Constants {
      * 对话框类型
      */
     public static final int TYPE_DIALOG_SPEAK = 1; //发言
-    public static final int TYPE_DIALOG_DAWN = 2;  //白天
+    public static final int TYPE_DIALOG_WROTE = 2;  //白天
     public static final int TYPE_DIALOG_DARK = 3;  //夜晚
 
 
