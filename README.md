@@ -4,7 +4,7 @@
 
 ## 测试APK
 
-[v0.9-beta.1 测试版本](https://github.com/werewolfKill/werewolf_android/tree/master/app/werewolf-0.9.apk)
+[v0.9-beta.1 测试版本](https://raw.githubusercontent.com/werewolfKill/werewolf_android/master/app/werewolf-0.9.apk)
 
 
 ## 安装指南
