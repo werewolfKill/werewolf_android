@@ -12,8 +12,8 @@ public class Constants {
     public static int ENCODING = AudioFormat.ENCODING_PCM_16BIT;
 
 //    public  static final String app_host = "192.168.0.102";
-    public static final String app_host="10.0.0.104";
-    public static final int app_port = 8080;
+    public static final String app_host="10.0.0.101";
+    public static final int app_port = 9000;
 
     //游戏模式
     public static final int MODEL_12_YNLS =1;  //12人预女猎守经典版
