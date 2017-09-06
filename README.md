@@ -7,7 +7,7 @@
 [v0.9-beta.1 测试版本](https://github.com/werewolfKill/werewolf_android/tree/master/app/werewolf-0.9.apk)
 
 
-##安装指南
+## 安装指南
 
 本项目为狼人杀android版本，服务器项目在[werewolf server](https://github.com/werewolfKill/werewolf_server)。若使用首先需安装服务器。
 具体过程如下：
@@ -21,6 +21,6 @@
 
 
 
-##备注
+## 备注
 
 本项目为业余项目，欢迎同学们贡献代码，如觉得做的不错，可以star。在次表示感谢。
