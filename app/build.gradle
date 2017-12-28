@@ -23,6 +23,11 @@ android {
             targetCompatibility JavaVersion.VERSION_1_8
         }
     }
+    android.applicationVariants.all { variant ->
+        variant.outputs.all {
+            outputFileName = "werewolf-${defaultConfig.versionName}.apk"
+        }
+    }
 }
 
 dependencies {
