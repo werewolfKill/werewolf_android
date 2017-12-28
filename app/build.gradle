@@ -1,9 +1,8 @@
 apply plugin: 'com.android.application'
-apply plugin: 'me.tatarka.retrolambda'
 
 android {
     compileSdkVersion 25
-    buildToolsVersion "25.0.2"
+    buildToolsVersion '26.0.2'
     defaultConfig {
         applicationId "com.zinglabs.zwerewolf"
         minSdkVersion 21
@@ -23,8 +22,10 @@ android {
             sourceCompatibility JavaVersion.VERSION_1_8
             targetCompatibility JavaVersion.VERSION_1_8
         }
-        retrolambda {
-            javaVersion JavaVersion.VERSION_1_7
+    }
+    android.applicationVariants.all { variant ->
+        variant.outputs.all {
+            outputFileName = "werewolf-${defaultConfig.versionName}.apk"
         }
     }
 }
